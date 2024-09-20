@@ -1,0 +1,4 @@
+CREATE DATABASE proyecto2_ayd1;
+CREATE USER 'usuarioAyd1Proyecto2' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON proyecto2_ayd1.* TO 'usuarioAyd1Proyecto2';
+FLUSH PRIVILEGES;
