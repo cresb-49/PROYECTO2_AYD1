@@ -15,6 +15,12 @@ import { MatIconModule } from '@angular/material/icon';
 export class NavbarComponent implements OnInit {
   @Input() emptyNav = false;
 
+  navOptions= [
+    { name: 'Inicio', path: '/' },
+    { name: 'Acerca de', path: '/about' },
+    { name: 'Contacto', path: '/contact' },
+  ]
+
   constructor(
     private elementRef: ElementRef,
     public themeService: ThemeService,
