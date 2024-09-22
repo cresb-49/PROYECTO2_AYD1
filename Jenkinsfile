@@ -45,8 +45,9 @@ pipeline {
         }
         stage('Deploy Frontend') {
             steps {
+                echo 'Installing http-server...'
+                bat 'npm install -g http-server' // Instalar http-server globalmente
                 echo 'Deploying Frontend Application...'
-                bat 'npm install -g http-server'
                 bat 'http-server app_citas/dist -p 4200'
             }
         }
