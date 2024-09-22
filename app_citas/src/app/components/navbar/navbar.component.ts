@@ -1,4 +1,5 @@
 import { Component, HostListener, ElementRef, OnInit, Input } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../services/theme/theme.service';
 import { AuthService } from '../../services/auth/auth.service';
@@ -9,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [CommonModule, MatIconModule]
+  imports: [CommonModule, MatIconModule, RouterModule],
 })
 export class NavbarComponent implements OnInit {
   @Input() emptyNav = false;
