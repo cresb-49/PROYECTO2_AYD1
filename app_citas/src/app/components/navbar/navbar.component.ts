@@ -1,6 +1,7 @@
-import { Component, HostListener, ElementRef, OnInit } from '@angular/core';
+import { Component, HostListener, ElementRef, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ThemeService } from '../../services/theme.service';
+import { ThemeService } from '../../services/theme/theme.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -8,16 +9,25 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [CommonModule,MatIconModule]
+  imports: [CommonModule, MatIconModule]
 })
 export class NavbarComponent implements OnInit {
+  @Input() emptyNav = false;
 
-  constructor(private elementRef: ElementRef,public themeService: ThemeService) {}
+  constructor(
+    private elementRef: ElementRef,
+    public themeService: ThemeService,
+    private authService: AuthService
+  ) { }
   themeIcon = 'wb_sunny';
+  isLoggedIn = false;
 
   ngOnInit() {
+    // Cargamos el tema actual y asignamos el icono en la vista
     this.themeService.setTheme(this.themeService.currentTheme);
     this.setThemeIcon();
+    // Verificamos si el usuario está autenticado
+    this.isLoggedIn = this.authService.isLoggedIn();
   }
 
   // Cambiar el tema
