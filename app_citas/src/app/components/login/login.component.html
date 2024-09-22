@@ -1,21 +1,48 @@
-<mat-card class="card_login">
-  <mat-card-header>
-    <mat-card-title>Iniciar Sesión</mat-card-title>
-  </mat-card-header>
-  <mat-card-content class="mt-4">
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Correo Electrónico</mat-label>
-      <input matInput placeholder="Ingrese su correo">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Contraseña</mat-label>
-      <input matInput type="password" placeholder="Ingrese su contraseña">
-    </mat-form-field>
-  </mat-card-content>
-  <mat-card-actions>
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2 mr-2 mb-2 w-full">
-      Iniciar Sesión
-    </button>
-  </mat-card-actions>
-</mat-card>
+<div class="max-w-sm mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden p-6">
+  <div class="text-center">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Iniciar Sesión</h2>
+  </div>
+  <div class="space-y-4">
+    <!-- Campo de Correo Electrónico -->
+    <div class="flex flex-col">
+      <label for="email" class="text-gray-700 dark:text-gray-300 mb-1">Correo Electrónico</label>
+      <input
+        id="email"
+        type="email"
+        class="border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        placeholder="Ingrese su correo"
+      />
+    </div>
+    <!-- Campo de Contraseña -->
+    <div class="flex flex-col">
+      <label for="password" class="text-gray-700 dark:text-gray-300 mb-1">Contraseña</label>
+      <input
+        id="password"
+        type="password"
+        class="border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        placeholder="Ingrese su contraseña"
+      />
+    </div>
+    <!-- Botón de Iniciar Sesión -->
+    <div>
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full transition-colors duration-200"
+      >
+        Iniciar Sesión
+      </button>
+    </div>
+    <!-- Opción de Olvidaste tu Contraseña -->
+    <div class="text-center mt-2">
+      <a routerLink="/forgot-password" class="text-sm text-blue-500 hover:text-blue-700 transition-colors duration-200">
+        ¿Olvidaste tu contraseña?
+      </a>
+    </div>
+    <!-- Opción de Registro -->
+    <div class="text-center mt-4">
+      <span class="text-gray-600 dark:text-gray-400 text-sm">
+        ¿No tienes cuenta?
+        <a routerLink="/signup" class="text-blue-500 hover:text-blue-700 font-medium transition-colors duration-200">Regístrate</a>
+      </span>
+    </div>
+  </div>
+</div>

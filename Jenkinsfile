@@ -43,12 +43,10 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Frontend') {
+        stage('Restart Nginx') {
             steps {
-                echo 'Installing http-server...'
-                bat 'npm install -g http-server' // Instalar http-server globalmente
-                echo 'Deploying Frontend Application...'
-                bat 'http-server app_citas/dist -p 4200' // Desplegar la aplicación en el puerto 4200
+                echo 'Restarting Nginx...'
+                bat 'nginx -c C:\\nginx\\conf\\nginx.conf -s reload'
             }
         }
     }

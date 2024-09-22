@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -18,6 +19,7 @@ import { NgIf } from '@angular/common'; // Necesario para las directivas de cont
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    RouterModule,
     NgIf // Asegúrate de importar también las directivas de Angular
   ]
 })
