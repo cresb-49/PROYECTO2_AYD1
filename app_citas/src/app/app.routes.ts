@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home.component';
 import { NgModule } from '@angular/core';
 import { LoginComponent } from './components/login/login.component';
 import { SignupComponent } from './components/signup/signup.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -30,6 +31,9 @@ export const routes: Routes = [
       },
       {
         path: 'signup', component: SignupComponent
+      },
+      {
+        path: 'forgot-password', component: ForgotPasswordComponent
       }
     ]
   },
