@@ -42,11 +42,10 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Frontend') {
+        stage('Restart Nginx') {
             steps {
-                echo 'Deploying Frontend Application...'
-                bat 'npm install -g http-server'
-                bat 'http-server app_citas/dist -p 4200'
+                echo 'Restarting Nginx...'
+                bat 'nginx -c C:\\nginx\\conf\\nginx.conf -s reload'
             }
         }
     }
