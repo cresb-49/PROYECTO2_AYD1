@@ -1,20 +1,38 @@
-import { Component, HostListener, ElementRef } from '@angular/core';
+import { Component, HostListener, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../../services/theme.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   standalone: true,
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [CommonModule]
+  imports: [CommonModule,MatIconModule]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
+
+  constructor(private elementRef: ElementRef,public themeService: ThemeService) {}
+  themeIcon = 'wb_sunny';
+
+  ngOnInit() {
+    this.themeService.setTheme(this.themeService.currentTheme);
+    this.setThemeIcon();
+  }
+
+  // Cambiar el tema
+  toggleTheme() {
+    this.themeService.toggleTheme();
+    this.setThemeIcon();
+  }
+
+  // Establecer el icono según el tema
+  setThemeIcon() {
+    this.themeIcon = this.themeService.currentTheme === 'light' ? 'wb_sunny' : 'nightlight_round';
+  }
+
   userMenuOpen = false;
   navbarOpen = false;
-
-  constructor(private elementRef: ElementRef) {}
-
-  ngOnInit() {}
 
   toggleUserMenu() {
     this.userMenuOpen = !this.userMenuOpen;
