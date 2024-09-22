@@ -3,20 +3,24 @@ import { DefaultLayoutComponent } from './layout/default-layout/default-layout.c
 import { HomeComponent } from './components/home/home.component';
 import { NgModule } from '@angular/core';
 import { LoginComponent } from './components/login/login.component';
+import { SignupComponent } from './components/signup/signup.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component:DefaultLayoutComponent,
+    component: DefaultLayoutComponent,
     children: [
       {
-        path: '',component: HomeComponent
+        path: '', component: HomeComponent
       },
       {
-        path: 'home',component: HomeComponent
+        path: 'home', component: HomeComponent
       },
       {
-        path: 'login',component: LoginComponent
+        path: 'login', component: LoginComponent
+      },
+      {
+        path: 'signup', component: SignupComponent
       }
     ]
   }
@@ -27,4 +31,4 @@ export const routes: Routes = [
   exports: [RouterModule]
 })
 
-export class AppRoutingModule {}
+export class AppRoutingModule { }
