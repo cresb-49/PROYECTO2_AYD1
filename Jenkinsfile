@@ -48,7 +48,7 @@ pipeline {
                 echo 'Installing http-server...'
                 bat 'npm install -g http-server' // Instalar http-server globalmente
                 echo 'Deploying Frontend Application...'
-                bat 'http-server app_citas/dist -p 4200'
+                bat 'http-server app_citas/dist -p 4200' // Desplegar la aplicación en el puerto 4200
             }
         }
     }
