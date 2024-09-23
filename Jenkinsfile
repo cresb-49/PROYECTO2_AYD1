@@ -49,7 +49,7 @@ pipeline {
                 // y luego ejecutar el comando de reinicio de esa forma no dará error
                 dir('C:\\nginx') {
                     echo 'Restarting Nginx...'
-                    bat 'nginx -c C:\\nginx\\conf\\nginx.conf -s reload'
+                    bat 'nginx -s reload'
                 }
             }
         }
