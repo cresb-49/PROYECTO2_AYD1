@@ -10,6 +10,7 @@ import { SeeEmployeesComponent } from './views/see-employees/see-employees.compo
 import { EditEmployeeComponent } from './views/edit-employee/edit-employee.component';
 import { AdminDashboardComponent } from './views/admin-dashboard/admin-dashboard.component';
 import { EditCourtComponent } from './views/edit-court/edit-court.component';
+import { SeeCourtsComponent } from './views/see-courts/see-courts.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -25,6 +26,9 @@ export const routes: Routes = [
       },
       {
         path: 'empleados', component: SeeEmployeesComponent
+      },
+      {
+        path: 'canchas', component: SeeCourtsComponent
       },
       {
         path: 'edit-cancha/:id', component: EditCourtComponent
