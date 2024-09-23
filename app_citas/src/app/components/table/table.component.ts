@@ -29,11 +29,20 @@ export class TableComponent implements OnInit {
   ]
 
   @Input() actions: any[] = [
-    { name: 'Edit', icon: 'edit', route: '/edit-product', key: 'name' },
-    { name: 'Delete', icon: 'delete', route: '/delete-product', key: 'name' }
+    { name: 'Edit', icon: 'edit', route: '/edit-empleado', key: 'name'},
+    { name: 'Delete', icon: 'delete', action: this.helloOnTable, return: true },
   ]
 
   constructor() { }
+
+  public helloOnTable(value: any): void {
+    if (value) {
+      alert('Hello on table' + value);
+      console.log(value);
+    } else {
+      alert('Hello on table');
+    }
+  }
 
   ngOnInit() {
     if (this.useDataModel === false) {
@@ -45,16 +54,11 @@ export class TableComponent implements OnInit {
 
   public getValueByKey(key: string, value: any): any {
     // La informacion puede venir name o product.name, donde cada punto es un nivel mas profundo
-    console.log(key);
-
     const keys = key.split('.');
     let result = value;
     for (let i = 0; i < keys.length; i++) {
       result = result[keys[i]];
     }
-    console.log(result);
     return result;
-
   }
-
 }

@@ -18,10 +18,12 @@
           {{ getValueByKey(header.key,value) }}
         </th>
         <td class="px-6 py-4" *ngIf="actions.length > 0">
-          <a class=" mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline" *ngFor="let action of actions"
-            routerLink="value">
+          <button class="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
+            *ngFor="let action of actions"
+            (click)="!action.route && action.action((action.return??false) ? value : null)"
+            [routerLink]="action.route ? action.key ? (action.route+'/'+getValueByKey(action.key,value)) : action.route : null">
             {{action.name}}
-          </a>
+          </button>
         </td>
       </tr>
     </tbody>
