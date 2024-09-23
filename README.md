@@ -4,3 +4,5 @@ Proyecto 2 de Análisis y Diseño 1
 https://docs.google.com/document/d/1_fUfWfDKfEKnLCJ8C4qRNRm3_zT3IO9oHbHO7222CeE/edit?usp=sharing
 ## Diagrama de tablas
 https://drive.google.com/file/d/1_qejk2kEeJVTna8QKqLqDlKrtCjtnywF/view?usp=drive_link
+## Manual Tecnico
+https://docs.google.com/document/d/1GBK6KsoXLuUC5uthtX9OUsMGtsk4f0YhtyVnfLt0_Ps/edit?usp=sharing
