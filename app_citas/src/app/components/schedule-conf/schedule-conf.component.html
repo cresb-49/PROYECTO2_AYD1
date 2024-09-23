@@ -1,0 +1,21 @@
+<mat-card class="example-card w-[15rem] m-4" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>Dia: {{day}}</mat-card-title>
+      <mat-card-subtitle>Horario de Trabajo</mat-card-subtitle>
+      <mat-icon>wb_sunny</mat-icon>
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-card-content class="mt-4">
+    <div>
+      <mat-form-field class="w-full">
+        <mat-label>Inicio</mat-label>
+        <input matInput type="time" name="start" [(ngModel)]="start" required>
+      </mat-form-field>
+      <mat-form-field class="w-full">
+        <mat-label>Fin</mat-label>
+        <input matInput type="time" name="end" [(ngModel)]="end" required>
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+</mat-card>
