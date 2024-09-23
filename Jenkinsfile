@@ -45,8 +45,12 @@ pipeline {
         }
         stage('Restart Nginx') {
             steps {
-                echo 'Restarting Nginx...'
-                bat 'nginx -c C:\\nginx\\conf\\nginx.conf -s reload'
+                // Para que ngix no de error en el reinicio, hay que moverse primero a la carpeta de instalación
+                // y luego ejecutar el comando de reinicio de esa forma no dará error
+                dir('C:\\nginx') {
+                    echo 'Restarting Nginx...'
+                    bat 'nginx -c C:\\nginx\\conf\\nginx.conf -s reload'
+                }
             }
         }
     }
