@@ -6,6 +6,7 @@ import { NgModule } from '@angular/core';
 import { LoginComponent } from './components/login/login.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { SeeEmployeesComponent } from './views/see-employees/see-employees.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -18,6 +19,9 @@ export const routes: Routes = [
       },
       {
         path: 'home', component: HomeComponent
+      },
+      {
+        path: 'empleados', component: SeeEmployeesComponent
       }
     ]
   },
