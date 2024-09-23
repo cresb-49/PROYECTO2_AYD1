@@ -8,6 +8,7 @@ import { SignupComponent } from './components/signup/signup.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { SeeEmployeesComponent } from './views/see-employees/see-employees.component';
 import { EditEmployeeComponent } from './views/edit-employee/edit-employee.component';
+import { AdminDashboardComponent } from './views/admin-dashboard/admin-dashboard.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -26,6 +27,9 @@ export const routes: Routes = [
       },
       {
         path: 'edit-empleado/:id', component: EditEmployeeComponent
+      },
+      {
+        path: 'admin-dashboard', component: AdminDashboardComponent
       }
     ]
   },
