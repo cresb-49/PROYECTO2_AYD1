@@ -1,10 +1,9 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ScheduleConfComponent } from '../schedule-conf/schedule-conf.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ScheduleConfComponent],
+  imports: [CommonModule],
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']

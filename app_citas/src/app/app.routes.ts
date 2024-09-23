@@ -9,6 +9,7 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { SeeEmployeesComponent } from './views/see-employees/see-employees.component';
 import { EditEmployeeComponent } from './views/edit-employee/edit-employee.component';
 import { AdminDashboardComponent } from './views/admin-dashboard/admin-dashboard.component';
+import { EditCourtComponent } from './views/edit-court/edit-court.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -24,6 +25,9 @@ export const routes: Routes = [
       },
       {
         path: 'empleados', component: SeeEmployeesComponent
+      },
+      {
+        path: 'edit-cancha/:id', component: EditCourtComponent
       },
       {
         path: 'edit-empleado/:id', component: EditEmployeeComponent
