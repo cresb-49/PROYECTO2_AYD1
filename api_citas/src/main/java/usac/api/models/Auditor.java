@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class Auditor implements Serializable{
+public class Auditor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
