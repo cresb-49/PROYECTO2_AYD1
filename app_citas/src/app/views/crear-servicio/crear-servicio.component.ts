@@ -12,9 +12,22 @@ import { ScheduleConfComponent } from '../../components/schedule-conf/schedule-c
 })
 export class CrearServicioComponent implements OnInit {
 
+  activeButtonSave = false;
+  imageSrc: string = 'no-image-found.png'; // URL por defecto de la imagen
+
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imageSrc = e.target.result; // Actualiza la URL de la imagen
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
 }
