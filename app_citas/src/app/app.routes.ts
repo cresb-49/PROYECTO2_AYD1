@@ -11,6 +11,7 @@ import { EditEmployeeComponent } from './views/edit-employee/edit-employee.compo
 import { AdminDashboardComponent } from './views/admin-dashboard/admin-dashboard.component';
 import { EditCourtComponent } from './views/edit-court/edit-court.component';
 import { SeeCourtsComponent } from './views/see-courts/see-courts.component';
+import { ReservarCanchaComponent } from './views/reservar-cancha/reservar-cancha.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -38,6 +39,9 @@ export const routes: Routes = [
       },
       {
         path: 'admin-dashboard', component: AdminDashboardComponent
+      },
+      {
+        path: 'reservar-cancha/:id', component: ReservarCanchaComponent
       }
     ]
   },

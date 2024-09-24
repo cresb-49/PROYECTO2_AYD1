@@ -25,6 +25,8 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class ScheduleConfComponent {
+  @Input() isShowData = false;
+  @Input() showNonActive = true;
   @Input() data = [
     { day: 'Lunes', init: '08:00', end: '18:00', active: true },
     { day: 'Martes', init: '08:00', end: '18:00', active: true },
@@ -39,5 +41,12 @@ export class ScheduleConfComponent {
 
   cambiarEstado(dia: any) {
     dia.active = !dia.active;
+  }
+
+  filtroDataMostrar(){
+    if(this.showNonActive){
+      return this.data;
+    }
+    return this.data.filter((dia: any) => dia.active);
   }
 }
