@@ -7,11 +7,11 @@
         <img [src]="imageSrc" class="h-auto max-w-full max-h-[13.5rem]" alt="image description">
       </div>
       <div class="relative z-0 w-full mb-2 group">
-        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Subir Imagen</label>
         <input required
           class="block w-full mb-5 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           id="file_input" type="file" (change)="onFileSelected($event)">
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF</p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">Formatos permitidos: SVG, PNG, JPG o GIF</p>
       </div>
       <button type="submit"
         class="mt-4 mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full  px-5 py-2.5 text-center  dark:focus:ring-blue-800"
@@ -30,38 +30,36 @@
     <div class="relative z-0 w-full mb-5 group">
       <h5 class="text-xl font-bold dark:text-white mb-4">Información del Servicio</h5>
       <div class="relative z-0 w-full mb-4 group">
-        <label for="nombre_negocio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-        <input type="text" id="nombre_negocio" required
+        <label for="nombre_servicio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre del Servicio</label>
+        <input type="text" id="nombre_servicio" required
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2 mb-2">
         <div class="relative z-0 w-full mb-2 group">
-          <label for="admin_nombres" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo</label>
-          <input type="text" id="admin_nombres" required
+          <label for="costo_servicio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo del Servicio</label>
+          <input type="text" id="costo_servicio" required
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         </div>
         <div class="relative z-0 w-full mb-2 group">
-          <label for="admin_apellidos" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Duracion
-            (hrs)</label>
-          <input type="number" min="0.25" step="0.1" id="admin_apellidos" required
+          <label for="duracion_servicio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Duración (horas)</label>
+          <input type="number" min="0.25" step="0.1" id="duracion_servicio" required
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         </div>
       </div>
       <div class="relative z-0 w-full mb-3 group">
-        <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo
-          Empleado</label>
-        <select id="countries"
+        <label for="tipo_empleado" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Empleado</label>
+        <select id="tipo_empleado"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
           <option selected>Seleccionar</option>
-          <option value="US">Tipo 1</option>
-          <option value="CA">Tipo 2</option>
-          <option value="FR">Tipo 3</option>
-          <option value="DE">Tipo 4</option>
+          <option value="1">Tipo 1</option>
+          <option value="2">Tipo 2</option>
+          <option value="3">Tipo 3</option>
+          <option value="4">Tipo 4</option>
         </select>
       </div>
       <div class="relative z-0 w-full mb-2 group">
-        <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Detalles</label>
-        <textarea id="message" rows="4"
+        <label for="detalles_servicio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Detalles del Servicio</label>
+        <textarea id="detalles_servicio" rows="4"
           class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="Describe tu servicio..."></textarea>
       </div>
