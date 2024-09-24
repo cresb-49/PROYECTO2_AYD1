@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   standalone: true,
@@ -10,10 +11,12 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./agendar-cita.component.css']
 })
 export class AgendarCitaComponent implements OnInit {
+  enableCita = false;
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
+    this.enableCita = this.authService.isLoggedIn();
   }
 
 }
