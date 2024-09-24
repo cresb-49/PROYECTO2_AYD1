@@ -1,9 +1,5 @@
 <div class="w-full mt-4 pb-6">
   <div class="grid lg:grid-cols-4 lg:gap-6 md:grid-cols-2 md:gap-6 sm:grid-cols-1 sm:gap-6">
-    <app-card-actions class="mt-2" src="soccer_field.jpg" alt="Cancha de fut" title="Cancha 1" description="Dias: L, Ma, Mi, J, S"></app-card-actions>
-    <app-card-actions class="mt-2" src="soccer_field.jpg" alt="Cancha de fut" title="Cancha 2" description="Dias: L, Ma, Mi, J, S"></app-card-actions>
-    <app-card-actions class="mt-2" src="soccer_field.jpg" alt="Cancha de fut" title="Cancha 3" description="Dias: L, Ma, Mi, J, S"></app-card-actions>
-    <app-card-actions class="mt-2" src="soccer_field.jpg" alt="Cancha de fut" title="Cancha 4" description="Dias: L, Ma, Mi, J, S"></app-card-actions>
-    <app-card-actions class="mt-2" src="soccer_field.jpg" alt="Cancha de fut" title="Cancha 5" description="Dias: L, Ma, Mi, J, S"></app-card-actions>
+    <app-card-actions class="mt-2" src="soccer_field.jpg" alt="Cancha de fut" title="{{cancha.name}}" description="{{cancha.description}}" [actions]="setValueAction(cancha)" *ngFor="let cancha of canchas"></app-card-actions>
   </div>
 </div>
