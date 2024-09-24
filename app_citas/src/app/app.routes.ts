@@ -13,6 +13,8 @@ import { EditCourtComponent } from './views/edit-court/edit-court.component';
 import { SeeCourtsComponent } from './views/see-courts/see-courts.component';
 import { ReservarCanchaComponent } from './views/reservar-cancha/reservar-cancha.component';
 import { AgendarCitaComponent } from './views/agendar-cita/agendar-cita.component';
+import { CrearNegocioComponent } from './views/crear-negocio/crear-negocio.component';
+import { CrearServicioComponent } from './views/crear-servicio/crear-servicio.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -46,6 +48,12 @@ export const routes: Routes = [
       },
       {
         path: 'agendar-cita/:id', component: AgendarCitaComponent
+      },
+      {
+        path: 'crear-negocio', component: CrearNegocioComponent
+      },
+      {
+        path: 'crear-servicio', component: CrearServicioComponent
       }
     ]
   },
