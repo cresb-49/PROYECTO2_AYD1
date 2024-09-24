@@ -10,9 +10,12 @@ import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import usac.api.models.Auditor;
+import usac.api.models.Usuario;
 
 /**
  *
@@ -99,7 +102,17 @@ public class Service {
         return fallas;
     }
 
-    public boolean isUserAdmin(String email) {
+    public void verificarUsuarioJwt(Usuario usuarioTratar) throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailUsuarioAutenticado = authentication.getName();
+        // validar si el usuario tiene permiso de eliminar
+        if (!emailUsuarioAutenticado.equals(usuarioTratar.getEmail())
+                && !isUserAdmin(emailUsuarioAutenticado)) {
+            throw new Exception("No tienes permiso para realizar acciones a este usuario.");
+        }
+    }
+
+    private boolean isUserAdmin(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
     }

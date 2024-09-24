@@ -13,7 +13,7 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
     //Busqueda de usuario por email
     public Optional<Usuario> findByEmail(String email);
 
-    public Optional<Usuario> findByCodigoRecuperacion(String codigo);
+    public Optional<Usuario> findByTokenRecuperacion(String codigo);
 
     public Long deleteUsuarioById(Long id);
 
