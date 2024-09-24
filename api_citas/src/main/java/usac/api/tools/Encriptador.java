@@ -4,7 +4,6 @@ package usac.api.tools;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class Encriptador {
      * @param password
      * @return
      */
-    public static String encriptar(String password) {
+    public String encriptar(String password) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.encode(password);
     }
@@ -35,7 +34,7 @@ public class Encriptador {
      * @param passwordEncriptada
      * @return
      */
-    public static boolean compararPassword(String passwordSinEncriptar, String passwordEncriptada) {
+    public boolean compararPassword(String passwordSinEncriptar, String passwordEncriptada) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.matches(passwordSinEncriptar, passwordEncriptada);
     }
