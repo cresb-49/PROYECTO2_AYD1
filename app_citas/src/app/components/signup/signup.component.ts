@@ -1,13 +1,13 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { signUpCliente, UserService } from '../../services/user/user.service';
-
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-signup',
   standalone: true,
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css'],
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   encapsulation: ViewEncapsulation.None
 })
 export class SignupComponent {
@@ -26,6 +26,10 @@ export class SignupComponent {
     });
   }
 
+  clearForm() {
+    this.signupForm.reset();
+  }
+
   onSubmit() {
     if (this.signupForm.valid) {
       console.log(this.signupForm.value);
@@ -42,6 +46,7 @@ export class SignupComponent {
         {
           next: (data) => {
             console.log('response:', data);
+            this.clearForm();
           },
           error: (error) => {
             console.error('Error:', error);
