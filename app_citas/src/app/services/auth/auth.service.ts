@@ -5,11 +5,15 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
+  private token: string = ''; // Token de autenticación
+  private name: string = ''; // Nombre del usuario
+  private lastname: string = ''; // Apellido del usuario
+  private email: string = ''; // Correo electrónico del usuario
   private isAuthenticated = false; // Estado de autenticación
   private roles: string[] = []; // Roles del usuario
   private permissions: string[] = []; // Permisos del usuario
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   // Método para iniciar sesión
   login(email: string, password: string): boolean {
@@ -50,6 +54,26 @@ export class AuthService {
     return this.isAuthenticated || localStorage.getItem('isAuthenticated') === 'true';
   }
 
+  getToken(): string {
+    return this.token;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  getLastname(): string {
+    return this.lastname;
+  }
+
+  getEmail(): string {
+    return this.email;
+  }
+
+  getFullName(): string {
+    return `${this.name} ${this.lastname}`;
+  }
+
   // Obtener roles
   getUserRoles(): string[] {
     return this.roles.length > 0 ? this.roles : JSON.parse(localStorage.getItem('roles') || '[]');
@@ -68,5 +92,15 @@ export class AuthService {
   // Verificar si el usuario tiene un permiso específico
   hasPermission(permission: string): boolean {
     return this.getUserPermissions().includes(permission);
+  }
+
+  logOut(): void {
+    this.isAuthenticated = false;
+    this.roles = [];
+    this.permissions = [];
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('permissions');
+    this.router.navigate(['/login']);
   }
 }
