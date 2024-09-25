@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // Importa FormsModule para ngModel
+import { CommonModule } from '@angular/common';
 
 @Component({
   standalone: true,
@@ -14,6 +15,7 @@ import { FormsModule } from '@angular/forms'; // Importa FormsModule para ngMode
   styleUrls: ['./schedule-conf.component.css'],
   imports: [
     MatCardModule,
+    CommonModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -23,11 +25,28 @@ import { FormsModule } from '@angular/forms'; // Importa FormsModule para ngMode
   ],
 })
 export class ScheduleConfComponent {
-  @Input() day: string = 'Miercoles';
+  @Input() isShowData = false;
+  @Input() showNonActive = true;
+  @Input() data = [
+    { day: 'Lunes', init: '08:00', end: '18:00', active: true },
+    { day: 'Martes', init: '08:00', end: '18:00', active: true },
+    { day: 'Miércoles', init: '08:00', end: '18:00', active: true },
+    { day: 'Jueves', init: '08:00', end: '18:00', active: true },
+    { day: 'Viernes', init: '08:00', end: '18:00', active: true },
+    { day: 'Sábado', init: '08:00', end: '18:00', active: false },
+    { day: 'Domingo', init: '08:00', end: '18:00', active: false },
+  ];
 
-  // Inputs para las horas con valores por defecto
-  @Input() start: string = '08:00';
-  @Input() end: string = '18:00';
+  constructor() { }
 
-  constructor() {}
+  cambiarEstado(dia: any) {
+    dia.active = !dia.active;
+  }
+
+  filtroDataMostrar(){
+    if(this.showNonActive){
+      return this.data;
+    }
+    return this.data.filter((dia: any) => dia.active);
+  }
 }
