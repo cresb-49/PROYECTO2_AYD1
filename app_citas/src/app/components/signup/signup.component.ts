@@ -42,11 +42,9 @@ export class SignupComponent {
         {
           next: (data) => {
             console.log('response:', data);
-            this.toastr.success('Usuario creado exitosamente');
           },
           error: (error) => {
             console.error('Error:', error);
-            this.toastr.error('Error al crear el usuario');
           }
         }
       );
