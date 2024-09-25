@@ -7,7 +7,7 @@ export interface signUpCliente {
   apellidos: string;
   email: string;
   password: string;
-  telefono: string;
+  phone: string;
   nit: string;
   cui: string;
 }
@@ -19,7 +19,7 @@ export class UserService {
 
   constructor(private router: Router, private httpService: HttpService) { }
 
-  signUpCliente() {
-
+  signUpCliente(payload: signUpCliente) {
+    return this.httpService.post<any>('usuario/public/crearCliente', payload);
   }
 }
