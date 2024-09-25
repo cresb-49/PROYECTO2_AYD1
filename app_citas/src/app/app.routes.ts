@@ -18,6 +18,7 @@ import { CrearServicioComponent } from './views/crear-servicio/crear-servicio.co
 import { CreateUserAdminComponent } from './views/create-user-admin/create-user-admin.component';
 import { CreateUserAdminNegocioComponent } from './views/create-user-admin-negocio/create-user-admin-negocio.component';
 import { CrearEmpleadoComponent } from './views/crear-empleado/crear-empleado.component';
+import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -30,6 +31,9 @@ export const routes: Routes = [
       },
       {
         path: 'home', component: HomeComponent
+      },
+      {
+        path: 'calendar', component: MyCalendarComponent
       },
       {
         path: 'empleados', component: SeeEmployeesComponent
