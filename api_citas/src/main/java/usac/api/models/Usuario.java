@@ -32,13 +32,13 @@ public class Usuario extends Auditor {
 
     @NotBlank(message = "El cui del cliente no puede estar vacío.")
     @NotNull(message = "El cui del cliente no puede ser nulo")
-    @Size(min = 11, max = 12, message = "El teléfono del cliente debe tener entre 11 y 12 caracteres.")
+    @Size(min = 11, max = 12, message = "El nit del cliente debe tener entre 11 y 12 caracteres.")
     @Column(length = 13, unique = true)
     private String nit;
 
     @NotBlank(message = "El cui del cliente no puede estar vacío.")
     @NotNull(message = "El cui del cliente no puede ser nulo")
-    @Size(min = 11, max = 12, message = "El teléfono del cliente debe tener entre 11 y 12 caracteres.")
+    @Size(min = 11, max = 12, message = "El cui del cliente debe tener entre 11 y 12 caracteres.")
     @Column(length = 13, unique = true)
     private String cui;
 
