@@ -54,13 +54,13 @@ public class Usuario extends Auditor {
     @Column(length = 250)
     private String email;
 
-    @NotBlank(message = "El nombre del cliente no puede estar vacío.")
-    @Size(min = 1, max = 250, message = "El nombre del cliente debe tener entre 1 y 250 caracteres.")
+    @NotBlank(message = "Los nombres del cliente no puede estar vacío.")
+    @Size(min = 1, max = 250, message = "Los nombres del cliente debe tener entre 1 y 250 caracteres.")
     @Column(length = 250)
     private String nombres;
 
-    @NotBlank(message = "El nombre del cliente no puede estar vacío.")
-    @Size(min = 1, max = 250, message = "El nombre del cliente debe tener entre 1 y 250 caracteres.")
+    @NotBlank(message = "Los apellidos del cliente no puede estar vacío.")
+    @Size(min = 1, max = 250, message = "Los apellidos del cliente debe tener entre 1 y 250 caracteres.")
     @Column(length = 250)
     private String apellidos;
 
