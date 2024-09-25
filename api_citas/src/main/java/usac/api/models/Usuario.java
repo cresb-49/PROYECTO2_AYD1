@@ -4,8 +4,8 @@
  */
 package usac.api.models;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,9 +14,12 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.DynamicUpdate;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  *
@@ -54,7 +57,12 @@ public class Usuario extends Auditor {
     @NotBlank(message = "El nombre del cliente no puede estar vacío.")
     @Size(min = 1, max = 250, message = "El nombre del cliente debe tener entre 1 y 250 caracteres.")
     @Column(length = 250)
-    private String nombre;
+    private String nombres;
+
+    @NotBlank(message = "El nombre del cliente no puede estar vacío.")
+    @Size(min = 1, max = 250, message = "El nombre del cliente debe tener entre 1 y 250 caracteres.")
+    @Column(length = 250)
+    private String apellidos;
 
     @NotBlank(message = "La password del cliente no puede estar vacía.")
     @NotNull(message = "La password del cliente no puede ser nula.")
@@ -70,12 +78,13 @@ public class Usuario extends Auditor {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private List<RolUsuario> roles;
 
-    public Usuario(String nit, String cui, String phone, String email, String nombre, String password, String tokenRecuperacion) {
+    public Usuario(String nit, String cui, String phone, String email, String nombres, String apellidos, String password, String tokenRecuperacion) {
         this.nit = nit;
         this.cui = cui;
         this.phone = phone;
         this.email = email;
-        this.nombre = nombre;
+        this.nombres = nombres;
+        this.apellidos = apellidos;
         this.password = password;
         this.tokenRecuperacion = tokenRecuperacion;
     }
@@ -115,12 +124,19 @@ public class Usuario extends Auditor {
         this.email = email;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getNombres() {
+        return nombres;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 
     public String getPassword() {
