@@ -2,15 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
-import { AuthService } from '../auth/auth.service';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpService {
-  private baseUrl: string = 'https://localhost:8080'; // Cambia por tu URL base
+  private baseUrl: string = 'http://localhost:8080/api'; // Cambia por tu URL base
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient) { }
+
+  getToken(): string {
+    return localStorage.getItem('token') || '';
+  }
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Unknown error occurred';
@@ -34,7 +38,7 @@ export class HttpService {
   private getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.authService.getToken()}`,
+      Authorization: `Bearer ${this.getToken()}`,
     });
   }
 

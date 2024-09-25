@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpService } from '../http/http.service';
@@ -17,27 +18,27 @@ export class AuthService {
   constructor(private router: Router, private httpService: HttpService) { }
 
   // Método para iniciar sesión
-  // login(email: string, password: string): boolean {
-  //   const payload = {
-  //     email: email,
-  //     password: password
-  //   };
-  //   this.httpService.post<any>('auth/login', payload).subscribe(
-  //     {
-  //       next: (data) => {
-  //         console.log('response:', data);
-  //         this.isAuthenticated = true;
-  //         this.saveLocalStorage();
-  //       },
-  //       error: (error) => {
-  //         this.isAuthenticated = false;
-  //         console.error('Error:', error);
-  //         this.clearLocalStorage();
-  //       }
-  //     }
-  //   );
-  //   return this.isAuthenticated;
-  // }
+  login(email: string, password: string): boolean {
+    const payload = {
+      email: email,
+      password: password
+    };
+    this.httpService.post<any>('auth/login', payload).subscribe(
+      {
+        next: (data) => {
+          console.log('response:', data);
+          this.isAuthenticated = true;
+          this.saveLocalStorage();
+        },
+        error: (error) => {
+          this.isAuthenticated = false;
+          console.error('Error:', error);
+          this.clearLocalStorage();
+        }
+      }
+    );
+    return this.isAuthenticated;
+  }
 
   // Método para cerrar sesión
   logout(): void {

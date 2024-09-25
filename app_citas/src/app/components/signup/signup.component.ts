@@ -1,59 +1,57 @@
-import { Component ,ViewEncapsulation} from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon'; // Para íconos como el de visibilidad
-import { NgIf } from '@angular/common'; // Necesario para las directivas de control como *ngIf
-
+import { Component, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { signUpCliente, UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css',
-  imports: [
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    NgIf // Asegúrate de importar también las directivas de Angular
-  ],
+  styleUrls: ['./signup.component.css'],
+  imports: [ReactiveFormsModule],
   encapsulation: ViewEncapsulation.None
 })
 export class SignupComponent {
-  loginForm: FormGroup;
-  hide = true;
+  signupForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-    this.loginForm = this.fb.group({
+  constructor(private fb: FormBuilder, private userService: UserService) {
+    this.signupForm = this.fb.group({
+      nombres: ['', [Validators.required]],
+      apellidos: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      cui: ['', [Validators.required]],
+      nit: ['', [Validators.required]],
+      telefono: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
     });
   }
 
-  getErrorMessage(field: string): string {
-    const control = this.loginForm.get(field);
-    if (control?.hasError('required')) {
-      return 'Este campo es requerido';
-    }
-    if (control?.hasError('email')) {
-      return 'Correo inválido';
-    }
-    if (control?.hasError('minlength')) {
-      return 'Debe tener al menos 6 caracteres';
-    }
-    return '';
-  }
-
   onSubmit() {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-      console.log('Email:', email);
-      console.log('Password:', password);
-      // Aquí puedes hacer el envío del formulario al backend para autenticar al usuario
+    if (this.signupForm.valid) {
+      console.log(this.signupForm.value);
+      const payload: signUpCliente = {
+        nombres: this.signupForm.value.nombres,
+        apellidos: this.signupForm.value.apellidos,
+        email: this.signupForm.value.email,
+        cui: this.signupForm.value.cui,
+        nit: this.signupForm.value.nit,
+        phone: this.signupForm.value.telefono,
+        password: this.signupForm.value.password
+      };
+      this.userService.signUpCliente(payload).subscribe(
+        {
+          next: (data) => {
+            console.log('response:', data);
+            this.toastr.success('Usuario creado exitosamente');
+          },
+          error: (error) => {
+            console.error('Error:', error);
+            this.toastr.error('Error al crear el usuario');
+          }
+        }
+      );
+    } else {
+      console.error('Formulario inválido');
     }
   }
 }
