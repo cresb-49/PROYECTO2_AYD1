@@ -21,7 +21,7 @@ export class SignupComponent {
       cui: ['', [Validators.required]],
       nit: ['', [Validators.required]],
       telefono: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required]],
       confirmPassword: ['', [Validators.required]]
     });
   }
