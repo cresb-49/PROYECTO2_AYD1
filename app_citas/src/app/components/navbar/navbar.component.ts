@@ -18,8 +18,7 @@ export class NavbarComponent implements OnInit {
   navOptions= [
     { name: 'Inicio', path: '/' },
     { name: 'Canchas', path: '/canchas' },
-    { name: 'Acerca de', path: '/about' },
-    { name: 'Contacto', path: '/contact' },
+    { name: 'Calendario', path: '/calendar' },
   ]
 
   constructor(
