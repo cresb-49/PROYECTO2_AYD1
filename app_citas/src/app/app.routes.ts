@@ -16,7 +16,6 @@ import { AgendarCitaComponent } from './views/agendar-cita/agendar-cita.componen
 import { CrearNegocioComponent } from './views/crear-negocio/crear-negocio.component';
 import { CrearServicioComponent } from './views/crear-servicio/crear-servicio.component';
 import { CreateUserAdminComponent } from './views/create-user-admin/create-user-admin.component';
-import { CreateUserAdminNegocioComponent } from './views/create-user-admin-negocio/create-user-admin-negocio.component';
 import { CrearEmpleadoComponent } from './views/crear-empleado/crear-empleado.component';
 import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 
@@ -64,9 +63,6 @@ export const routes: Routes = [
       },
       {
         path: 'create-user-admin', component: CreateUserAdminComponent
-      },
-      {
-        path: 'create-user-admin-negocio', component: CreateUserAdminNegocioComponent
       },
       {
         path: 'crear-empleado', component: CrearEmpleadoComponent
