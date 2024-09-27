@@ -18,18 +18,18 @@ export interface DayMonthCalendarComponent {
   styleUrls: ['./calendar.component.css']
 })
 export class CalendarComponent implements OnInit {
-  weekDays: string[] = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+  weekDays: string[] = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
   monthNames: string[] = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
   currentDate: Date = new Date();
-  currentMonth: number = new Date().getMonth();
-  currentYear: number = new Date().getFullYear();
+  currentMonth: number = this.currentDate.getMonth();
+  currentYear: number = this.currentDate.getFullYear();
   diasMesActual: DayMonthCalendarComponent[] = [];
 
   constructor() { }
 
   ngOnInit() {
-    this.obtenerDiasMesActual();
     this.setMothAndYearByDate(this.currentDate);
+    this.obtenerDiasMesActual();
   }
 
   setMothAndYearByDate(date: Date): void {
@@ -38,33 +38,64 @@ export class CalendarComponent implements OnInit {
   }
 
   obtenerDiasMesActual() {
+    this.diasMesActual = []; // Reiniciamos la lista de días del mes
+
     // Obtenermos cuantos días tiene el mes actual
-    const diasMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-    console.log(diasMes);
+    const diasMes = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
     // Dia de la semana en que inicia el mes
-    const diaInicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay();
+    const diaInicioMes = new Date(this.currentYear, this.currentMonth, 1).getDay();
     // Dia de la semana en que termina el mes
-    const diaFinMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDay();
-    console.log(diaInicioMes);
-    console.log(diaFinMes);
+    const diaFinMes = new Date(this.currentYear, this.currentMonth + 1, 0).getDay();
+
+    // Añadir días del mes anterior si el mes no inicia en domingo
     if (!(diaInicioMes === 0)) {
-      //Obtenemos los ultimos x días del mes anterior
-      const diasMesAnterior = new Date(new Date().getFullYear(), new Date().getMonth(), 0).getDate();
+      const diasMesAnterior = new Date(this.currentYear, this.currentMonth, 0).getDate();
       for (let i = diasMesAnterior - diaInicioMes + 1; i <= diasMesAnterior; i++) {
-        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents: i % 2 === 0 });
+        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents: false });
       }
     }
+
+    // Añadir días del mes actual
     for (let i = 1; i <= diasMes; i++) {
       this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: true, showEvents: i % 2 === 0 });
     }
-    //Si el mes termina en sabado no agregamos más días del siguiente mes
+
+    // Añadir días del siguiente mes si el mes no termina en sábado
     if (!(diaFinMes === 6)) {
-      const dias_agregar = 7 - (diaFinMes + 1);
-      for (let i = 1; i <= dias_agregar; i++) {
-        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents: i % 2 === 0 });
+      const diasAgregar = 6 - diaFinMes;
+      for (let i = 1; i <= diasAgregar; i++) {
+        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents: false });
       }
     }
   }
 
+  previousMonth() {
+    // Decrementar el mes actual
+    if (this.currentMonth === 0) {
+      this.currentMonth = 11;
+      this.currentYear--;
+    } else {
+      this.currentMonth--;
+    }
+    this.currentDate = new Date(this.currentYear, this.currentMonth, 1);
+    this.obtenerDiasMesActual();
+  }
 
+  nextMonth() {
+    // Incrementar el mes actual
+    if (this.currentMonth === 11) {
+      this.currentMonth = 0;
+      this.currentYear++;
+    } else {
+      this.currentMonth++;
+    }
+    this.currentDate = new Date(this.currentYear, this.currentMonth, 1);
+    this.obtenerDiasMesActual();
+  }
+
+  goToCurrentMonth() {
+    this.currentDate = new Date(); // Reiniciamos a la fecha actual
+    this.setMothAndYearByDate(this.currentDate); // Actualizamos currentMonth y currentYear
+    this.obtenerDiasMesActual(); // Actualizamos los días del mes actual
+  }
 }
