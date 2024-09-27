@@ -1,0 +1,13 @@
+/* Aplica el estilo a la barra de desplazamiento dentro del contenedor específico */
+.flex::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+.flex::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5); /* Color semi-transparente (azul con 50% de opacidad) */
+  border-radius: 4px; /* Bordes redondeados */
+}
+
+.flex::-webkit-scrollbar-track {
+  background: transparent; /* Fondo transparente del track de la barra de desplazamiento */
+}
