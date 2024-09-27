@@ -6,7 +6,6 @@ export interface EventConfig {
   interval: string;
 }
 
-
 @Component({
   standalone: true,
   imports: [CommonModule],
@@ -29,13 +28,36 @@ export class MonthDayCalendarComponent implements OnInit {
     }
   ];
 
+  // Control de la visibilidad y contenido del popover
+  isPopoverVisible: boolean = false;
+  activePopover: 'reservations' | 'appointments' | null = null;
+  popoverPosition = { top: '0px', left: '0px' };
+
   constructor() { }
+
+  ngOnInit() {
+  }
 
   dayHasEvents(): boolean {
     return this.events.length > 0;
   }
 
-  ngOnInit() {
+  showPopover(type: 'reservations' | 'appointments'): void {
+    this.isPopoverVisible = true;
+    this.activePopover = type;
+    this.setPosition(); // Actualiza la posición del popover basado en el punto
   }
 
+  hidePopover(): void {
+    this.isPopoverVisible = false;
+    this.activePopover = null;
+  }
+
+  private setPosition(): void {
+    // Calcula la posición donde el popover debe aparecer
+    this.popoverPosition = {
+      top: '-20px', // Ajusta la posición vertical del popover
+      left: '-40px' // Ajusta la posición horizontal del popover
+    };
+  }
 }

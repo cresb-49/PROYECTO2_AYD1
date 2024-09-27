@@ -40,17 +40,17 @@ export class CalendarComponent implements OnInit {
       //Obtenemos los ultimos x días del mes anterior
       const diasMesAnterior = new Date(new Date().getFullYear(), new Date().getMonth(), 0).getDate();
       for (let i = diasMesAnterior - diaInicioMes + 1; i <= diasMesAnterior; i++) {
-        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents: false });
+        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents: i%2 === 0 });
       }
     }
     for (let i = 1; i <= diasMes; i++) {
-      this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: true, showEvents: true });
+      this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: true, showEvents:  i%2 === 0 });
     }
     //Si el mes termina en sabado no agregamos más días del siguiente mes
     if (!(diaFinMes === 6)) {
       const dias_agregar = 7 - (diaFinMes + 1);
       for (let i = 1; i <= dias_agregar; i++) {
-        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents: false });
+        this.diasMesActual.push({ numberDay: i, eventsConfig: [], isMonthDay: false, showEvents:  i%2 === 0 });
       }
     }
   }
