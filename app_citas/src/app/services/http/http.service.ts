@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import * as CryptoJS from 'crypto-js';
 
 export interface ApiResponse {
   code: number;
@@ -27,7 +28,11 @@ export class HttpService {
   constructor(private http: HttpClient) { }
 
   getToken(): string {
-    return localStorage.getItem('token') || '';
+    return this.decrypt(localStorage.getItem('token') || '');
+  }
+
+  private decrypt(data: string): string {
+    return CryptoJS.AES.decrypt(data, environment.encryptionKey).toString(CryptoJS.enc.Utf8);
   }
 
   private handleError(error: HttpErrorResponse) {
