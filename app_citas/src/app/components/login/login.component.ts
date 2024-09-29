@@ -3,7 +3,8 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+
 
 @Component({
   standalone: true,
@@ -12,18 +13,19 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.scss'],
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterModule
   ]
 })
 export class LoginComponent implements OnInit {
   email = '';
   password = '';
 
-  constructor(private router: Router,private toastr: ToastrService, private authService: AuthService) { }
+  constructor(private router: Router, private toastr: ToastrService, private authService: AuthService) { }
 
   ngOnInit() {
     //Si el usuario ya está autenticado, redirigirlo a la página de inicio
-    if(this.authService.isLoggedIn()){
+    if (this.authService.isLoggedIn()) {
       this.router.navigate(['/']);
     }
   }

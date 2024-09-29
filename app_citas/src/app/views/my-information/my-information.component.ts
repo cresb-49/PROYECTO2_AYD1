@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { AuthService } from '../../services/auth/auth.service';
+import { UpdateInfoUser, UserService } from '../../services/user/user.service';
+import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   standalone: true,
@@ -17,7 +21,12 @@ export class MyInformationComponent implements OnInit {
   activeButtonSave = false;
   activeChangePassword = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private authService: AuthService,
+    private toastr: ToastrService
+  ) {
     // Inicializamos los formularios con FormBuilder
     this.infoForm = this.fb.group({
       first_name: ['', [Validators.required, Validators.minLength(2)]],
@@ -35,14 +44,36 @@ export class MyInformationComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Escuchamos cambios en los formularios para habilitar los botones
+    // Escuchamos cambios en los formularios para habilitar los botones ademas los formularios tuvieron que ser modificados
     this.infoForm.statusChanges.subscribe(status => {
-      console.log('Status:', status);
-      this.activeButtonSave = status === 'VALID';
+      this.activeButtonSave = status === 'VALID' && this.infoForm.dirty;
     });
-
     this.passwordForm.statusChanges.subscribe(status => {
-      this.activeChangePassword = status === 'VALID';
+      this.activeChangePassword = status === 'VALID' && this.passwordForm.dirty;
+    });
+    //Obtenemos la información del usuario
+    this.getMyInformation();
+  }
+
+  getMyInformation() {
+    this.userService.getPerfil(this.authService.getId()).subscribe({
+      next: (data: ApiResponse) => {
+        this.setInfoForm(data.data);
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error');
+      }
+    });
+  }
+
+  private setInfoForm(data: any) {
+    this.infoForm.setValue({
+      first_name: data.nombres,
+      last_name: data.apellidos,
+      nit: data.nit,
+      phone: data.phone,
+      cui: data.cui,
+      email: data.email,
     });
   }
 
@@ -67,9 +98,28 @@ export class MyInformationComponent implements OnInit {
   // Métodos para manejar los formularios
   submitInfoForm() {
     if (this.infoForm.valid) {
-      console.log('Formulario Información:', this.infoForm.value);
+      const payload: UpdateInfoUser = {
+        id: this.authService.getId(),
+        nombres: this.infoForm.get('first_name')?.value,
+        apellidos: this.infoForm.get('last_name')?.value,
+        email: this.infoForm.get('email')?.value,
+        phone: this.infoForm.get('phone')?.value,
+        nit: this.infoForm.get('nit')?.value,
+        cui: this.infoForm.get('cui')?.value,
+      };
+      this.userService.changeUserInfo(payload).subscribe({
+        next: (data: ApiResponse) => {
+          this.toastr.success('Información actualizada', 'Éxito');
+          this.setInfoForm(data.data);
+          this.activeButtonSave = false;
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error');
+        }
+      });
     }
   }
+
 
   submitPasswordForm() {
     if (this.passwordForm.valid) {

@@ -89,7 +89,7 @@
         placeholder="•••••••••" />
       <div *ngIf="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched" class="text-red-600 text-sm mt-1">
         <span *ngIf="passwordForm.get('password')?.errors?.['required']">La contraseña es obligatoria.</span>
-        <span *ngIf="passwordForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres.</span>
+        <span *ngIf="passwordForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres.</span>
       </div>
     </div>
     <div class="mb-6">
@@ -100,7 +100,7 @@
         placeholder="•••••••••" />
       <div *ngIf="passwordForm.get('confirm_password')?.invalid && passwordForm.get('confirm_password')?.touched" class="text-red-600 text-sm mt-1">
         <span *ngIf="passwordForm.get('confirm_password')?.errors?.['required']">La confirmación es obligatoria.</span>
-        <span *ngIf="passwordForm.get('confirm_password')?.errors?.['minlength']">Debe tener al menos 8 caracteres.</span>
+        <span *ngIf="passwordForm.get('confirm_password')?.errors?.['minlength']">Debe tener al menos 6 caracteres.</span>
         <span *ngIf="passwordForm.get('confirm_password')?.errors?.['mismatch']">Las contraseñas no coinciden.</span>
       </div>
     </div>
