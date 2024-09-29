@@ -2,6 +2,22 @@ import { Component, Input, input, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+
+export interface TableHeader {
+  name: string;
+  key: string;
+  main?: boolean;
+}
+
+export interface TableAction {
+  name: string;
+  icon: string;
+  route?: string;
+  action?: (value: any) => void;
+  return?: boolean;
+  key?: string;
+}
+
 @Component({
   standalone: true,
   imports: [RouterModule, CommonModule],
@@ -13,7 +29,7 @@ export class TableComponent implements OnInit {
 
   @Input() useDataModel: boolean = false;
 
-  @Input() headers: any[] = [
+  @Input() headers: TableHeader[] = [
     { name: 'Product Name', key: 'name', main: true },
     { name: 'Color', key: 'color' },
     { name: 'Category', key: 'category' },
