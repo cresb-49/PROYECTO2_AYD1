@@ -12,6 +12,12 @@ export interface signUpCliente {
   cui: string;
 }
 
+export enum UserRoles {
+  CLIENTE = 'CLIENTE',
+  ADMIN = 'ADMIN',
+  EMPLEADO = 'EMPLEADO'
+}
+
 @Injectable({
   providedIn: 'root'
 })

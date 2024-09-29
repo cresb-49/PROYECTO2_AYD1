@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterModule, ScheduleConfComponent],
+  imports: [CommonModule, RouterModule, ScheduleConfComponent, FormsModule],
   selector: 'app-crear-negocio',
   templateUrl: './crear-negocio.component.html',
   styleUrls: ['./crear-negocio.component.css']

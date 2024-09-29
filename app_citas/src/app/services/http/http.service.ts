@@ -3,6 +3,19 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 
+export interface ApiResponse {
+  code: number;
+  message: string;
+  data: any;
+  warning: string;
+  error: string;
+  errors: any;
+  warnings: any;
+}
+
+export interface ErrorApiResponse extends ApiResponse {
+  sideError: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +31,7 @@ export class HttpService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Unknown error occurred';
+    let errorResponse = error.error as ErrorApiResponse;
     if (error.error instanceof ErrorEvent) {
       // Error del lado del cliente
       errorMessage = `Client-side error: ${error.error.message}`;
@@ -25,7 +39,7 @@ export class HttpService {
       // Error del lado del servidor
       errorMessage = `Server-side error: ${error.status} - ${error.message}`;
     }
-    return throwError(errorMessage);
+    return throwError({ ...errorResponse, sideError: errorMessage } as ErrorApiResponse);
   }
 
   private getHeaders(): HttpHeaders {

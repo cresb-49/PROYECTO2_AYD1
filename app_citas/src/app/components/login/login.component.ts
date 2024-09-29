@@ -1,12 +1,9 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon'; // Para íconos como el de visibilidad
-import { NgIf } from '@angular/common'; // Necesario para las directivas de control como *ngIf
+import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -14,46 +11,29 @@ import { NgIf } from '@angular/common'; // Necesario para las directivas de cont
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   imports: [
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    RouterModule,
-    NgIf // Asegúrate de importar también las directivas de Angular
+    CommonModule,
+    FormsModule
   ]
 })
-export class LoginComponent {
-  loginForm: FormGroup;
-  hide = true;
+export class LoginComponent implements OnInit {
+  email = '';
+  password = '';
 
-  constructor(private fb: FormBuilder) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
+  constructor(private router: Router,private toastr: ToastrService, private authService: AuthService) { }
+
+  ngOnInit() {
+    //Si el usuario ya está autenticado, redirigirlo a la página de inicio
+    if(this.authService.isLoggedIn()){
+      this.router.navigate(['/']);
+    }
   }
 
-  getErrorMessage(field: string): string {
-    const control = this.loginForm.get(field);
-    if (control?.hasError('required')) {
-      return 'Este campo es requerido';
-    }
-    if (control?.hasError('email')) {
-      return 'Correo inválido';
-    }
-    if (control?.hasError('minlength')) {
-      return 'Debe tener al menos 6 caracteres';
-    }
-    return '';
+
+  sendLogin() {
+    console.log('userName:', this.email);
+    console.log('password:', this.password);
+    let result = this.authService.login(this.email, this.password);
+    console.log('result:', result);
   }
 
-  onSubmit() {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-      console.log('Email:', email);
-      console.log('Password:', password);
-      // Aquí puedes hacer el envío del formulario al backend para autenticar al usuario
-    }
-  }
 }

@@ -1,7 +1,9 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { signUpCliente, UserService } from '../../services/user/user.service';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -10,10 +12,10 @@ import { CommonModule } from '@angular/common';
   imports: [ReactiveFormsModule, CommonModule],
   encapsulation: ViewEncapsulation.None
 })
-export class SignupComponent {
+export class SignupComponent implements OnInit {
   signupForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private userService: UserService) {
+  constructor(private fb: FormBuilder, private userService: UserService, private router: Router, private authService: AuthService) {
     this.signupForm = this.fb.group({
       nombres: ['', [Validators.required]],
       apellidos: ['', [Validators.required]],
@@ -24,6 +26,13 @@ export class SignupComponent {
       password: ['', [Validators.required]],
       confirmPassword: ['', [Validators.required]]
     });
+  }
+
+  ngOnInit() {
+    //Si el usuario ya está autenticado, redirigirlo a la página de inicio
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/']);
+    }
   }
 
   clearForm() {
