@@ -1,7 +1,9 @@
 
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpService } from '../http/http.service';
+import { ApiResponse, HttpService } from '../http/http.service';
+import { ToastrService } from 'ngx-toastr';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +16,13 @@ export class AuthService {
   private isAuthenticated = false; // Estado de autenticación
   private roles: string[] = []; // Roles del usuario
   private permissions: string[] = []; // Permisos del usuario
+  private authStatusSubject = new BehaviorSubject<boolean>(this.isLoggedIn());
 
-  constructor(private router: Router, private httpService: HttpService) { }
+  constructor(private router: Router, private httpService: HttpService, private toastr: ToastrService) { }
+
+  get authStatus$(): Observable<boolean> {
+    return this.authStatusSubject.asObservable();
+  }
 
   // Método para iniciar sesión
   login(email: string, password: string): boolean {
@@ -23,17 +30,22 @@ export class AuthService {
       email: email,
       password: password
     };
-    this.httpService.post<any>('auth/login', payload).subscribe(
+    this.httpService.post<any>('usuario/public/login', payload).subscribe(
       {
-        next: (data) => {
-          console.log('response:', data);
+        next: (data: ApiResponse) => {
           this.isAuthenticated = true;
-          this.saveLocalStorage();
+          console.log('response:', data.data);
+          this.saveLocalStorage(data.data);
+          this.toastr.success( `${this.getFullName()}`,'Bienvenido!');
+          this.authStatusSubject.next(true);
+          this.router.navigate(['/']);
         },
-        error: (error) => {
+        error: (error: ApiResponse) => {
           this.isAuthenticated = false;
-          console.error('Error:', error);
+          console.log('Error:', error);
+          this.toastr.error('Error', 'Credenciales inválidas');
           this.clearLocalStorage();
+          this.authStatusSubject.next(false);
         }
       }
     );
@@ -48,6 +60,7 @@ export class AuthService {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('roles');
     localStorage.removeItem('permissions');
+    this.authStatusSubject.next(false);
     this.router.navigate(['/login']);
   }
 
@@ -97,14 +110,14 @@ export class AuthService {
   }
 
   private saveLocalStorage(payload: any = null): void {
+    console.log('payload:', payload);
     if (payload) {
-      this.token = payload.token;
-      this.name = payload.name;
-      this.lastname = payload.lastname;
-      this.email = payload.email;
-      this.isAuthenticated = payload.isAuthenticated;
-      this.roles = payload.roles;
-      this.permissions = payload.permissions;
+      this.token = payload.jwt;
+      this.name = payload.usuario.nombres;
+      this.lastname = payload.usuario.apellidos;
+      this.email = payload.usuario.email;
+      this.roles = this.getPayloadRoles(payload.usuario.roles);
+      this.permissions = [];
     }
     localStorage.setItem('token', this.token);
     localStorage.setItem('name', this.name);
@@ -113,6 +126,10 @@ export class AuthService {
     localStorage.setItem('isAuthenticated', this.isAuthenticated.toString());
     localStorage.setItem('roles', JSON.stringify(this.roles));
     localStorage.setItem('permissions', JSON.stringify(this.permissions));
+  }
+
+  private getPayloadRoles(roles: any[]): string[] {
+    return roles.map((role: any) => role.rol.nombre);
   }
 
   private clearLocalStorage(): void {

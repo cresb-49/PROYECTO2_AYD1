@@ -12,6 +12,12 @@ export interface signUpCliente {
   cui: string;
 }
 
+export enum UserRoles {
+  CLIENTE = 'CLIENTE',
+  ADMIN = 'ADMIN',
+  EMPLEADO = 'EMPLEADO'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,5 +27,17 @@ export class UserService {
 
   signUpCliente(payload: signUpCliente) {
     return this.httpService.post<any>('usuario/public/crearCliente', payload);
+  }
+
+  getUser(id: number | string) {
+    return this.httpService.get<any>(`private/getUsuario/${id}`, null, true);
+  }
+
+  getUsers() {
+    return this.httpService.get<any>('private/getUsuarios', null, true);
+  }
+
+  getPerfil(id: number | string) {
+    return this.httpService.get<any>(`protected/getPerfil/${id}`, null, true);
   }
 }
