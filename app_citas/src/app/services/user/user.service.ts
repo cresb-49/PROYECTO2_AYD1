@@ -18,6 +18,11 @@ export enum UserRoles {
   EMPLEADO = 'EMPLEADO'
 }
 
+export interface RecoveryPasswordSend {
+  nuevaPassword: string;
+  codigo: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -61,5 +66,17 @@ export class UserService {
         }
       }
     );
+  }
+
+  sendNewPassword(payload: RecoveryPasswordSend) {
+    this.httpService.patch<any>('usuario/public/recuperarPassword', payload).subscribe({
+      next: (data: ApiResponse) => {
+        this.toastr.success('Contraseña cambiada con éxito');
+        this.router.navigate(['/login']);
+      },
+      error: (data: ErrorApiResponse) => {
+        this.toastr.error(data.error, 'Error al cambiar la contraseña');
+      }
+    });
   }
 }
