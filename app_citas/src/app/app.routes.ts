@@ -61,7 +61,7 @@ export const routes: Routes = [
         path: 'agendar-cita/:id', component: AgendarCitaComponent
       },
       {
-        path: 'crear-negocio', component: CrearNegocioComponent
+        path: 'negocio', component: CrearNegocioComponent
       },
       {
         path: 'crear-servicio', component: CrearServicioComponent
