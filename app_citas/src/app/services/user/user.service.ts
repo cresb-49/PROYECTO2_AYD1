@@ -12,6 +12,15 @@ export interface signUpCliente {
   cui: string;
 }
 
+export interface UpdateInfoUser {
+  nombres: string;
+  apellidos: string;
+  email: string;
+  phone: string;
+  nit: string;
+  cui: string;
+}
+
 export enum UserRoles {
   CLIENTE = 'CLIENTE',
   ADMIN = 'ADMIN',
@@ -78,5 +87,9 @@ export class UserService {
         this.toastr.error(data.error, 'Error al cambiar la contraseña');
       }
     });
+  }
+
+  changeUserInfo(payload: UpdateInfoUser) {
+    return this.httpService.patch<any>('usuario/protected/actualizarUsuarioSinPassword', payload, true);
   }
 }
