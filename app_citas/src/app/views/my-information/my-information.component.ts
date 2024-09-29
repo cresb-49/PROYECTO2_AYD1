@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from '../../services/auth/auth.service';
-import { UpdateInfoUser, UserService } from '../../services/user/user.service';
+import { UpdateInfoUser, UpdateUserPassword, UserService } from '../../services/user/user.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -40,6 +40,7 @@ export class MyInformationComponent implements OnInit {
     this.passwordForm = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirm_password: ['', [Validators.required, Validators.minLength(6)]],
+      current_password: ['', [Validators.required, Validators.minLength(6)]],
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -123,7 +124,23 @@ export class MyInformationComponent implements OnInit {
 
   submitPasswordForm() {
     if (this.passwordForm.valid) {
-      console.log('Formulario Contraseña:', this.passwordForm.value);
+      const payload: UpdateUserPassword = {
+        id: this.authService.getId(),
+        password: this.passwordForm.get('current_password')?.value,
+        newPassword: this.passwordForm.get('password')?.value
+      };
+      this.userService.changeUserPassword(payload).subscribe({
+        next: (data: ApiResponse) => {
+          this.toastr.success('Contraseña actualizada', 'Éxito');
+          this.passwordForm.reset();
+          this.activeChangePassword = false;
+          this.toastr.info('Por favor inicia sesión nuevamente', 'Información');
+          this.authService.logout();
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error');
+        }
+      })
     }
   }
 }

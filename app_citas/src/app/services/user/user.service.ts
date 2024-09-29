@@ -22,6 +22,12 @@ export interface UpdateInfoUser {
   cui: string;
 }
 
+export interface UpdateUserPassword {
+  id: number;
+  password: string;
+  newPassword: string;
+}
+
 export enum UserRoles {
   CLIENTE = 'CLIENTE',
   ADMIN = 'ADMIN',
@@ -92,5 +98,9 @@ export class UserService {
 
   changeUserInfo(payload: UpdateInfoUser) {
     return this.httpService.patch<any>('usuario/protected/actualizarUsuarioSinPassword', payload, true);
+  }
+
+  changeUserPassword(payload: UpdateUserPassword) {
+    return this.httpService.patch<any>('usuario/protected/cambiarPassword', payload, true);
   }
 }
