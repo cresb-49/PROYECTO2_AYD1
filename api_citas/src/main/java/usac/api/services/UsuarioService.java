@@ -17,8 +17,8 @@ import usac.api.models.Rol;
 import usac.api.models.RolUsuario;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
-import usac.api.models.dto.UserChangePasswordDTO;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
@@ -153,7 +153,7 @@ public class UsuarioService extends usac.api.services.Service {
      * el proceso de actualización de la contraseña.
      */
     @Transactional(rollbackOn = Exception.class)
-    public String cambiarPassword(UserChangePasswordDTO usuPassChange) throws Exception {
+    public String cambiarPassword(UserChangePasswordRequest usuPassChange) throws Exception {
         // Validamos que el ID del usuario no sea nulo o inválido
         if (usuPassChange.getId() == null || usuPassChange.getId() <= 0) {
             throw new Exception("Id inválido.");

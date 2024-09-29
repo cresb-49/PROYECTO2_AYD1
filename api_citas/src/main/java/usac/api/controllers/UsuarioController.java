@@ -27,8 +27,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
-import usac.api.models.dto.UserChangePasswordDTO;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.services.UsuarioService;
 import usac.api.tools.transformers.ApiBaseTransformer;
 
@@ -124,7 +124,7 @@ public class UsuarioController {
     })
     @PatchMapping("/protected/cambiarPassword")
     public ResponseEntity<?> cambiarPassword(
-            @Parameter(description = "ID del producto a buscar", required = true, example = "{id:1,password:\"xd\",newPassword:\"xdnt\"}") @RequestBody UserChangePasswordDTO requestBody) {
+            @Parameter(description = "ID del producto a buscar", required = true, example = "{id:1,password:\"xd\",newPassword:\"xdnt\"}") @RequestBody UserChangePasswordRequest requestBody) {
         try {
             String respuesta = usuarioService.cambiarPassword(requestBody);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
