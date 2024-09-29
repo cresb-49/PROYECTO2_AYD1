@@ -19,6 +19,7 @@ import { CreateUserAdminComponent } from './views/create-user-admin/create-user-
 import { CrearEmpleadoComponent } from './views/crear-empleado/crear-empleado.component';
 import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 import { MyInformationComponent } from './views/my-information/my-information.component';
+import { RecoveryPasswordComponent } from './views/recovery-password/recovery-password.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -86,6 +87,9 @@ export const routes: Routes = [
       },
       {
         path: 'forgot-password', component: ForgotPasswordComponent
+      },
+      {
+        path: 'password_reset/form', component: RecoveryPasswordComponent
       }
     ]
   },

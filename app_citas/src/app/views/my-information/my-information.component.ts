@@ -37,7 +37,6 @@ export class MyInformationComponent implements OnInit {
   ngOnInit() {
     // Escuchamos cambios en los formularios para habilitar los botones
     this.infoForm.statusChanges.subscribe(status => {
-      console.log('Status:', status);
       this.activeButtonSave = status === 'VALID';
     });
 
