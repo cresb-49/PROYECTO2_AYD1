@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import * as CryptoJS from 'crypto-js';
 
 export interface ApiResponse {
   code: number;
@@ -21,12 +23,16 @@ export interface ErrorApiResponse extends ApiResponse {
   providedIn: 'root',
 })
 export class HttpService {
-  private baseUrl: string = 'http://localhost:8080/api'; // Cambia por tu URL base
+  private baseUrl: string = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
   getToken(): string {
-    return localStorage.getItem('token') || '';
+    return this.decrypt(localStorage.getItem('token') || '');
+  }
+
+  private decrypt(data: string): string {
+    return CryptoJS.AES.decrypt(data, environment.encryptionKey).toString(CryptoJS.enc.Utf8);
   }
 
   private handleError(error: HttpErrorResponse) {

@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { ApiResponse, HttpService } from '../http/http.service';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, Observable } from 'rxjs';
+import * as CryptoJS from 'crypto-js';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -70,24 +72,32 @@ export class AuthService {
     return this.isAuthenticated || localStorage.getItem('isAuthenticated') === 'true';
   }
 
+  private encrypt(data: string): string {
+    return CryptoJS.AES.encrypt(data, environment.encryptionKey).toString();
+  }
+
+  private decrypt(data: string): string {
+    return CryptoJS.AES.decrypt(data, environment.encryptionKey).toString(CryptoJS.enc.Utf8);
+  }
+
   getId(): number {
-    return this.id !== 0 ? this.id : parseInt(localStorage.getItem('id') || '0');
+    return this.id !== 0 ? this.id : parseInt(this.getFromLocalStorage('id') || '0');
   }
 
   getToken(): string {
-    return this.token !== '' ? this.token : localStorage.getItem('token') || '';
+    return this.token !== '' ? this.token : this.getFromLocalStorage('token') || '';
   }
 
   getName(): string {
-    return this.name !== '' ? this.name : localStorage.getItem('name') || '';
+    return this.name !== '' ? this.name : this.getFromLocalStorage('name') || '';
   }
 
   getLastname(): string {
-    return this.lastname !== '' ? this.lastname : localStorage.getItem('lastname') || '';
+    return this.lastname !== '' ? this.lastname : this.getFromLocalStorage('lastname') || '';
   }
 
   getEmail(): string {
-    return this.email !== '' ? this.email : localStorage.getItem('email') || '';
+    return this.email !== '' ? this.email : this.getFromLocalStorage('email') || '';
   }
 
   getFullName(): string {
@@ -96,12 +106,12 @@ export class AuthService {
 
   // Obtener roles
   getUserRoles(): string[] {
-    return this.roles.length > 0 ? this.roles : JSON.parse(localStorage.getItem('roles') || '[]');
+    return this.roles.length > 0 ? this.roles : JSON.parse(this.getFromLocalStorage('roles') || '[]');
   }
 
   // Obtener permisos
   getUserPermissions(): string[] {
-    return this.permissions.length > 0 ? this.permissions : JSON.parse(localStorage.getItem('permissions') || '[]');
+    return this.permissions.length > 0 ? this.permissions : JSON.parse(this.getFromLocalStorage('permissions') || '[]');
   }
 
   // Verificar si el usuario tiene un rol específico
@@ -124,14 +134,14 @@ export class AuthService {
       this.roles = this.getPayloadRoles(payload.usuario.roles);
       this.permissions = [];
     }
-    localStorage.setItem('id', this.id.toString());
-    localStorage.setItem('token', this.token);
-    localStorage.setItem('name', this.name);
-    localStorage.setItem('lastname', this.lastname);
-    localStorage.setItem('email', this.email);
-    localStorage.setItem('isAuthenticated', this.isAuthenticated.toString());
-    localStorage.setItem('roles', JSON.stringify(this.roles));
-    localStorage.setItem('permissions', JSON.stringify(this.permissions));
+    this.setToLocalStorage('id', this.id.toString());
+    this.setToLocalStorage('token', this.token);
+    this.setToLocalStorage('name', this.name);
+    this.setToLocalStorage('lastname', this.lastname);
+    this.setToLocalStorage('email', this.email);
+    this.setToLocalStorage('isAuthenticated', this.isAuthenticated.toString());
+    this.setToLocalStorage('roles', JSON.stringify(this.roles));
+    this.setToLocalStorage('permissions', JSON.stringify(this.permissions));
   }
 
   private getPayloadRoles(roles: any[]): string[] {
@@ -159,5 +169,18 @@ export class AuthService {
   logOut(): void {
     this.clearLocalStorage();
     this.router.navigate(['/login']);
+  }
+
+  private setToLocalStorage(key: string, value: string): void {
+    const encryptedValue = this.encrypt(value);
+    localStorage.setItem(key, encryptedValue);
+  }
+
+  private getFromLocalStorage(key: string): string | null {
+    const encryptedValue = localStorage.getItem(key);
+    if (encryptedValue) {
+      return this.decrypt(encryptedValue);
+    }
+    return null;
   }
 }

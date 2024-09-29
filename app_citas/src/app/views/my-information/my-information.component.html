@@ -8,9 +8,11 @@
         <input type="text" id="first_name" formControlName="first_name"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="John" />
-        <div *ngIf="infoForm.get('first_name')?.invalid && infoForm.get('first_name')?.touched" class="text-red-600 text-sm mt-1">
+        <div *ngIf="infoForm.get('first_name')?.invalid && infoForm.get('first_name')?.touched"
+          class="text-red-600 text-sm mt-1">
           <span *ngIf="infoForm.get('first_name')?.errors?.['required']">El nombre es obligatorio.</span>
-          <span *ngIf="infoForm.get('first_name')?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres.</span>
+          <span *ngIf="infoForm.get('first_name')?.errors?.['minlength']">El nombre debe tener al menos 2
+            caracteres.</span>
         </div>
       </div>
       <div>
@@ -18,9 +20,11 @@
         <input type="text" id="last_name" formControlName="last_name"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="Doe" />
-        <div *ngIf="infoForm.get('last_name')?.invalid && infoForm.get('last_name')?.touched" class="text-red-600 text-sm mt-1">
+        <div *ngIf="infoForm.get('last_name')?.invalid && infoForm.get('last_name')?.touched"
+          class="text-red-600 text-sm mt-1">
           <span *ngIf="infoForm.get('last_name')?.errors?.['required']">El apellido es obligatorio.</span>
-          <span *ngIf="infoForm.get('last_name')?.errors?.['minlength']">El apellido debe tener al menos 2 caracteres.</span>
+          <span *ngIf="infoForm.get('last_name')?.errors?.['minlength']">El apellido debe tener al menos 2
+            caracteres.</span>
         </div>
       </div>
       <div>
@@ -54,7 +58,8 @@
         </div>
       </div>
       <div>
-        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo Electrónico</label>
+        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo
+          Electrónico</label>
         <input type="email" id="email" formControlName="email"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="john.doe@company.com" />
@@ -83,13 +88,27 @@
   <form [formGroup]="passwordForm" (ngSubmit)="submitPasswordForm()">
     <h4 class="text-2xl font-bold dark:text-white mb-4">Cambiar Contraseña</h4>
     <div class="mb-6">
+      <label for="current_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contraseña Actual</label>
+      <input type="password" id="current_password" formControlName="current_password"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="•••••••••" />
+      <div *ngIf="passwordForm.get('current_password')?.invalid && passwordForm.get('current_password')?.touched"
+        class="text-red-600 text-sm mt-1">
+        <span *ngIf="passwordForm.get('current_password')?.errors?.['required']">La contraseña es obligatoria.</span>
+        <span *ngIf="passwordForm.get('current_password')?.errors?.['minlength']">La contraseña debe tener al menos 6
+          caracteres.</span>
+      </div>
+    </div>
+    <div class="mb-6">
       <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contraseña</label>
       <input type="password" id="password" formControlName="password"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="•••••••••" />
-      <div *ngIf="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched" class="text-red-600 text-sm mt-1">
+      <div *ngIf="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched"
+        class="text-red-600 text-sm mt-1">
         <span *ngIf="passwordForm.get('password')?.errors?.['required']">La contraseña es obligatoria.</span>
-        <span *ngIf="passwordForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres.</span>
+        <span *ngIf="passwordForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6
+          caracteres.</span>
       </div>
     </div>
     <div class="mb-6">
@@ -98,9 +117,11 @@
       <input type="password" id="confirm_password" formControlName="confirm_password"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="•••••••••" />
-      <div *ngIf="passwordForm.get('confirm_password')?.invalid && passwordForm.get('confirm_password')?.touched" class="text-red-600 text-sm mt-1">
+      <div *ngIf="passwordForm.get('confirm_password')?.invalid && passwordForm.get('confirm_password')?.touched"
+        class="text-red-600 text-sm mt-1">
         <span *ngIf="passwordForm.get('confirm_password')?.errors?.['required']">La confirmación es obligatoria.</span>
-        <span *ngIf="passwordForm.get('confirm_password')?.errors?.['minlength']">Debe tener al menos 6 caracteres.</span>
+        <span *ngIf="passwordForm.get('confirm_password')?.errors?.['minlength']">Debe tener al menos 6
+          caracteres.</span>
         <span *ngIf="passwordForm.get('confirm_password')?.errors?.['mismatch']">Las contraseñas no coinciden.</span>
       </div>
     </div>
