@@ -9,6 +9,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+  private id: number = 0; // ID del usuario
   private token: string = ''; // Token de autenticación
   private name: string = ''; // Nombre del usuario
   private lastname: string = ''; // Apellido del usuario
@@ -36,7 +37,7 @@ export class AuthService {
           this.isAuthenticated = true;
           console.log('response:', data.data);
           this.saveLocalStorage(data.data);
-          this.toastr.success( `${this.getFullName()}`,'Bienvenido!');
+          this.toastr.success(`${this.getFullName()}`, 'Bienvenido!');
           this.authStatusSubject.next(true);
           this.router.navigate(['/']);
         },
@@ -67,6 +68,10 @@ export class AuthService {
   // Verificar si el usuario está autenticado
   isLoggedIn(): boolean {
     return this.isAuthenticated || localStorage.getItem('isAuthenticated') === 'true';
+  }
+
+  getId(): number {
+    return this.id !== 0 ? this.id : parseInt(localStorage.getItem('id') || '0');
   }
 
   getToken(): string {
@@ -110,8 +115,8 @@ export class AuthService {
   }
 
   private saveLocalStorage(payload: any = null): void {
-    console.log('payload:', payload);
     if (payload) {
+      this.id = payload.usuario.id;
       this.token = payload.jwt;
       this.name = payload.usuario.nombres;
       this.lastname = payload.usuario.apellidos;
@@ -119,6 +124,7 @@ export class AuthService {
       this.roles = this.getPayloadRoles(payload.usuario.roles);
       this.permissions = [];
     }
+    localStorage.setItem('id', this.id.toString());
     localStorage.setItem('token', this.token);
     localStorage.setItem('name', this.name);
     localStorage.setItem('lastname', this.lastname);
@@ -140,6 +146,7 @@ export class AuthService {
     this.isAuthenticated = false;
     this.roles = [];
     this.permissions = [];
+    localStorage.removeItem('id');
     localStorage.removeItem('token');
     localStorage.removeItem('name');
     localStorage.removeItem('lastname');

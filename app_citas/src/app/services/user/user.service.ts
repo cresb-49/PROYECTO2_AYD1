@@ -13,6 +13,7 @@ export interface signUpCliente {
 }
 
 export interface UpdateInfoUser {
+  id: number;
   nombres: string;
   apellidos: string;
   email: string;
@@ -56,7 +57,7 @@ export class UserService {
   }
 
   getPerfil(id: number | string) {
-    return this.httpService.get<any>(`protected/getPerfil/${id}`, null, true);
+    return this.httpService.get<any>(`usuario/protected/getPerfil/${id}`, null, true);
   }
 
   sendRecoveryEmail(correoElectronico: string) {
