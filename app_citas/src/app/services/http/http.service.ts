@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface ApiResponse {
   code: number;
@@ -21,7 +22,7 @@ export interface ErrorApiResponse extends ApiResponse {
   providedIn: 'root',
 })
 export class HttpService {
-  private baseUrl: string = 'http://localhost:8080/api'; // Cambia por tu URL base
+  private baseUrl: string = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
