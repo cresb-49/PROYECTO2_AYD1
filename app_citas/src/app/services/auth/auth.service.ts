@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiResponse, HttpService } from '../http/http.service';
 import { ToastrService } from 'ngx-toastr';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,13 @@ export class AuthService {
   private isAuthenticated = false; // Estado de autenticación
   private roles: string[] = []; // Roles del usuario
   private permissions: string[] = []; // Permisos del usuario
+  private authStatusSubject = new BehaviorSubject<boolean>(this.isLoggedIn());
 
   constructor(private router: Router, private httpService: HttpService, private toastr: ToastrService) { }
+
+  get authStatus$(): Observable<boolean> {
+    return this.authStatusSubject.asObservable();
+  }
 
   // Método para iniciar sesión
   login(email: string, password: string): boolean {
@@ -31,6 +37,7 @@ export class AuthService {
           console.log('response:', data.data);
           this.saveLocalStorage(data.data);
           this.toastr.success( `${this.getFullName()}`,'Bienvenido!');
+          this.authStatusSubject.next(true);
           this.router.navigate(['/']);
         },
         error: (error: ApiResponse) => {
@@ -38,6 +45,7 @@ export class AuthService {
           console.log('Error:', error);
           this.toastr.error('Error', 'Credenciales inválidas');
           this.clearLocalStorage();
+          this.authStatusSubject.next(false);
         }
       }
     );
@@ -52,6 +60,7 @@ export class AuthService {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('roles');
     localStorage.removeItem('permissions');
+    this.authStatusSubject.next(false);
     this.router.navigate(['/login']);
   }
 
