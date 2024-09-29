@@ -1,22 +1,22 @@
-package usac.api.models.dto;
+package usac.api.models.request;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserChangePasswordDTO {
+public class UserChangePasswordRequest {
     private Long id;
     private String email;
     private String password;
     private String newPassword;
 
-    public UserChangePasswordDTO(Long id,String email, String password, String newPassword) {
+    public UserChangePasswordRequest(Long id,String email, String password, String newPassword) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.newPassword = newPassword;
     }
 
-    public UserChangePasswordDTO() {
+    public UserChangePasswordRequest() {
     }
 
     public Long getId() {
