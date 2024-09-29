@@ -29,8 +29,8 @@ export class MyInformationComponent implements OnInit {
     });
 
     this.passwordForm = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirm_password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirm_password: ['', [Validators.required, Validators.minLength(6)]],
     }, { validators: this.passwordMatchValidator });
   }
 
