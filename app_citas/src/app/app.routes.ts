@@ -20,6 +20,7 @@ import { CrearEmpleadoComponent } from './views/crear-empleado/crear-empleado.co
 import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 import { MyInformationComponent } from './views/my-information/my-information.component';
 import { RecoveryPasswordComponent } from './views/recovery-password/recovery-password.component';
+import { SeeUsersComponent } from './views/see-users/see-users.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -61,7 +62,10 @@ export const routes: Routes = [
         path: 'agendar-cita/:id', component: AgendarCitaComponent
       },
       {
-        path: 'crear-negocio', component: CrearNegocioComponent
+        path: 'negocio', component: CrearNegocioComponent
+      },
+      {
+        path: 'usuarios', component: SeeUsersComponent
       },
       {
         path: 'crear-servicio', component: CrearServicioComponent

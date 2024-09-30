@@ -1,13 +1,18 @@
 <section class="px-20">
-
-  <h3 class="text-3xl font-bold dark:text-white">Crear un Negocio</h3>
-
+  <h3 class="text-3xl font-bold dark:text-white">Mi Negocio</h3>
   <form class="w-full mt-4 pb-6">
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-2">
       <div class="relative z-0 w-full mb-4 group">
+        <h5 class="text-xl font-bold dark:text-white mb-4">Información del Negocio</h5>
+        <div class="relative z-0 w-full mb-4 group">
+          <label for="nombre_negocio"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
+          <input type="text" id="nombre_negocio" required
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        </div>
         <h5 class="text-xl font-bold dark:text-white mb-4">Logo del Negocio</h5>
         <div class="relative z-0 w-full mb-2 group flex justify-center items-center">
-          <img [src]="imageSrc" class="h-auto max-w-full max-h-[16.5rem]" alt="image description">
+          <img [src]="imageSrc" class="h-auto max-w-full max-h-[20rem]" alt="image description">
         </div>
         <div class="relative z-0 w-full mb-2 group">
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload
@@ -17,66 +22,24 @@
             id="file_input" type="file" (change)="onFileSelected($event)">
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF</p>
         </div>
-        <button type="submit"
-          class="mt-4 mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full  px-5 py-2.5 text-center  dark:focus:ring-blue-800"
-          [ngClass]="{
-          'cursor-not-allowed': !activeButtonSave ,
-          'hover:bg-blue-800': activeButtonSave ,
-          'dark:hover:bg-blue-700': activeButtonSave,
-          'bg-blue-700': activeButtonSave,
-          'bg-blue-400': !activeButtonSave,
-          'dark:bg-blue-600': activeButtonSave,
-          'dark:bg-blue-500': !activeButtonSave
-        }" [disabled]="!activeButtonSave">
-          Crear Negocio
-        </button>
       </div>
-      <div class="relative z-0 w-full mb-5 group">
-        <h5 class="text-xl font-bold dark:text-white mb-4">Información del Negocio</h5>
-        <div class="relative z-0 w-full mb-4 group">
-          <label for="nombre_negocio"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-          <input type="text" id="nombre_negocio" required
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
-        <h5 class="text-xl font-bold dark:text-white mb-4">Admin del Negocio</h5>
-        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2">
-          <div class="relative z-0 w-full mb-2 group">
-            <label for="admin_nombres"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombres</label>
-            <input type="text" id="admin_nombres" required
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          </div>
-          <div class="relative z-0 w-full mb-2 group">
-            <label for="admin_apellidos"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apellidos</label>
-            <input type="text" id="admin_apellidos" required
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          </div>
-        </div>
-        <div class="relative z-0 w-full mb-2 group">
-          <label for="admin_email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-          <input type="email" id="admin_email" required
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
-        <div class="relative z-0 w-full mb-2 group">
-          <label for="admin_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Contraseña
-          </label>
-          <input type="password" id="admin_password" required
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
-        <div class="relative z-0 w-full mb-2 group">
-          <label for="admin_confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Confirmar Contraseña
-          </label>
-          <input type="password" id="admin_confirm_password" required
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
+      <div class="relative z-0 w-full mb-4 group">
+        <h5 class="text-xl font-bold dark:text-white mb-4">Configuración del Horario</h5>
+        <app-schedule-conf></app-schedule-conf>
       </div>
     </div>
-    <h4 class="text-2xl font-bold dark:text-white">Configuración del Horario</h4>
-    <app-schedule-conf></app-schedule-conf>
+    <button type="submit"
+      class=" mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full  px-5 py-2.5 text-center  dark:focus:ring-blue-800"
+      [ngClass]="{
+        'cursor-not-allowed': !activeButtonSave ,
+        'hover:bg-blue-800': activeButtonSave ,
+        'dark:hover:bg-blue-700': activeButtonSave,
+        'bg-blue-700': activeButtonSave,
+        'bg-blue-400': !activeButtonSave,
+        'dark:bg-blue-600': activeButtonSave,
+        'dark:bg-blue-500': !activeButtonSave
+      }" [disabled]="!activeButtonSave">
+      Actuializar Negocio
+    </button>
   </form>
-
 </section>

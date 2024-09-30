@@ -69,7 +69,7 @@ export class AuthService {
 
   // Verificar si el usuario está autenticado
   isLoggedIn(): boolean {
-    return this.isAuthenticated || localStorage.getItem('isAuthenticated') === 'true';
+    return this.isAuthenticated || this.getFromLocalStorage('isAuthenticated') === 'true';
   }
 
   private encrypt(data: string): string {
