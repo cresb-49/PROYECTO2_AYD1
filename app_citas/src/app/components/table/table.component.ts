@@ -44,8 +44,8 @@ export class TableComponent implements OnInit {
     { name: 'Product 5', color: 'purple', category: 'category 5', price: 500 }
   ]
 
-  @Input() actions: any[] = [
-    { name: 'Edit', icon: 'edit', route: '/edit-empleado', key: 'name'},
+  @Input() actions: TableAction[] = [
+    { name: 'Edit', icon: 'edit', route: '/edit-empleado', key: 'name' },
     { name: 'Delete', icon: 'delete', action: this.helloOnTable, return: true },
   ]
 
@@ -76,5 +76,13 @@ export class TableComponent implements OnInit {
       result = result[keys[i]];
     }
     return result;
+  }
+
+  executeAction(action: any, value: any): void {
+    if (!action.route) {
+      if (action.action) {
+        action.action(action.return ? value : null);
+      }
+    }
   }
 }
