@@ -11,12 +11,14 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
@@ -176,23 +178,34 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_Success() throws Exception {
-        // Crear un usuario con un ID válido
+        // Crear una solicitud de cambio de contraseña con datos válidos
         UserChangePasswordRequest usuario = new UserChangePasswordRequest();
         usuario.setId(1L);
         usuario.setPassword("oldPassword");
         usuario.setNewPassword("newPassword");
 
-
+        // Simulación del usuario encontrado en la base de datos
         Usuario usuarioEncontrado = new Usuario();
         usuarioEncontrado.setId(1L);
         usuarioEncontrado.setPassword("oldPassword");
 
+        when(encriptador.compararPassword(usuario.getPassword(),
+                usuarioEncontrado.getPassword())).
+                thenReturn(Boolean.TRUE);
+
+        // Simular búsqueda del usuario por ID
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEncontrado));
+
+        // Simular encriptado de la nueva contraseña
         when(encriptador.encriptar("newPassword")).thenReturn("encryptedPassword");
+
+        // Simular que la actualización del usuario es exitosa
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioEncontrado);
 
+        // Ejecutar el método de cambio de contraseña
         String resultado = usuarioService.cambiarPassword(usuario);
 
+        // Verificación del resultado y del encriptado
         assertEquals("Se cambió tu contraseña con éxito.", resultado);
         assertEquals("encryptedPassword", usuarioEncontrado.getPassword());
         verify(usuarioRepository, times(1)).save(usuarioEncontrado);
@@ -200,16 +213,27 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_InvalidId() {
-        // Crear un usuario con un ID inválido
+        // Crear un usuario con un ID inválido (null)
         UserChangePasswordRequest usuario = new UserChangePasswordRequest();
-        usuario.setId(null);
+        usuario.setId(null);  // ID inválido
         usuario.setPassword("oldPassword");
         usuario.setNewPassword("newPassword");
 
+        Set<ConstraintViolation<UserChangePasswordRequest>> violations = new HashSet<>();
+        ConstraintViolation<UserChangePasswordRequest> violation = mock(
+                ConstraintViolation.class);
+
+        when(violation.getMessage()).thenReturn("El id no puede ser nulo.");
+        violations.add(violation);
+        when(validator.validate(any(UserChangePasswordRequest.class))).thenReturn(violations);
+
+        // Verificamos que se lanza una excepción debido a la validación del ID
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.cambiarPassword(usuario);
         });
-        assertEquals("Id inválido.", exception.getMessage());
+
+        // Verificar que el mensaje de la excepción sea por el ID nulo
+        assertEquals("El id no puede ser nulo.\n", exception.getMessage());
     }
 
     @Test
@@ -230,41 +254,61 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_UpdateFail() throws Exception {
-        // Crear un usuario con un ID válido
+        // Crear una solicitud de cambio de contraseña con datos válidos
         UserChangePasswordRequest usuario = new UserChangePasswordRequest();
         usuario.setId(1L);
         usuario.setPassword("oldPassword");
         usuario.setNewPassword("newPassword");
 
+        // Simulación del usuario encontrado en la base de datos
         Usuario usuarioEncontrado = new Usuario();
         usuarioEncontrado.setId(1L);
         usuarioEncontrado.setPassword("oldPassword");
 
+        // Simular búsqueda del usuario por ID
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEncontrado));
+
+        when(encriptador.compararPassword(usuario.getPassword(),
+                usuarioEncontrado.getPassword())).
+                thenReturn(Boolean.TRUE);
+        // Simular el encriptado de la nueva contraseña
         when(encriptador.encriptar("newPassword")).thenReturn("encryptedPassword");
+
+        // Simular que la actualización falla (devuelve null)
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(null);
 
+        // Verificar que lanza una excepción
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.cambiarPassword(usuario);
         });
+
+        // Verificación del mensaje de la excepción
         assertEquals("No pudimos actualizar tu contraseña, inténtalo más tarde.", exception.getMessage());
     }
 
     @Test
-    void testCambiarPassword_InvalidPassword() throws Exception {
-        // Crear un usuario con un ID válido pero sin contraseña
+    void testCambiarPassword_InvalidPassword() {
+        // Crear un usuario con una contraseña nueva inválida (null)
         UserChangePasswordRequest usuario = new UserChangePasswordRequest();
-        usuario.setId(1L);
+        usuario.setId(1L);  // ID válido
         usuario.setPassword("oldPassword");
-        usuario.setNewPassword(null);
+        usuario.setNewPassword(null);  // Contraseña nueva inválida
 
-        doThrow(new Exception("Contraseña inválida")).when(usuarioService)
-                .validarAtributo(usuario, "password");
+        Set<ConstraintViolation<UserChangePasswordRequest>> violations = new HashSet<>();
+        ConstraintViolation<UserChangePasswordRequest> violation = mock(
+                ConstraintViolation.class);
 
+        when(violation.getMessage()).thenReturn("La contraseña nueva no puede ser nula.");
+        violations.add(violation);
+        when(validator.validate(any(UserChangePasswordRequest.class))).thenReturn(violations);
+
+        // Verificamos que se lanza una excepción debido a la validación de la contraseña nueva
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.cambiarPassword(usuario);
         });
-        assertEquals("Contraseña inválida", exception.getMessage());
+
+        // Verificar que el mensaje de la excepción sea por la contraseña nueva nula
+        assertEquals("La contraseña nueva no puede ser nula.\n", exception.getMessage());
     }
 
     @Test

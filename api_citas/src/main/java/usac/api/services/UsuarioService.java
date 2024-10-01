@@ -154,22 +154,8 @@ public class UsuarioService extends usac.api.services.Service {
      */
     @Transactional(rollbackOn = Exception.class)
     public String cambiarPassword(UserChangePasswordRequest usuPassChange) throws Exception {
-        // Validamos que el ID del usuario no sea nulo o inválido
-        if (usuPassChange.getId() == null || usuPassChange.getId() <= 0) {
-            throw new Exception("Id inválido.");
-        }
-        // Validamos que la contraseña actual no esté vacía
-        if (usuPassChange.getPassword() == null || usuPassChange.getPassword().isBlank()){
-            throw new Exception("La contraseña actual no puede estar vacía.");
-        }
-        // Validamos que la nueva contraseña no esté vacía y cumpla con los requisitos
-        if (usuPassChange.getNewPassword() == null || usuPassChange.getNewPassword().isBlank()){
-            throw new Exception("La nueva contraseña no puede estar vacía.");
-        }
-        // validamos que la contraseña tenga entre 1 y 250 caracteres
-        if (usuPassChange.getNewPassword().length() < 1 || usuPassChange.getNewPassword().length() > 250) {
-            throw new Exception("La nueva contraseña debe tener entre 1 y 250 caracteres.");
-        }
+        // validar el modelo
+        boolean validarModelo = this.validarModelo(usuPassChange);
         // Buscamos al usuario por su ID
         Usuario usuario = usuarioRepository.findById(usuPassChange.getId()).orElse(null);
 
