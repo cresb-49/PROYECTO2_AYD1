@@ -30,9 +30,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @DynamicUpdate
 public class Usuario extends Auditor {
 
-    @NotBlank(message = "El cui del cliente no puede estar vacío.")
-    @NotNull(message = "El cui del cliente no puede ser nulo")
-    @Size(min = 11, max = 12, message = "El nit del cliente debe tener entre 11 y 12 caracteres.")
     @Column(length = 13, unique = true)
     private String nit;
 
@@ -78,7 +75,8 @@ public class Usuario extends Auditor {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private List<RolUsuario> roles;
 
-    public Usuario(String nit, String cui, String phone, String email, String nombres, String apellidos, String password, String tokenRecuperacion) {
+    public Usuario(String nit, String cui, String phone, String email, String nombres, String apellidos,
+            String password) {
         this.nit = nit;
         this.cui = cui;
         this.phone = phone;
@@ -86,7 +84,6 @@ public class Usuario extends Auditor {
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.password = password;
-        this.tokenRecuperacion = tokenRecuperacion;
     }
 
     public Usuario() {

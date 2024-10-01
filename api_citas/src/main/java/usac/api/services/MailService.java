@@ -30,30 +30,7 @@ public class MailService extends Service {
     @Autowired
     private AppProperties appProperties;
 
-    /**
-     *
-     * @param correo correo electronico destinatario
-     * @param parametro parametro que vaya a ir en el reporte
-     * @param tipoDeCorreo 1: confirmacion, 2.recuperacion, 3. Bajo Stock
-     */
-    public void enviarCorreoEnSegundoPlano(String correo, String parametro, int tipoDeCorreo) {
-        Thread hiloMail = new Thread() {
-            @Override
-            public void run() {
-                switch (tipoDeCorreo) {
-                    case 1:
-                        // enviarCorreoTwoFactorToken(correo, parametro);
-                        break;
-                    case 2:
-                        enviarCorreoDeRecuperacion(correo, parametro);
-                        break;
-                }
-            }
-        };
-        hiloMail.start();
-    }
-
-    private void enviarCorreoDeRecuperacion(String correo, String codigoActivacion) {
+    public void enviarCorreoDeRecuperacion(String correo, String codigoActivacion) {
         try {
             Context context = new Context();//crear nuevo contexto
             String url = String.format("http://localhost:%s/password_reset/form?c=%s",
@@ -69,8 +46,7 @@ public class MailService extends Service {
             helper.setSubject("Recuperación de cuenta P2.");
             helper.setFrom("P2 <namenotfound4004@gmail.com>");
             mailSender.send(mimeMessage);
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
         }
     }
 }

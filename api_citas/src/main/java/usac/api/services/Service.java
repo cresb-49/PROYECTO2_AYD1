@@ -112,7 +112,7 @@ public class Service {
         }
     }
 
-    private boolean isUserAdmin(String email) {
+    public boolean isUserAdmin(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
     }
