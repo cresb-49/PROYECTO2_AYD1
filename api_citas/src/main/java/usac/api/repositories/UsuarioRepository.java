@@ -21,13 +21,21 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
 
     public boolean existsByNit(String nit);
 
+    public boolean existsByPhone(String phone);
+
+    public boolean existsByCui(String cui);
+
     public boolean existsUsuarioByEmailAndIdNot(String email, Long id);
 
     public boolean existsUsuarioByNitAndIdNot(String nit, Long id);
 
+    public boolean existsUsuarioByCuiAndIdNot(String nit, Long id);
+
+    public boolean existsUsuarioByPhoneAndIdNot(String nit, Long id);
+
     @Override
     public List<Usuario> findAll();
-/*
+    /*
     @Query("SELECT new com.ayd1.APIecommerce.models.dto.reports.ClienteFrecuenteDto("
             + "df.usuario.id, "
             + "df.usuario.nombres, "

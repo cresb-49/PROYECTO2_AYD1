@@ -1,15 +1,32 @@
 package usac.api.models.request;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserChangePasswordRequest {
+
+    @NotBlank(message = "El id no puede estar vacío.")
+    @NotNull(message = "El id no puede ser nulo.")
     private Long id;
+
+    @NotBlank(message = "La email no puede estar vacía.")
+    @NotNull(message = "La email no puede ser nula.")
     private String email;
+
+    @Size(min = 1, max = 250, message = "La contraseña debe tener entre 1 y 250 caracteres.")
+    @NotBlank(message = "La contraseña actual no puede estar vacía.")
+    @NotNull(message = "La contraseña actual no puede ser nula.")
     private String password;
+
+    @Size(min = 1, max = 250, message = "La contraseña nueva debe tener entre 1 y 250 caracteres.")
+    @NotBlank(message = "La contraseña nueva no puede estar vacía.")
+    @NotNull(message = "La contraseña nueva no puede ser nula.")
     private String newPassword;
 
-    public UserChangePasswordRequest(Long id,String email, String password, String newPassword) {
+    public UserChangePasswordRequest(Long id, String email, String password, String newPassword) {
         this.id = id;
         this.email = email;
         this.password = password;

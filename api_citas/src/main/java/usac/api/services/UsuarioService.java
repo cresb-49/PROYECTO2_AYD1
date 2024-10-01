@@ -84,10 +84,10 @@ public class UsuarioService extends usac.api.services.Service {
         // Si la actualización es exitosa, enviamos el correo de recuperación
         if (actualizacion != null && actualizacion.getId() > 0) {
             // Usamos el servicio de correo para enviar el correo en segundo plano
-            mailService.enviarCorreoEnSegundoPlano(
+            mailService.enviarCorreoDeRecuperacion(
                     actualizacion.getEmail(),
-                    actualizacion.getTokenRecuperacion(),
-                    2);
+                    actualizacion.getTokenRecuperacion()
+            );
 
             // Retornamos un mensaje de confirmación
             return "Te hemos enviado un correo electrónico con las instrucciones para recuperar tu cuenta. Por favor revisa tu bandeja de entrada.";
@@ -154,22 +154,8 @@ public class UsuarioService extends usac.api.services.Service {
      */
     @Transactional(rollbackOn = Exception.class)
     public String cambiarPassword(UserChangePasswordRequest usuPassChange) throws Exception {
-        // Validamos que el ID del usuario no sea nulo o inválido
-        if (usuPassChange.getId() == null || usuPassChange.getId() <= 0) {
-            throw new Exception("Id inválido.");
-        }
-        // Validamos que la contraseña actual no esté vacía
-        if (usuPassChange.getPassword() == null || usuPassChange.getPassword().isBlank()){
-            throw new Exception("La contraseña actual no puede estar vacía.");
-        }
-        // Validamos que la nueva contraseña no esté vacía y cumpla con los requisitos
-        if (usuPassChange.getNewPassword() == null || usuPassChange.getNewPassword().isBlank()){
-            throw new Exception("La nueva contraseña no puede estar vacía.");
-        }
-        // validamos que la contraseña tenga entre 1 y 250 caracteres
-        if (usuPassChange.getNewPassword().length() < 1 || usuPassChange.getNewPassword().length() > 250) {
-            throw new Exception("La nueva contraseña debe tener entre 1 y 250 caracteres.");
-        }
+        // validar el modelo
+        boolean validarModelo = this.validarModelo(usuPassChange);
         // Buscamos al usuario por su ID
         Usuario usuario = usuarioRepository.findById(usuPassChange.getId()).orElse(null);
 
@@ -274,8 +260,37 @@ public class UsuarioService extends usac.api.services.Service {
         this.isDesactivated(usuarioEncontrado);
 
         // Verificamos si existe otro usuario con el mismo correo electrónico
-        if (this.usuarioRepository.existsUsuarioByEmailAndIdNot(usuario.getEmail(), usuario.getId())) {
-            throw new Exception(String.format("No se editó el usuario %s, debido a que ya existe otro usuario con el mismo email.", usuario.getEmail()));
+        if (this.usuarioRepository.existsUsuarioByEmailAndIdNot(usuario.getEmail(),
+                usuario.getId())) {
+            throw new Exception(String.format("No se editó el usuario %s, "
+                    + "debido a que ya existe otro usuario con el mismo email.",
+                    usuario.getEmail()));
+        }
+
+        // Verificamos si existe otro usuario con el mismo phone
+        if (this.usuarioRepository.existsUsuarioByPhoneAndIdNot(usuario.getPhone(),
+                usuario.getId())) {
+            throw new Exception(String.format("No se editó el usuario"
+                    + " %s, debido a que ya existe otro usuario con el mismo teléfono.",
+                    usuario.getEmail()));
+        }
+
+        // Verificamos si existe otro usuario con el mismo correo cui
+        if (this.usuarioRepository.existsUsuarioByCuiAndIdNot(usuario.getCui(),
+                usuario.getId())) {
+            throw new Exception(String.format("No se editó el usuario"
+                    + " %s, debido a que ya existe otro usuario con el mismo cui.",
+                    usuario.getEmail()));
+        }
+
+        if (usuario.getNit() != null) {
+            // Verificamos si existe otro usuario con el mismo nit
+            if (this.usuarioRepository.existsUsuarioByNitAndIdNot(usuario.getNit(),
+                    usuario.getId())) {
+                throw new Exception(String.format("No se editó el usuario"
+                        + " %s, debido a que ya existe otro usuario con el mismo nit.",
+                        usuario.getEmail()));
+            }
         }
 
         // Mantenemos la contraseña original y roles del usuario
@@ -410,6 +425,27 @@ public class UsuarioService extends usac.api.services.Service {
     }
 
     /**
+     * Crea un nuevo usuario con el rol de empleado, validando el modelo y
+     * asignando el rol correspondiente.
+     *
+     * @param crear El objeto Usuario que contiene los datos del nuevo
+     * administrador a crear.
+     * @return El objeto Usuario creado con el rol de Empleado.
+     * @throws Exception Si los datos del usuario no son válidos o si ocurre un
+     * error durante la creación.
+     */
+    public Usuario crearEmpleado(Usuario crear) throws Exception {
+        // Validamos el modelo de usuario
+        this.validarModelo(crear);
+
+        // Obtenemos el rol 'ADMIN' para asignarlo al nuevo usuario
+        Rol rol = this.rolService.getRolByNombre("EMPLEADO");
+
+        // Guardamos el usuario con el rol de Administrador
+        return this.guardarUsuario(crear, rol);
+    }
+
+    /**
      * Guarda un usuario asignandole un rol
      *
      * @param crear
@@ -422,6 +458,21 @@ public class UsuarioService extends usac.api.services.Service {
         if (this.usuarioRepository.existsByEmail(crear.getEmail())) {
             throw new Exception("El Email ya existe.");
         }
+
+        if (this.usuarioRepository.existsByPhone(crear.getPhone())) {
+            throw new Exception("El numero de telefono ya existe.");
+        }
+
+        if (this.usuarioRepository.existsByCui(crear.getCui())) {
+            throw new Exception("El numero de telefono ya existe.");
+        }
+
+        if (crear.getNit() != null) {
+            if (this.usuarioRepository.existsByNit(crear.getNit())) {
+                throw new Exception("El nit ya existe.");
+            }
+        }
+
         // Asignamos un rol al usuario
         RolUsuario rolUsuario = new RolUsuario(rol, crear);
         ArrayList<RolUsuario> rols = new ArrayList<>();

@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.PasswordChangeRequest;
@@ -180,6 +181,38 @@ public class UsuarioController {
     public ResponseEntity<?> crearCliente(@RequestBody Usuario crear) {
         try {
             LoginDTO respuesta = usuarioService.crearUsuarioCliente(crear);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Crea un nuevo usuario adminstrador en el sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario admin exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @PostMapping("/private/crearAdministrador")
+    public ResponseEntity<?> crearAdministrador(@RequestBody Usuario crear) {
+        try {
+            Usuario respuesta = usuarioService.crearAdministrador(crear);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Crea un nuevo usuario adminstrador en el sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario admin exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @PostMapping("/private/crearEmpleado")
+    public ResponseEntity<?> crearEmpleado(@RequestBody Usuario crear) {
+        try {
+            Usuario respuesta = usuarioService.crearAdministrador(crear);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();

@@ -36,6 +36,24 @@ public class Service {
      * @throws Exception
      */
     public boolean validarModelo(Object object) throws Exception {
+        // El validador automáticamente valida las restricciones anotadas en el modelo
+        Set<ConstraintViolation<Object>> violations = validator.validate(object);
+
+        if (!violations.isEmpty()) {
+            // Si hay violaciones, construimos el mensaje de error
+            StringBuilder errors = new StringBuilder();
+            for (ConstraintViolation<Object> violation : violations) {
+                errors.append(violation.getMessage()).append("\n");
+            }
+            // Lanzamos la excepción con los errores encontrados
+            throw new Exception(errors.toString());
+        }
+
+        return true;
+    }
+
+    /*
+    public boolean validarModelo(Object object) throws Exception {
         // extraemos las validaciones
         Set<ConstraintViolation<Object>> validaciones = validator.validate(object);
         // validamos los valores
@@ -43,7 +61,7 @@ public class Service {
             throw new Exception(extraerErrores(validaciones));
         }
         return true;
-    }
+    }*/
 
     /**
      * Selecciona solamente os objetos que tengan desactivatedAt = null
@@ -112,7 +130,7 @@ public class Service {
         }
     }
 
-    private boolean isUserAdmin(String email) {
+    public boolean isUserAdmin(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
     }
