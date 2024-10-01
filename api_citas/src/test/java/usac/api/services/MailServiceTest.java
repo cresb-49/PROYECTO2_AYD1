@@ -25,7 +25,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 import usac.api.config.AppProperties;
-import usac.api.repositories.UsuarioRepository;
 
 /**
  *
