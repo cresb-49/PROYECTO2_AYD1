@@ -16,7 +16,7 @@ export class HomeComponent {
 
   searchTypeMenuOpen = false;
   searchValue = '';
-  selectedOption = this.negocio;
+  selectedOption = this.servicios;
 
   constructor(private elementRef: ElementRef) { }
 

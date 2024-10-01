@@ -1,21 +1,32 @@
 package usac.api.services;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +41,7 @@ import usac.api.models.Rol;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
@@ -165,9 +177,16 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_Success() throws Exception {
+<<<<<<< HEAD
         Usuario usuario = new Usuario();
+=======
+        // Crear un usuario con un ID válido
+        UserChangePasswordRequest usuario = new UserChangePasswordRequest();
+>>>>>>> ec10b4f316255d7500a0ada47e70a6ecfd90a592
         usuario.setId(1L);
-        usuario.setPassword("newPassword");
+        usuario.setPassword("oldPassword");
+        usuario.setNewPassword("newPassword");
+
 
         Usuario usuarioEncontrado = new Usuario();
         usuarioEncontrado.setId(1L);
@@ -186,9 +205,15 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_InvalidId() {
+<<<<<<< HEAD
         Usuario usuario = new Usuario();
+=======
+        // Crear un usuario con un ID inválido
+        UserChangePasswordRequest usuario = new UserChangePasswordRequest();
+>>>>>>> ec10b4f316255d7500a0ada47e70a6ecfd90a592
         usuario.setId(null);
-        usuario.setPassword("newPassword");
+        usuario.setPassword("oldPassword");
+        usuario.setNewPassword("newPassword");
 
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.cambiarPassword(usuario);
@@ -198,9 +223,15 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_UserNotFound() {
+<<<<<<< HEAD
         Usuario usuario = new Usuario();
+=======
+        // Crear un usuario con un ID válido
+        UserChangePasswordRequest usuario = new UserChangePasswordRequest();
+>>>>>>> ec10b4f316255d7500a0ada47e70a6ecfd90a592
         usuario.setId(1L);
-        usuario.setPassword("newPassword");
+        usuario.setPassword("oldPassword");
+        usuario.setNewPassword("newPassword");
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -212,9 +243,15 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_UpdateFail() throws Exception {
+<<<<<<< HEAD
         Usuario usuario = new Usuario();
+=======
+        // Crear un usuario con un ID válido
+        UserChangePasswordRequest usuario = new UserChangePasswordRequest();
+>>>>>>> ec10b4f316255d7500a0ada47e70a6ecfd90a592
         usuario.setId(1L);
-        usuario.setPassword("newPassword");
+        usuario.setPassword("oldPassword");
+        usuario.setNewPassword("newPassword");
 
         Usuario usuarioEncontrado = new Usuario();
         usuarioEncontrado.setId(1L);
@@ -232,9 +269,17 @@ public class UsuarioServiceTest {
 
     @Test
     void testCambiarPassword_InvalidPassword() throws Exception {
+<<<<<<< HEAD
         Usuario usuario = new Usuario();
         usuario.setId(1L);
         usuario.setPassword(null);
+=======
+        // Crear un usuario con un ID válido pero sin contraseña
+        UserChangePasswordRequest usuario = new UserChangePasswordRequest();
+        usuario.setId(1L);
+        usuario.setPassword("oldPassword");
+        usuario.setNewPassword(null);
+>>>>>>> ec10b4f316255d7500a0ada47e70a6ecfd90a592
 
         doThrow(new Exception("Contraseña inválida")).when(usuarioService)
                 .validarAtributo(usuario, "password");
@@ -553,8 +598,13 @@ public class UsuarioServiceTest {
         usuario.setCui("12345678901");
         usuario.setPhone("12345678");
         usuario.setEmail("newuser@test.com");
+<<<<<<< HEAD
         usuario.setNombres("Nuevo Usuario");
         usuario.setApellidos("Nuevo Usuario");
+=======
+        usuario.setNombres("Nuevo");
+        usuario.setApellidos("Usuario");
+>>>>>>> ec10b4f316255d7500a0ada47e70a6ecfd90a592
         usuario.setPassword("password_valida");
 
         Rol clienteRol = new Rol();

@@ -1,24 +1,28 @@
 package usac.api.services;
 
-import usac.api.tools.Encriptador;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
 import usac.api.models.Rol;
 import usac.api.models.RolUsuario;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
+import usac.api.tools.Encriptador;
 
 @Service
 public class UsuarioService extends usac.api.services.Service {
@@ -149,15 +153,23 @@ public class UsuarioService extends usac.api.services.Service {
      * el proceso de actualización de la contraseña.
      */
     @Transactional(rollbackOn = Exception.class)
-    public String cambiarPassword(Usuario usuPassChange) throws Exception {
+    public String cambiarPassword(UserChangePasswordRequest usuPassChange) throws Exception {
         // Validamos que el ID del usuario no sea nulo o inválido
         if (usuPassChange.getId() == null || usuPassChange.getId() <= 0) {
             throw new Exception("Id inválido.");
         }
-
+        // Validamos que la contraseña actual no esté vacía
+        if (usuPassChange.getPassword() == null || usuPassChange.getPassword().isBlank()){
+            throw new Exception("La contraseña actual no puede estar vacía.");
+        }
         // Validamos que la nueva contraseña no esté vacía y cumpla con los requisitos
-        this.validarAtributo(usuPassChange, "password");
-
+        if (usuPassChange.getNewPassword() == null || usuPassChange.getNewPassword().isBlank()){
+            throw new Exception("La nueva contraseña no puede estar vacía.");
+        }
+        // validamos que la contraseña tenga entre 1 y 250 caracteres
+        if (usuPassChange.getNewPassword().length() < 1 || usuPassChange.getNewPassword().length() > 250) {
+            throw new Exception("La nueva contraseña debe tener entre 1 y 250 caracteres.");
+        }
         // Buscamos al usuario por su ID
         Usuario usuario = usuarioRepository.findById(usuPassChange.getId()).orElse(null);
 
@@ -170,8 +182,13 @@ public class UsuarioService extends usac.api.services.Service {
         this.isDesactivated(usuario);
         this.verificarUsuarioJwt(usuario);
 
+        // Verificamos que la contraseña actual sea correcta
+        if (!this.encriptador.compararPassword(usuPassChange.getPassword(), usuario.getPassword())) {
+            throw new Exception("Contraseña actual incorrecta.");
+        }
+
         // Encriptamos la nueva contraseña y actualizamos el campo en el modelo de usuario
-        usuario.setPassword(this.encriptador.encriptar(usuPassChange.getPassword()));
+        usuario.setPassword(this.encriptador.encriptar(usuPassChange.getNewPassword()));
 
         // Guardamos el usuario con la nueva contraseña
         Usuario update = this.usuarioRepository.save(usuario);

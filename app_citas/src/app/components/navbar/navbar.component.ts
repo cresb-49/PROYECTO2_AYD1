@@ -1,50 +1,65 @@
-import { Component, HostListener, ElementRef, OnInit, Input } from '@angular/core';
+import { Component, HostListener, ElementRef, OnInit, Input, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../services/theme/theme.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { MatIconModule } from '@angular/material/icon';
+import { Subscription } from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [CommonModule, MatIconModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIconModule],
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   @Input() emptyNav = false;
+  name = '';
+  email = '';
 
-  navOptions= [
+  navOptions = [
     { name: 'Inicio', path: '/' },
     { name: 'Canchas', path: '/canchas' },
-    { name: 'Acerca de', path: '/about' },
-    { name: 'Contacto', path: '/contact' },
-  ]
+    { name: 'Calendario', path: '/calendar' },
+  ];
+
+  themeIcon = 'wb_sunny';
+  isLoggedIn = false;
+  private authSubscription: Subscription = new Subscription();
 
   constructor(
     private elementRef: ElementRef,
     public themeService: ThemeService,
     private authService: AuthService
   ) { }
-  themeIcon = 'wb_sunny';
-  isLoggedIn = false;
 
   ngOnInit() {
-    // Cargamos el tema actual y asignamos el icono en la vista
     this.themeService.setTheme(this.themeService.currentTheme);
     this.setThemeIcon();
-    // Verificamos si el usuario está autenticado
-    this.isLoggedIn = this.authService.isLoggedIn();
+    // Subscribe to auth status
+    this.authSubscription = this.authService.authStatus$.subscribe(isLoggedIn => {
+      this.isLoggedIn = isLoggedIn;
+      this.name = this.authService.getFullName();
+      this.email = this.authService.getEmail();
+    });
   }
 
-  // Cambiar el tema
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
+  logout() {
+    this.authService.logout();
+  }
+
   toggleTheme() {
     this.themeService.toggleTheme();
     this.setThemeIcon();
   }
 
-  // Establecer el icono según el tema
   setThemeIcon() {
     this.themeIcon = this.themeService.currentTheme === 'light' ? 'wb_sunny' : 'nightlight_round';
   }
@@ -60,10 +75,8 @@ export class NavbarComponent implements OnInit {
     this.navbarOpen = !this.navbarOpen;
   }
 
-  // Escuchar los eventos de clic en el documento
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    // Verificar si el clic ocurrió fuera del menú del usuario
     if (
       this.userMenuOpen &&
       !this.elementRef.nativeElement.querySelector('#user-dropdown').contains(event.target)
@@ -71,7 +84,6 @@ export class NavbarComponent implements OnInit {
       this.userMenuOpen = false;
     }
 
-    // Verificar si el clic ocurrió fuera del menú de navegación
     if (
       this.navbarOpen &&
       !this.elementRef.nativeElement.querySelector('#navbar-user').contains(event.target) &&

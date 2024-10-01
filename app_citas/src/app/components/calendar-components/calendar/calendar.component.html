@@ -1,0 +1,71 @@
+<section
+  class="relative min-h-screen flex flex-col items-center justify-center lg:py-10 md:py-6 py-5 lg:px-[20rem] md:px-10 overflow-hidden px-2">
+  <div class="w-full relative z-10 ">
+    <div>
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 w-full overflow-x-auto"> <!-- Añadido overflow-x-auto -->
+        <div class="col-span-12 xl:col-span-5 flex flex-col items-center xl:items-start w-full">
+          <h2
+            class="font-manrope text-2xl sm:text-3xl leading-tight text-gray-900 dark:text-gray-100 mb-1.5 text-center xl:text-left w-full">
+            Actividades de Hoy
+          </h2>
+          <p
+            class="text-base sm:text-lg font-normal text-gray-800 dark:text-gray-300 mb-4 text-center xl:text-left w-full">
+            No olvides tus pendientes
+          </p>
+          <div
+            class="flex gap-3 flex-col items-center xl:items-start w-full overflow-y-auto max-h-[524px] scrollbar-thin scrollbar-thumb-transparent scrollbar-track-transparent">
+            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
+            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
+            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
+            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
+            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
+            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
+          </div>
+        </div>
+        <div
+          class="col-span-12 xl:col-span-7 px-2.5 py-5 sm:p-8 bg-gradient-to-b from-white/25 to-white dark:from-gray-800 dark:to-gray-900 xl:bg-white dark:xl:bg-gray-900 rounded-2xl max-xl:row-start-1 w-full">
+          <div class="flex flex-col md:flex-row gap-4 items-center justify-between mb-5 w-full">
+            <div class="flex items-center gap-4">
+              <h5 class="text-lg sm:text-xl leading-8 font-semibold text-gray-900 dark:text-gray-100 w-full">
+                {{monthNames[currentMonth]}} {{currentYear}}
+              </h5>
+              <div class="flex items-center">
+                <button (click)="previousMonth()"
+                  class="text-blue-600 dark:text-blue-400 p-1 rounded transition-all duration-300 hover:text-white hover:bg-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M10.0002 11.9999L6 7.99971L10.0025 3.99719" stroke="currentcolor" stroke-width="1.3"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+                <button (click)="nextMonth()"
+                  class="text-blue-600 dark:text-blue-400 p-1 rounded transition-all duration-300 hover:text-white hover:bg-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M6.00236 3.99707L10.0025 7.99723L6 11.9998" stroke="currentcolor" stroke-width="1.3"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <button (click)="goToCurrentMonth()" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Retornar mes Actual</button>
+          </div>
+          <div class="border border-gray-200 dark:border-gray-700 rounded-xl w-full overflow-x-auto">
+            <!-- Añadido overflow-x-auto -->
+            <div class="border border-gray-200 dark:border-gray-700 rounded-xl min-w-[600px]">
+              <!-- Añadido min-width para prevenir que la tabla se reduzca demasiado -->
+              <div class="grid grid-cols-7 rounded-t-3xl border-b border-gray-200 dark:border-gray-600 w-full">
+                <div *ngFor="let weekday of weekDays"
+                  class="py-3.5 border-r border-gray-200 dark:border-gray-600 bg-blue-50 dark:bg-gray-700 flex items-center justify-center text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 w-full">
+                  {{weekday}}
+                </div>
+              </div>
+              <div class="grid grid-cols-7 rounded-b-xl w-full">
+                <app-month-day-calendar *ngFor="let dia of diasMesActual" [isMonthDay]="dia.isMonthDay"
+                  [dayNumber]="dia.numberDay" [showEvents]="dia.showEvents" class="w-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

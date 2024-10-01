@@ -30,18 +30,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @DynamicUpdate
 public class Usuario extends Auditor {
 
+
+    @NotBlank(message = "El cui del cliente no puede estar vacío.")
+    @NotNull(message = "El cui del cliente no puede ser nulo")
+    @Size(min = 6, max = 12, message = "El nit del cliente debe tener entre 6 y 12 caracteres.")
     @Column(length = 13, unique = true)
     private String nit;
 
     @NotBlank(message = "El cui del cliente no puede estar vacío.")
     @NotNull(message = "El cui del cliente no puede ser nulo")
-    @Size(min = 11, max = 12, message = "El cui del cliente debe tener entre 11 y 12 caracteres.")
+    @Size(min = 13, max = 13, message = "El cui del cliente debe tener entre 13 caracteres.")
     @Column(length = 13, unique = true)
     private String cui;
 
     @NotBlank(message = "El teléfono del cliente no puede estar vacío.")
     @NotNull(message = "El teléfono del cliente no puede ser nulo")
-    @Size(min = 8, max = 9, message = "El teléfono del cliente debe tener entre 8 y 9 caracteres.")
+    @Size(min = 8, max = 8, message = "El teléfono del cliente debe tener 8 digitos")
     @Column(length = 10, unique = true)
     private String phone;
 
