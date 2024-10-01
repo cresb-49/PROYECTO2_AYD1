@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserChangePasswordRequest {
 
-    @NotBlank(message = "El id no puede estar vacío.")
     @NotNull(message = "El id no puede ser nulo.")
     private Long id;
 
@@ -16,7 +15,6 @@ public class UserChangePasswordRequest {
     @NotNull(message = "La email no puede ser nula.")
     private String email;
 
-    @Size(min = 1, max = 250, message = "La contraseña debe tener entre 1 y 250 caracteres.")
     @NotBlank(message = "La contraseña actual no puede estar vacía.")
     @NotNull(message = "La contraseña actual no puede ser nula.")
     private String password;
