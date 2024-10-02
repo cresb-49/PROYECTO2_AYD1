@@ -25,7 +25,8 @@ export class CrearNegocioComponent implements OnInit {
     nombre: '',
     logo: '',
     asignacion_manual: false,
-    direccion: ''
+    direccion: '',
+    horarios: []
   };
 
   negocioData: Negocio = {
@@ -33,7 +34,8 @@ export class CrearNegocioComponent implements OnInit {
     nombre: '',
     logo: '',
     asignacion_manual: false,
-    direccion: ''
+    direccion: '',
+    horarios: []
   };
 
   private negocioDataSubject = new BehaviorSubject<Negocio>(this.negocioData); // Para observar cambios
@@ -64,8 +66,11 @@ export class CrearNegocioComponent implements OnInit {
             nombre: response.data.nombre,
             logo: response.data.logo,
             asignacion_manual: response.data.asignacion_manual,
-            direccion: response.data.direccion
+            direccion: response.data.direccion,
+            horarios: response.data.horarios
           };
+          console.log(this.negocioData);
+
           this.imageSrc = response.data.logo;
           this.negocioOriginalData = { ...this.negocioData }; // Guardamos la copia original
 
