@@ -37,7 +37,7 @@ public class NegocioController {
         }
     }
 
-    @GetMapping("/private/negocio")
+    @GetMapping("/private/negocio") //TODO: Debe ser ruta privada
     public ResponseEntity<?> getNegocio() {
         try {
             Negocio data = negocioService.obtenerNegocio();
