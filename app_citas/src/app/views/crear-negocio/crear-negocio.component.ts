@@ -7,6 +7,7 @@ import { Negocio, NegocioService, PayloadNegocio } from '../../services/negocio/
 import { ToastrService } from 'ngx-toastr';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { BehaviorSubject, debounceTime } from 'rxjs';
+import { DiaService } from '../../services/dia/dia.service';
 
 @Component({
   standalone: true,
@@ -39,12 +40,13 @@ export class CrearNegocioComponent implements OnInit {
 
   constructor(
     private toastr: ToastrService,
-    private negocioService: NegocioService
+    private negocioService: NegocioService,
+    private diaService: DiaService
   ) { }
 
   ngOnInit() {
     this.cargarDatosNegocio();
-
+    this.getDias();
     // Suscribirnos a los cambios en negocioData y comparar con negocioOriginalData
     this.negocioDataSubject.pipe(
       debounceTime(300) // Evitar múltiples comparaciones inmediatas
@@ -129,6 +131,17 @@ export class CrearNegocioComponent implements OnInit {
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.message, 'Error al actualizar el negocio');
+      }
+    });
+  }
+
+  getDias(){
+    this.diaService.getDias().subscribe({
+      next: (response: ApiResponse) => {
+        console.log(response.data);
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.message, 'Error al obtener los días');
       }
     });
   }
