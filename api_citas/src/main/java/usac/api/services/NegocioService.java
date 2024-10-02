@@ -1,10 +1,15 @@
 package usac.api.services;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import usac.api.models.Dia;
+import usac.api.models.HorarioNegocio;
 import usac.api.models.Negocio;
 import usac.api.repositories.NegocioRepository;
 
@@ -34,14 +39,20 @@ public class NegocioService extends usac.api.services.Service {
         Negocio negocioUpdate =  negocioRepository.save(negocio);
         if(negocioUpdate != null && negocioUpdate.getId() != null) {
             return negocioUpdate;
-        }
+        }        
         throw new Exception("No logramos actualizar el negocio, inténtalo más tarde.");
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public Negocio CrearNegocio(Negocio negocio) throws Exception {
+    public Negocio CrearNegocio(Negocio negocio,ArrayList<Dia>horario) throws Exception {
         // Validar el modelo del negocio
         this.validarModelo(negocio);
+        // Asignar el horario al negocio
+        ArrayList<HorarioNegocio> horarioCreado = new ArrayList<>();
+        for(Dia dia: horario) {
+            horarioCreado.add(new HorarioNegocio(dia, negocio,LocalTime.of(8,0),LocalTime.of(18,0)));
+        }
+        negocio.setHorarios(horarioCreado);
         // Crear el negocio
         Negocio negocioCreado = negocioRepository.save(negocio);
         if(negocioCreado != null && negocioCreado.getId() != null) {

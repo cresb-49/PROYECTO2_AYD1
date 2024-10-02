@@ -6,6 +6,7 @@ package usac.api.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -16,10 +17,12 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import usac.api.models.Dia;
 import usac.api.models.Negocio;
 import usac.api.models.Rol;
 import usac.api.models.Usuario;
 import usac.api.repositories.RolRepository;
+import usac.api.services.DiaService;
 import usac.api.services.NegocioService;
 import usac.api.services.UsuarioService;
 
@@ -36,6 +39,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private UsuarioService usuarioService;
     @Autowired
     private NegocioService negocioService;
+    @Autowired
+    private DiaService diaService;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -100,6 +105,26 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
+            // Creacion de los dias de la semana
+            Dia lunes = new Dia("Lunes");
+            Dia martes = new Dia("Martes");
+            Dia miercoles = new Dia("Miercoles");
+            Dia jueves = new Dia("Jueves");
+            Dia viernes = new Dia("Viernes");
+            Dia sabado = new Dia("Sabado");
+            Dia domingo = new Dia("Domingo");
+            // Se insertan los dias
+            try {
+                lunes = this.diaService.insertarDia(lunes);
+                martes = this.diaService.insertarDia(martes);
+                miercoles = this.diaService.insertarDia(miercoles);
+                jueves = this.diaService.insertarDia(jueves);
+                viernes = this.diaService.insertarDia(viernes);
+                this.diaService.insertarDia(sabado);
+                this.diaService.insertarDia(domingo);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
             // siders roles
             this.insertarRol(new Rol("CLIENTE"));
             this.insertarRol(new Rol("ADMIN"));
@@ -132,11 +157,17 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             String logo = cargarImagenComoBase64();
             Negocio negocio = new Negocio(logo, "TiendaAyD", false, "2da calle XXX-XXX-XX Quetgo");
             try {
-                this.negocioService.CrearNegocio(negocio);
+                ArrayList<Dia> horario = new ArrayList<>();
+                horario.add(lunes);
+                horario.add(martes);
+                horario.add(miercoles);
+                horario.add(jueves);
+                horario.add(viernes);
+                this.negocioService.CrearNegocio(negocio,horario);
             } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
             
-
             /*
             Categoria categoria = new Categoria("Hogar");
             this.insertarCategoria(categoria);

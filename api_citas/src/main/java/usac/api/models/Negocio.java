@@ -1,15 +1,22 @@
 package usac.api.models;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
 @Table(name = "negocio")
@@ -39,6 +46,11 @@ public class Negocio extends Auditor {
     @Size(min = 1, max = 250, message = "La dirección del negocio debe tener entre 1 y 250 caracteres.")
     private String direccion;
 
+    @OneToMany
+    @Cascade(CascadeType.ALL)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private List<HorarioNegocio> horarios;
+
     public Negocio() {
     }
 
@@ -61,19 +73,31 @@ public class Negocio extends Auditor {
         return nombre;
     }
 
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public boolean isAsignacionManual() {
+        return asignacionManual;
+    }
+
     public void setAsignacionManual(boolean asignacionManual) {
         this.asignacionManual = asignacionManual;
     }
 
-    public boolean isAsignacion_manual() {
-        return asignacionManual;
+    public String getDireccion() {
+        return direccion;
     }
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
 
-    public String getDireccion() {
-        return direccion;
+    public List<HorarioNegocio> getHorarios() {
+        return horarios;
     }
+
+    public void setHorarios(List<HorarioNegocio> horarios) {
+        this.horarios = horarios;
+    }    
 }
