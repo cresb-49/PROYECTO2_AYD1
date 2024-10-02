@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import usac.api.models.Negocio;
+import usac.api.models.dto.NegocioDTO;
+import usac.api.services.B64Service;
 import usac.api.services.NegocioService;
 import usac.api.tools.transformers.ApiBaseTransformer;
 
@@ -19,12 +21,17 @@ import usac.api.tools.transformers.ApiBaseTransformer;
 public class NegocioController {
     @Autowired
     private NegocioService negocioService;
+    @Autowired
+    private B64Service b64Service;
 
     @GetMapping("/public/negocio")
     public ResponseEntity<?> getMethodName() {
         try {
             Negocio data = negocioService.obtenerNegocio();
-            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
+            boolean hasExtension =b64Service.hasExtension(data.getLogo()); 
+            String logo = hasExtension ? data.getLogo() : b64Service.addExtension(data.getLogo());
+            NegocioDTO negocioDTO = new NegocioDTO(data.getId(), data.getNombre(), logo);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", negocioDTO, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
