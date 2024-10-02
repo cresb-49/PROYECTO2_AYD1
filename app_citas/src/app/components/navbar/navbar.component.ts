@@ -5,6 +5,8 @@ import { ThemeService } from '../../services/theme/theme.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
+import { InfoNegocio, NegocioService } from '../../services/negocio/negocio.service';
+import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 
 @Component({
   standalone: true,
@@ -17,6 +19,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   @Input() emptyNav = false;
   name = '';
   email = '';
+
+  infoNegocio: InfoNegocio = {
+    id: 0,
+    nombre: 'Negocio',
+    logo: ''
+  }
 
   navOptions = [
     { name: 'Inicio', path: '/' },
@@ -31,7 +39,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private elementRef: ElementRef,
     public themeService: ThemeService,
-    private authService: AuthService
+    private authService: AuthService,
+    private negocioService: NegocioService
   ) { }
 
   ngOnInit() {
@@ -43,6 +52,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.name = this.authService.getFullName();
       this.email = this.authService.getEmail();
     });
+    this.obtenerDatosNegocio();
+  }
+
+  obtenerDatosNegocio() {
+    this.negocioService.getInfoNegocio().subscribe(
+      {
+        next: (response: ApiResponse) => {
+          this.infoNegocio = {
+            id: response.data.id,
+            nombre: response.data.nombre,
+            logo: response.data.logo
+          }
+        }
+      }
+    )
   }
 
   ngOnDestroy() {
