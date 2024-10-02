@@ -21,6 +21,7 @@ import usac.api.models.Dia;
 import usac.api.models.Negocio;
 import usac.api.models.Rol;
 import usac.api.models.Usuario;
+import usac.api.repositories.DiaRepository;
 import usac.api.repositories.RolRepository;
 import usac.api.services.DiaService;
 import usac.api.services.NegocioService;
@@ -41,6 +42,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private NegocioService negocioService;
     @Autowired
     private DiaService diaService;
+    @Autowired
+    private DiaRepository diaRepository;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -54,77 +57,84 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
         }
     }
 
+    public Dia insertarDia(Dia dia) throws Exception {
+        try {
+            Optional<Dia> opDia = this.diaRepository.findOneByNombre(dia.getNombre());
+            if (opDia.isPresent()) {
+                return opDia.get();
+            }
+            return this.diaRepository.save(dia);
+        } catch (Exception e) {
+            throw new Exception("Error");
+        }
+    }
+
     /*
-
-    public EstadoEnvio insertarEstadoEnvio(EstadoEnvio estadoEnvio) throws Exception {
-        try {
-            Optional<EstadoEnvio> opRol = this.estadoEnvioRepository.findOneByNombre(estadoEnvio.getNombre());
-            if (opRol.isPresent()) {
-                return opRol.get();
-            }
-            return this.estadoEnvioRepository.save(estadoEnvio);
-        } catch (Exception e) {
-            throw new Exception("Error");
-        }
-    }
-
-    public Categoria insertarCategoria(Categoria cat) throws Exception {
-        try {
-            Optional<Categoria> opCat = this.categoriaRepository.findOneByNombre(cat.getNombre());
-            if (opCat.isPresent()) {
-                return opCat.get();
-            }
-            return this.categoriaRepository.save(cat);
-        } catch (Exception e) {
-            throw new Exception("Error");
-        }
-    }
-
-    public TiendaConfig insertarTiendaConfig(TiendaConfig config) throws Exception {
-        try {
-            TiendaConfig conf = this.tiendaConfigReporitory.findFirstByOrderByIdAsc().orElse(null);
-            if (conf == null) {
-                return this.tiendaConfigReporitory.save(config);
-            }
-            return conf;
-
-        } catch (Exception e) {
-            throw new Exception("Error");
-        }
-    }
-
-    public Permiso insertarPermisoSiNoExiste(Permiso pa) {
-        Permiso permiso = this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
-        if (permiso == null) {
-            return this.permisoRepository.save(
-                    pa);
-        }
-        return permiso;
-    }
+     * 
+     * public EstadoEnvio insertarEstadoEnvio(EstadoEnvio estadoEnvio) throws
+     * Exception {
+     * try {
+     * Optional<EstadoEnvio> opRol =
+     * this.estadoEnvioRepository.findOneByNombre(estadoEnvio.getNombre());
+     * if (opRol.isPresent()) {
+     * return opRol.get();
+     * }
+     * return this.estadoEnvioRepository.save(estadoEnvio);
+     * } catch (Exception e) {
+     * throw new Exception("Error");
+     * }
+     * }
+     * 
+     * public Categoria insertarCategoria(Categoria cat) throws Exception {
+     * try {
+     * Optional<Categoria> opCat =
+     * this.categoriaRepository.findOneByNombre(cat.getNombre());
+     * if (opCat.isPresent()) {
+     * return opCat.get();
+     * }
+     * return this.categoriaRepository.save(cat);
+     * } catch (Exception e) {
+     * throw new Exception("Error");
+     * }
+     * }
+     * 
+     * public TiendaConfig insertarTiendaConfig(TiendaConfig config) throws
+     * Exception {
+     * try {
+     * TiendaConfig conf =
+     * this.tiendaConfigReporitory.findFirstByOrderByIdAsc().orElse(null);
+     * if (conf == null) {
+     * return this.tiendaConfigReporitory.save(config);
+     * }
+     * return conf;
+     * 
+     * } catch (Exception e) {
+     * throw new Exception("Error");
+     * }
+     * }
+     * 
+     * public Permiso insertarPermisoSiNoExiste(Permiso pa) {
+     * Permiso permiso =
+     * this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
+     * if (permiso == null) {
+     * return this.permisoRepository.save(
+     * pa);
+     * }
+     * return permiso;
+     * }
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
             // Creacion de los dias de la semana
-            Dia lunes = new Dia("Lunes");
-            Dia martes = new Dia("Martes");
-            Dia miercoles = new Dia("Miercoles");
-            Dia jueves = new Dia("Jueves");
-            Dia viernes = new Dia("Viernes");
-            Dia sabado = new Dia("Sabado");
-            Dia domingo = new Dia("Domingo");
-            // Se insertan los dias
-            try {
-                lunes = this.diaService.insertarDia(lunes);
-                martes = this.diaService.insertarDia(martes);
-                miercoles = this.diaService.insertarDia(miercoles);
-                jueves = this.diaService.insertarDia(jueves);
-                viernes = this.diaService.insertarDia(viernes);
-                this.diaService.insertarDia(sabado);
-                this.diaService.insertarDia(domingo);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
+            Dia lunes = this.insertarDia(new Dia("Lunes"));
+            Dia martes = this.insertarDia(new Dia("Martes"));
+            Dia miercoles = this.insertarDia(new Dia("Miercoles"));
+            Dia jueves = this.insertarDia(new Dia("Jueves"));
+            Dia viernes = this.insertarDia(new Dia("Viernes"));
+            Dia sabado = this.insertarDia(new Dia("Sabado"));
+            Dia domingo = this.insertarDia(new Dia("Domingo"));
+
             // siders roles
             this.insertarRol(new Rol("CLIENTE"));
             this.insertarRol(new Rol("ADMIN"));
@@ -136,14 +146,14 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "elrincondelgamer77@gmail.com",
                     "admin", "admin",
                     "12345");
-            
+
             Usuario admin2 = new Usuario(
-                    "777666555", 
-                    "1234567891234", 
-                    "12345678", 
-                    "carlosbpac@gmail.com", 
-                    "Carlos", 
-                    "Pac", 
+                    "777666555",
+                    "1234567891234",
+                    "12345678",
+                    "carlosbpac@gmail.com",
+                    "Carlos",
+                    "Pac",
                     "12345");
 
             try {
@@ -153,7 +163,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 System.err.println(e.getMessage());
             }
             // Se crea el modelo del negocio de la APP
-            //Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a base64
+            // Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a
+            // base64
             String logo = cargarImagenComoBase64();
             Negocio negocio = new Negocio(logo, "TiendaAyD", false, "2da calle XXX-XXX-XX Quetgo");
             try {
@@ -163,73 +174,75 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 horario.add(miercoles);
                 horario.add(jueves);
                 horario.add(viernes);
-                this.negocioService.CrearNegocio(negocio,horario);
+                this.negocioService.CrearNegocio(negocio, horario);
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
-            
+
             /*
-            Categoria categoria = new Categoria("Hogar");
-            this.insertarCategoria(categoria);
-
-            //estado de envio
-            EstadoEnvio estadoEnvio = new EstadoEnvio("PENDIENTE");
-            this.insertarEstadoEnvio(estadoEnvio);
-            EstadoEnvio estadoEnvio2 = new EstadoEnvio("ENTREGADO");
-            this.insertarEstadoEnvio(estadoEnvio2);
-
-            // IMAGEN DEFAULT DE LA TIENDA
-            byte[] img = getClass().getResourceAsStream("/img/logo.png").readAllBytes();
-
-            TiendaConfig tiendaConfig = new TiendaConfig("TiendaAyD1", img, 12.00,
-                    "2da calle XXX-XXX-XX Quetgo",
-                    "image/png", 25.0);
-            this.insertarTiendaConfig(tiendaConfig);
-       
-            Usuario user1 = new Usuario("Carlos",
-                    "Pac", "carlosbpac@gmail.com",
-                    null, "12345",
-                    null, null, false);
-
-            Usuario ayudante = new Usuario("Luis",
-                    "Monterroso", "luismonteg1@hotmail.com",
-                    null, "12345",
-                    null, null, false);
-
-           
-            // Crear los usuarios, un catch por usuario para que ignore las * excepciones que puedan haber
-            
-            try {
-                this.usuarioService.crearAdministrador(admin);
-            } catch (Exception e) {
-            }
-            try {
-                this.usuarioService.crearUsuarioNormal(user1);
-
-            } catch (Exception e) {
-            }
-            try {
-                this.usuarioService.crearAyudante(
-                        new UsuarioAyudanteRequest(ayudante, new ArrayList<>()));
-            } catch (Exception e) {
-            }
-
-            // Creacion de todos los permisos que tiene el sistema
-            for (PermisoEnum permiso : PermisoEnum.values()) {
-
-                Permiso insercion = this.insertarPermisoSiNoExiste(
-                        new Permiso(
-                                permiso.getNombrePermiso(),
-                                permiso.getRuta()));
-                try {
-                    // Asignacion de permisos a los usuarios
-                    Usuario ayudante2 = this.usuarioService.getByEmail(
-                            "luismonteg1@hotmail.com");
-                    this.usuarioService.agregarPermisoUsuario(ayudante2,
-                            insercion);
-                } catch (Exception e) {
-                }
-            }  */
+             * Categoria categoria = new Categoria("Hogar");
+             * this.insertarCategoria(categoria);
+             * 
+             * //estado de envio
+             * EstadoEnvio estadoEnvio = new EstadoEnvio("PENDIENTE");
+             * this.insertarEstadoEnvio(estadoEnvio);
+             * EstadoEnvio estadoEnvio2 = new EstadoEnvio("ENTREGADO");
+             * this.insertarEstadoEnvio(estadoEnvio2);
+             * 
+             * // IMAGEN DEFAULT DE LA TIENDA
+             * byte[] img = getClass().getResourceAsStream("/img/logo.png").readAllBytes();
+             * 
+             * TiendaConfig tiendaConfig = new TiendaConfig("TiendaAyD1", img, 12.00,
+             * "2da calle XXX-XXX-XX Quetgo",
+             * "image/png", 25.0);
+             * this.insertarTiendaConfig(tiendaConfig);
+             * 
+             * Usuario user1 = new Usuario("Carlos",
+             * "Pac", "carlosbpac@gmail.com",
+             * null, "12345",
+             * null, null, false);
+             * 
+             * Usuario ayudante = new Usuario("Luis",
+             * "Monterroso", "luismonteg1@hotmail.com",
+             * null, "12345",
+             * null, null, false);
+             * 
+             * 
+             * // Crear los usuarios, un catch por usuario para que ignore las * excepciones
+             * que puedan haber
+             * 
+             * try {
+             * this.usuarioService.crearAdministrador(admin);
+             * } catch (Exception e) {
+             * }
+             * try {
+             * this.usuarioService.crearUsuarioNormal(user1);
+             * 
+             * } catch (Exception e) {
+             * }
+             * try {
+             * this.usuarioService.crearAyudante(
+             * new UsuarioAyudanteRequest(ayudante, new ArrayList<>()));
+             * } catch (Exception e) {
+             * }
+             * 
+             * // Creacion de todos los permisos que tiene el sistema
+             * for (PermisoEnum permiso : PermisoEnum.values()) {
+             * 
+             * Permiso insercion = this.insertarPermisoSiNoExiste(
+             * new Permiso(
+             * permiso.getNombrePermiso(),
+             * permiso.getRuta()));
+             * try {
+             * // Asignacion de permisos a los usuarios
+             * Usuario ayudante2 = this.usuarioService.getByEmail(
+             * "luismonteg1@hotmail.com");
+             * this.usuarioService.agregarPermisoUsuario(ayudante2,
+             * insercion);
+             * } catch (Exception e) {
+             * }
+             * }
+             */
         } catch (Exception ex) {
             Logger.getLogger(SeedersConfig.class.getName()).log(Level.SEVERE, null, ex);
         }

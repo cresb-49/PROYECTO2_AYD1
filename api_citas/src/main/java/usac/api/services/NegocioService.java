@@ -45,6 +45,10 @@ public class NegocioService extends usac.api.services.Service {
 
     @Transactional(rollbackOn = Exception.class)
     public Negocio CrearNegocio(Negocio negocio,ArrayList<Dia>horario) throws Exception {
+        //Solo puede existir un negocio
+        if(negocioRepository.count() > 0) {
+            throw new Exception("Ya existe un negocio registrado");
+        }
         // Validar el modelo del negocio
         this.validarModelo(negocio);
         // Asignar el horario al negocio

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.OnDelete;
@@ -13,8 +14,13 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
-@Table(name = "horario_negocio")
+@Table(name = "horario_negocio", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"dia", "negocio"})
+})
 @SQLDelete(sql = "UPDATE horario_negocio SET deleted_at = NULL WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class HorarioNegocio extends Auditor {
@@ -27,12 +33,15 @@ public class HorarioNegocio extends Auditor {
     @ManyToOne//indicador de relacion muchos a uno
     @JoinColumn(name = "negocio", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Negocio negocio;
 
-    @NotNull(message = "La hora de apertura no puede ser nula")    
+    @NotNull(message = "La hora de apertura no puede ser nula")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm") // Formato para hora
     private LocalTime apertura;
 
     @NotNull(message = "La hora de cierre no puede ser nula")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm") // Formato para hora
     private LocalTime cierre;
 
     public HorarioNegocio() {

@@ -1,5 +1,7 @@
 package usac.api.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,10 @@ public class DiaService extends usac.api.services.Service {
             throw new Exception("Dia no encontrado.");
         }
         return dia;
+    }
+
+    public List<Dia> getDias() {
+        return (List<Dia>) this.diaRepository.findAll();
     }
 
     public Dia insertarDia(Dia dia) throws Exception {
