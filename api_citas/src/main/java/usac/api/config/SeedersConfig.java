@@ -4,6 +4,9 @@
  */
 package usac.api.config;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,9 +16,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import usac.api.models.Negocio;
 import usac.api.models.Rol;
 import usac.api.models.Usuario;
 import usac.api.repositories.RolRepository;
+import usac.api.services.NegocioService;
 import usac.api.services.UsuarioService;
 
 /**
@@ -29,6 +34,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private RolRepository rolRepository;
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private NegocioService negocioService;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -104,11 +111,30 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "elrincondelgamer77@gmail.com",
                     "admin", "admin",
                     "12345");
+            
+            Usuario admin2 = new Usuario(
+                    null, 
+                    "1234567891234", 
+                    "12345678", 
+                    "carlosbpac@gmail.com", 
+                    "Carlos", 
+                    "Pac", 
+                    "12345");
 
             try {
                 this.usuarioService.crearAdministrador(admin);
+                this.usuarioService.crearAdministrador(admin2);
             } catch (Exception e) {
             }
+            // Se crea el modelo del negocio de la APP
+            //Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a base64
+            String logo = cargarImagenComoBase64();
+            Negocio negocio = new Negocio(logo, "TiendaAyD", false, "2da calle XXX-XXX-XX Quetgo");
+            try {
+                this.negocioService.CrearNegocio(negocio);
+            } catch (Exception e) {
+            }
+            
 
             /*
             Categoria categoria = new Categoria("Hogar");
@@ -174,6 +200,24 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             }  */
         } catch (Exception ex) {
             Logger.getLogger(SeedersConfig.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public String cargarImagenComoBase64() {
+        // Cargar el archivo desde resources
+        try (InputStream inputStream = getClass().getResourceAsStream("/images/logo.svg")) {
+            if (inputStream == null) {
+                throw new IOException("No se pudo encontrar el archivo logo.svg en el directorio /resources/images");
+            }
+
+            // Leer todos los bytes del archivo
+            byte[] bytes = inputStream.readAllBytes();
+
+            // Convertir a Base64
+            return Base64.getEncoder().encodeToString(bytes);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error al cargar y convertir la imagen a Base64", e);
         }
     }
 }
