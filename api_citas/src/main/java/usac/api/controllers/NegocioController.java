@@ -25,13 +25,26 @@ public class NegocioController {
     private B64Service b64Service;
 
     @GetMapping("/public/negocio")
-    public ResponseEntity<?> getMethodName() {
+    public ResponseEntity<?> infoNegocio() {
         try {
             Negocio data = negocioService.obtenerNegocio();
             boolean hasExtension =b64Service.hasExtension(data.getLogo()); 
             String logo = hasExtension ? data.getLogo() : b64Service.addExtension(data.getLogo());
             NegocioDTO negocioDTO = new NegocioDTO(data.getId(), data.getNombre(), logo);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", negocioDTO, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @GetMapping("/private/negocio")
+    public ResponseEntity<?> getNegocio() {
+        try {
+            Negocio data = negocioService.obtenerNegocio();
+            boolean hasExtension =b64Service.hasExtension(data.getLogo());
+            String logo = hasExtension ? data.getLogo() : b64Service.addExtension(data.getLogo());
+            data.setLogo(logo);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }

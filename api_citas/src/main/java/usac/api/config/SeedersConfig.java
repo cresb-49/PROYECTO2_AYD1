@@ -106,14 +106,14 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             this.insertarRol(new Rol("EMPLEADO"));
 
             // Seeder de usuarios del sistema
-            Usuario admin = new Usuario(null, "3399123123123123",
-                    "12345",
+            Usuario admin = new Usuario("456123789", "3322114455669",
+                    "89456123",
                     "elrincondelgamer77@gmail.com",
                     "admin", "admin",
                     "12345");
             
             Usuario admin2 = new Usuario(
-                    null, 
+                    "777666555", 
                     "1234567891234", 
                     "12345678", 
                     "carlosbpac@gmail.com", 
@@ -125,6 +125,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
             } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
             // Se crea el modelo del negocio de la APP
             //Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a base64
