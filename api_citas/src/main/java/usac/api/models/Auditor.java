@@ -4,18 +4,22 @@
  */
 package usac.api.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  *
@@ -42,11 +46,16 @@ public class Auditor {
     @Schema(hidden = true)
     private LocalDateTime desactivatedAt;
 
-    public Auditor(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime desactivatedAt) {
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Schema(hidden = true)
+    private LocalDateTime deletedAt;
+
+    public Auditor(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime desactivatedAt, LocalDateTime deletedAt) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.desactivatedAt = desactivatedAt;
+        this.deletedAt = deletedAt;
     }
 
     public Auditor(Long id) {
@@ -86,6 +95,14 @@ public class Auditor {
 
     public void setDesactivatedAt(LocalDateTime desactivatedAt) {
         this.desactivatedAt = desactivatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
 }

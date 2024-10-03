@@ -21,6 +21,14 @@ public class DiaService extends usac.api.services.Service {
         return dia;
     }
 
+    public Dia getDiaById(Long id) throws Exception {
+        Dia dia = this.diaRepository.findById(id).orElse(null);
+        if (dia == null) {
+            throw new Exception("Dia no encontrado.");
+        }
+        return dia;
+    }
+
     public List<Dia> getDias() {
         return (List<Dia>) this.diaRepository.findAll();
     }

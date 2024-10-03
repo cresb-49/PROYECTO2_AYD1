@@ -1,13 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
+import { DayConfig, ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
 import { FormsModule } from '@angular/forms';
-import { Negocio, NegocioService, PayloadNegocio } from '../../services/negocio/negocio.service';
+import { Dia, Horario, Negocio, NegocioService, PayloadNegocio } from '../../services/negocio/negocio.service';
 import { ToastrService } from 'ngx-toastr';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { BehaviorSubject, debounceTime } from 'rxjs';
 import { DiaService } from '../../services/dia/dia.service';
+
+export interface ManageNegocio {
+  id: number;
+  nombre: string;
+  logo: string;
+  asignacion_manual: boolean;
+  direccion: string;
+  horarios: DayConfig[];
+}
 
 @Component({
   standalone: true,
@@ -20,23 +29,27 @@ export class CrearNegocioComponent implements OnInit {
   activeButtonSave = false;
   imageSrc: string = 'no-image-found.png'; // URL por defecto de la imagen
 
-  negocioOriginalData: Negocio = {
+  dataDias: Dia[] = []
+
+  negocioOriginalData: ManageNegocio = {
     id: 0,
     nombre: '',
     logo: '',
     asignacion_manual: false,
-    direccion: ''
+    direccion: '',
+    horarios: []
   };
 
-  negocioData: Negocio = {
+  negocioData: ManageNegocio = {
     id: 0,
     nombre: '',
     logo: '',
     asignacion_manual: false,
-    direccion: ''
+    direccion: '',
+    horarios: []
   };
 
-  private negocioDataSubject = new BehaviorSubject<Negocio>(this.negocioData); // Para observar cambios
+  private negocioDataSubject = new BehaviorSubject<ManageNegocio>(this.negocioData); // Para observar cambios
 
   constructor(
     private toastr: ToastrService,
@@ -44,14 +57,17 @@ export class CrearNegocioComponent implements OnInit {
     private diaService: DiaService
   ) { }
 
-  ngOnInit() {
-    this.cargarDatosNegocio();
-    this.getDias();
+  async ngOnInit() {
+    await this.getDias();
+    await this.cargarDatosNegocio();
     // Suscribirnos a los cambios en negocioData y comparar con negocioOriginalData
     this.negocioDataSubject.pipe(
       debounceTime(300) // Evitar múltiples comparaciones inmediatas
     ).subscribe(newData => {
       this.activeButtonSave = !this.compararObjetos(newData, this.negocioOriginalData);
+      if (this.activeButtonSave) {
+        this.toastr.info('Hay cambios pendientes por guardar');
+      }
     });
   }
 
@@ -63,11 +79,19 @@ export class CrearNegocioComponent implements OnInit {
             id: response.data.id,
             nombre: response.data.nombre,
             logo: response.data.logo,
-            asignacion_manual: response.data.asignacion_manual,
-            direccion: response.data.direccion
+            asignacion_manual: response.data.asignacionManual,
+            direccion: response.data.direccion,
+            horarios: [...this.calcularHorario(response.data.horarios)],
           };
           this.imageSrc = response.data.logo;
-          this.negocioOriginalData = { ...this.negocioData }; // Guardamos la copia original
+          this.negocioOriginalData = {
+            id: response.data.id,
+            nombre: response.data.nombre,
+            logo: response.data.logo,
+            asignacion_manual: response.data.asignacionManual,
+            direccion: response.data.direccion,
+            horarios: [...this.calcularHorario(response.data.horarios)],
+          }; // Guardamos la copia original
 
           this.negocioDataSubject.next(this.negocioData); // Emitir el valor inicial de negocioData
         },
@@ -78,8 +102,38 @@ export class CrearNegocioComponent implements OnInit {
     );
   }
 
+  calcularHorario(horarios: any): DayConfig[] {
+    let negocioHas: DayConfig[] = horarios.map((horario: any) => {
+      return {
+        id: horario.dia.id,
+        day: horario.dia.nombre,
+        init: horario.apertura,
+        end: horario.cierre,
+        active: true
+      } as DayConfig
+    })
+    //En el listado de dias buscamos por medio de id si ya esta agregado si no esta agregado
+    //se agrega con active en false y init y end en 00:00
+    this.dataDias.forEach((dia) => {
+      let index = negocioHas.findIndex((diaHas) => {
+        return diaHas.id === dia.id
+      })
+      if (index === -1) {
+        negocioHas.push({
+          id: dia.id,
+          day: dia.nombre,
+          init: '00:00',
+          end: '00:00',
+          active: false
+        } as DayConfig)
+      }
+    })
+    return negocioHas;
+  }
+
+
   // Comparación profunda entre dos objetos
-  compararObjetos(obj1: Negocio, obj2: Negocio): boolean {
+  compararObjetos(obj1: ManageNegocio, obj2: ManageNegocio): boolean {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   }
 
@@ -101,6 +155,11 @@ export class CrearNegocioComponent implements OnInit {
     this.negocioDataSubject.next(this.negocioData);
   }
 
+  onDataChange(newData: DayConfig[]) {
+    this.negocioData.horarios = newData;
+    this.negocioDataSubject.next(this.negocioData);
+  }
+
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -115,12 +174,26 @@ export class CrearNegocioComponent implements OnInit {
   }
 
   actualizarNegocio(): void {
+    const daysActive = this.negocioData.horarios.filter((day: DayConfig) => day.active);
+    const horario: Horario[] = daysActive.map((day: DayConfig) => {
+      return {
+        dia: {
+          id: day.id,
+          nombre: day.day
+        },
+        apertura: day.init,
+        cierre: day.end
+      } as Horario
+    });
     const payload: PayloadNegocio = {
-      id: this.negocioData.id,
-      nombre: this.negocioData.nombre,
-      logo: this.negocioData.logo,
-      asignacionManual: this.negocioData.asignacion_manual,
-      direccion: this.negocioData.direccion
+      negocio: {
+        id: this.negocioData.id,
+        nombre: this.negocioData.nombre,
+        logo: this.negocioData.logo,
+        asignacionManual: this.negocioData.asignacion_manual,
+        direccion: this.negocioData.direccion
+      },
+      horarios: horario
     };
 
     this.negocioService.updateNegocio(payload).subscribe({
@@ -135,10 +208,16 @@ export class CrearNegocioComponent implements OnInit {
     });
   }
 
-  getDias(){
+  getDias() {
     this.diaService.getDias().subscribe({
       next: (response: ApiResponse) => {
-        console.log(response.data);
+        const dias = response.data ?? [];
+        dias.forEach((dia: any) => {
+          this.dataDias.push({
+            id: dia.id,
+            nombre: dia.nombre,
+          } as Dia);
+        });
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.message, 'Error al obtener los días');

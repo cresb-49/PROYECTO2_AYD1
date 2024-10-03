@@ -3,20 +3,33 @@ import { Router } from '@angular/router';
 import { ApiResponse, ErrorApiResponse, HttpService } from '../http/http.service';
 import { ToastrService } from 'ngx-toastr';
 
+export interface Dia {
+  id: number;
+  nombre: string;
+}
+export interface Horario {
+  dia: Dia;
+  apertura: string;
+  cierre: string;
+}
 export interface Negocio {
   id: number;
   nombre: string;
   logo: string;
   asignacion_manual: boolean;
   direccion: string;
+  horarios: Horario[];
 }
 
 export interface PayloadNegocio {
-  id: number;
-  nombre: string;
-  logo: string;
-  asignacionManual: boolean;
-  direccion: string;
+  negocio: {
+    id: number;
+    nombre: string;
+    logo: string;
+    asignacionManual: boolean;
+    direccion: string;
+  };
+  horarios: Horario[];
 }
 
 export interface InfoNegocio {

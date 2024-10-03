@@ -3,15 +3,15 @@ package usac.api.models.dto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NegocioDTO {
+public class NegocioPublicDTO {
     private Long id;
     private String nombre;
     private String logo;
 
-    public NegocioDTO() {
+    public NegocioPublicDTO() {
     }
 
-    public NegocioDTO(Long id, String nombre, String logo) {
+    public NegocioPublicDTO(Long id, String nombre, String logo) {
         this.id = id;
         this.nombre = nombre;
         this.logo = logo;
