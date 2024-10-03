@@ -21,18 +21,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
 @Table(name = "horario_negocio", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"dia", "negocio"})
+        @UniqueConstraint(columnNames = { "dia", "negocio" })
 })
 @SQLDelete(sql = "UPDATE horario_negocio SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class HorarioNegocio extends Auditor {
 
-    @ManyToOne//indicador de relacion muchos a uno
+    @ManyToOne // indicador de relacion muchos a uno
     @JoinColumn(name = "dia", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Dia dia;
 
-    @ManyToOne//indicador de relacion muchos a uno
+    @ManyToOne // indicador de relacion muchos a uno
     @JoinColumn(name = "negocio", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -87,5 +87,12 @@ public class HorarioNegocio extends Auditor {
 
     public void setCierre(LocalTime cierre) {
         this.cierre = cierre;
+    }
+
+    @Override
+    public String toString() {
+        return "HorarioNegocio [apertura=" + apertura + ", cierre=" + cierre + ", dia=" + dia.getNombre() + ", negocio="
+                + negocio.getId()
+                + ", deletedAt=" + getDeletedAt() + "]";
     }
 }

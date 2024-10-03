@@ -3,7 +3,6 @@ package usac.api.services;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -21,6 +20,8 @@ public class NegocioService extends usac.api.services.Service {
     private NegocioRepository negocioRepository;
     @Autowired
     private DiaService diaService;
+    @Autowired
+    private HorarioNegocioService horarioNegocioService;
 
     public Negocio obtenerNegocio() {
         return negocioRepository.findFirstByOrderByIdAsc().orElse(null);
@@ -45,40 +46,24 @@ public class NegocioService extends usac.api.services.Service {
         negocioEncontrado.setLogo(negocio.getLogo());
         negocioEncontrado.setAsignacionManual(negocio.isAsignacionManual());
         negocioEncontrado.setDireccion(negocio.getDireccion());
-
-        // Obtener la lista actual de horarios
-        List<HorarioNegocio> horariosActuales = negocioEncontrado.getHorarios();
-        System.out.println("Horarios actuales");
-        System.out.println(horariosActuales);
-        // Crear una lista de los horarios a eliminar (los que ya no están en la nueva
-        // lista)
-        List<HorarioNegocio> horariosAEliminar = horariosActuales.stream()
-                .filter(horarioActual -> horarios.stream()
-                        .noneMatch(horarioNuevo -> horarioNuevo.getDia().getNombre()
-                                .equals(horarioActual.getDia().getNombre())))
-                .collect(Collectors.toList());
-
-        // Eliminar los horarios que ya no están en la nueva lista
-        horariosActuales.removeAll(horariosAEliminar);
-
+        // Eliminar los horarios anteriores
+        negocioEncontrado.getHorarios().clear();
         // Actualizar o agregar los nuevos horarios
         for (HorarioNegocio horario : horarios) {
-            Dia dia = diaService.getDiaByNombre(horario.getDia().getNombre());
-
-            // Verificar si el horario ya existe
-            HorarioNegocio horarioExistente = horariosActuales.stream()
-                    .filter(h -> h.getDia().getNombre().equals(horario.getDia().getNombre()))
-                    .findFirst().orElse(null);
-
-            if (horarioExistente == null) {
-                // Agregar un nuevo horario
-                HorarioNegocio nuevoHorario = new HorarioNegocio(dia, negocioEncontrado, horario.getApertura(),
-                        horario.getCierre());
-                horariosActuales.add(nuevoHorario);
+            HorarioNegocio horarioEncontrado = horarioNegocioService
+                    .obtenerHorarioPorDiaYNegocio(diaService.getDiaByNombre(horario.getDia().getNombre()), negocioEncontrado);
+            // Si el horario ya existe, se actualiza
+            if (horarioEncontrado != null) {
+                horarioEncontrado.setApertura(horario.getApertura());
+                horarioEncontrado.setCierre(horario.getCierre());
+                negocioEncontrado.getHorarios().add(horarioEncontrado);
+                //Si el horario encontrado esta eliminado, se activa
+                if (horarioEncontrado.getDeletedAt() != null) {
+                    horarioEncontrado.setDeletedAt(null);
+                }
             } else {
-                // Actualizar el horario existente
-                horarioExistente.setApertura(horario.getApertura());
-                horarioExistente.setCierre(horario.getCierre());
+                // Si el horario no existe, se crea
+                negocioEncontrado.getHorarios().add(new HorarioNegocio(diaService.getDiaByNombre(horario.getDia().getNombre()), negocioEncontrado, horario.getApertura(), horario.getCierre()));
             }
         }
         // Guardar los cambios
