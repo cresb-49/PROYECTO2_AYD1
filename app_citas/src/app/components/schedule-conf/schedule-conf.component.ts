@@ -1,12 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // Importa FormsModule para ngModel
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 export interface DayConfig {
   id: number;
@@ -22,14 +17,8 @@ export interface DayConfig {
   templateUrl: './schedule-conf.component.html',
   styleUrls: ['./schedule-conf.component.css'],
   imports: [
-    MatCardModule,
     CommonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    NgIf,
-    FormsModule // Asegúrate de importar FormsModule aquí
+    FormsModule
   ],
 })
 export class ScheduleConfComponent {
@@ -48,15 +37,34 @@ export class ScheduleConfComponent {
   // Emisor de eventos de cambios en la data
   @Output() dataChange = new EventEmitter<DayConfig[]>();
 
-  constructor() {}
+  constructor(
+    private toastr: ToastrService
+  ) { }
 
   cambiarEstado(dia: DayConfig) {
     dia.active = !dia.active; // Cambia el estado del día
     this.emitirCambio(); // Emite el evento de cambio
   }
 
-  onHorarioChange() {
-    this.emitirCambio(); // Llama a esta función cuando se editen los campos
+  onHorarioChange(dia: DayConfig) {
+    if (this.horaInicioMayorQueHoraFin(dia.init, dia.end)) {
+      dia.init = this.restarUnMinuto(dia.end); // Restamos un minuto a la hora de fin y la ponemos como inicio
+      this.toastr.error(`La hora de inicio no puede ser mayor que la hora de fin para el día ${dia.day}. Se ajustará la hora de inicio.`);
+    }
+    this.emitirCambio(); // Emite el evento después de cualquier cambio
+  }
+
+  // Función para restar un minuto a una hora dada
+  restarUnMinuto(hora: string): string {
+    const [horas, minutos] = hora.split(':').map(Number);
+    const fecha = new Date(0, 0, 0, horas, minutos);
+    fecha.setMinutes(fecha.getMinutes() - 1); // Restamos un minuto
+
+    // Formateamos las horas y minutos para que siempre tengan dos dígitos
+    const horasAjustadas = fecha.getHours().toString().padStart(2, '0');
+    const minutosAjustados = fecha.getMinutes().toString().padStart(2, '0');
+
+    return `${horasAjustadas}:${minutosAjustados}`;
   }
 
   emitirCambio() {
@@ -68,5 +76,15 @@ export class ScheduleConfComponent {
       return this.data;
     }
     return this.data.filter((dia: DayConfig) => dia.active);
+  }
+
+  // Función para verificar si la hora de inicio es mayor que la hora de fin
+  horaInicioMayorQueHoraFin(init: string, end: string): boolean {
+    const [initHoras, initMinutos] = init.split(':').map(Number);
+    const [endHoras, endMinutos] = end.split(':').map(Number);
+    const horaInicio = new Date(0, 0, 0, initHoras, initMinutos);
+    const horaFin = new Date(0, 0, 0, endHoras, endMinutos);
+
+    return horaInicio.getTime() > horaFin.getTime();
   }
 }

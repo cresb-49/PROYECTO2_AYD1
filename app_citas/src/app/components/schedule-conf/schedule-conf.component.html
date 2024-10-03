@@ -15,18 +15,20 @@
           <label class="inline-flex items-center">
             <input type="checkbox"
               class="form-checkbox h-5 w-5 text-blue-600 dark:text-blue-400 dark:bg-gray-700 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-              [checked]="value.active" (change)="cambiarEstado(value)" (ngModelChange)="onHorarioChange()">
+              [checked]="value.active" (change)="cambiarEstado(value)">
           </label>
         </td>
         <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
           {{value.day}}
         </td>
         <td class="px-6 py-4">
-          <input type="time" [disabled]="!isShowData?!value.active:true" [(ngModel)]="value.init" (ngModelChange)="onHorarioChange()"
+          <input type="time" [disabled]="!isShowData?!value.active:true" [(ngModel)]="value.init"
+            (ngModelChange)="onHorarioChange(value)"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         </td>
         <td class="px-6 py-4">
-          <input type="time" [disabled]="!isShowData?!value.active:true" [(ngModel)]="value.end" (ngModelChange)="onHorarioChange()"
+          <input type="time" [disabled]="!isShowData?!value.active:true" [(ngModel)]="value.end"
+            (ngModelChange)="onHorarioChange(value)"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         </td>
       </tr>
