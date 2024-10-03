@@ -46,7 +46,7 @@ public class Negocio extends Auditor {
     @Size(min = 1, max = 250, message = "La dirección del negocio debe tener entre 1 y 250 caracteres.")
     private String direccion;
 
-    @OneToMany
+    @OneToMany(mappedBy = "negocio", orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private List<HorarioNegocio> horarios;

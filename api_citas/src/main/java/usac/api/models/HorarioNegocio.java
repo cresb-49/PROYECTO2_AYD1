@@ -17,6 +17,8 @@ import org.hibernate.annotations.Where;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @Entity
 @Table(name = "horario_negocio", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"dia", "negocio"})
@@ -34,6 +36,7 @@ public class HorarioNegocio extends Auditor {
     @JoinColumn(name = "negocio", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Schema(hidden = true)
     private Negocio negocio;
 
     @NotNull(message = "La hora de apertura no puede ser nula")

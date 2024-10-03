@@ -174,12 +174,26 @@ export class CrearNegocioComponent implements OnInit {
   }
 
   actualizarNegocio(): void {
+    const daysActive = this.negocioData.horarios.filter((day: DayConfig) => day.active);
+    const horario: Horario[] = daysActive.map((day: DayConfig) => {
+      return {
+        dia: {
+          id: day.id,
+          nombre: day.day
+        },
+        apertura: day.init,
+        cierre: day.end
+      } as Horario
+    });
     const payload: PayloadNegocio = {
-      id: this.negocioData.id,
-      nombre: this.negocioData.nombre,
-      logo: this.negocioData.logo,
-      asignacionManual: this.negocioData.asignacion_manual,
-      direccion: this.negocioData.direccion
+      negocio: {
+        id: this.negocioData.id,
+        nombre: this.negocioData.nombre,
+        logo: this.negocioData.logo,
+        asignacionManual: this.negocioData.asignacion_manual,
+        direccion: this.negocioData.direccion
+      },
+      horarios: horario
     };
 
     this.negocioService.updateNegocio(payload).subscribe({
