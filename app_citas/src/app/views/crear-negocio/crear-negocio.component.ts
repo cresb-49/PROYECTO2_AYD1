@@ -65,6 +65,9 @@ export class CrearNegocioComponent implements OnInit {
       debounceTime(300) // Evitar múltiples comparaciones inmediatas
     ).subscribe(newData => {
       this.activeButtonSave = !this.compararObjetos(newData, this.negocioOriginalData);
+      if (this.activeButtonSave) {
+        this.toastr.info('Hay cambios pendientes por guardar');
+      }
     });
   }
 
