@@ -50,6 +50,13 @@ public class Auditor {
     @Schema(hidden = true)
     private LocalDateTime deletedAt;
 
+    public Auditor(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime desactivatedAt) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.desactivatedAt = desactivatedAt;
+    }
+    
     public Auditor(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime desactivatedAt, LocalDateTime deletedAt) {
         this.id = id;
         this.createdAt = createdAt;
