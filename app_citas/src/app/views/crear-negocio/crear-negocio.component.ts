@@ -64,7 +64,6 @@ export class CrearNegocioComponent implements OnInit {
     this.negocioDataSubject.pipe(
       debounceTime(300) // Evitar múltiples comparaciones inmediatas
     ).subscribe(newData => {
-      console.log(newData);
       this.activeButtonSave = !this.compararObjetos(newData, this.negocioOriginalData);
     });
   }
@@ -202,7 +201,6 @@ export class CrearNegocioComponent implements OnInit {
             nombre: dia.nombre,
           } as Dia);
         });
-        console.log(this.dataDias);
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.message, 'Error al obtener los días');
