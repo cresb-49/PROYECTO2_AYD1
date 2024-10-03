@@ -8,7 +8,6 @@ export interface Dia{
   nombre:string;
 }
 export interface Horario{
-  id:number;
   dia: Dia;
   apertura:string;
   cierre:string;

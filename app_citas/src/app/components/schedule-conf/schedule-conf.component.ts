@@ -8,6 +8,14 @@ import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // Importa FormsModule para ngModel
 import { CommonModule } from '@angular/common';
 
+export interface DayConfig {
+  id: number;
+  day: string;
+  init: string;
+  end: string;
+  active: boolean;
+}
+
 @Component({
   standalone: true,
   selector: 'app-schedule-conf',
@@ -27,26 +35,38 @@ import { CommonModule } from '@angular/common';
 export class ScheduleConfComponent {
   @Input() isShowData = false;
   @Input() showNonActive = true;
-  @Input() data = [
-    { day: 'Lunes', init: '08:00', end: '18:00', active: true },
-    { day: 'Martes', init: '08:00', end: '18:00', active: true },
-    { day: 'Miércoles', init: '08:00', end: '18:00', active: true },
-    { day: 'Jueves', init: '08:00', end: '18:00', active: true },
-    { day: 'Viernes', init: '08:00', end: '18:00', active: true },
-    { day: 'Sábado', init: '08:00', end: '18:00', active: false },
-    { day: 'Domingo', init: '08:00', end: '18:00', active: false },
+  @Input() data: DayConfig[] = [
+    { id: 1, day: 'Lunes', init: '08:00', end: '18:00', active: true },
+    { id: 2, day: 'Martes', init: '08:00', end: '18:00', active: true },
+    { id: 3, day: 'Miércoles', init: '08:00', end: '18:00', active: true },
+    { id: 4, day: 'Jueves', init: '08:00', end: '18:00', active: true },
+    { id: 5, day: 'Viernes', init: '08:00', end: '18:00', active: true },
+    { id: 6, day: 'Sábado', init: '08:00', end: '18:00', active: false },
+    { id: 7, day: 'Domingo', init: '08:00', end: '18:00', active: false },
   ];
 
-  constructor() { }
+  // Emisor de eventos de cambios en la data
+  @Output() dataChange = new EventEmitter<DayConfig[]>();
 
-  cambiarEstado(dia: any) {
-    dia.active = !dia.active;
+  constructor() {}
+
+  cambiarEstado(dia: DayConfig) {
+    dia.active = !dia.active; // Cambia el estado del día
+    this.emitirCambio(); // Emite el evento de cambio
   }
 
-  filtroDataMostrar(){
-    if(this.showNonActive){
+  onHorarioChange() {
+    this.emitirCambio(); // Llama a esta función cuando se editen los campos
+  }
+
+  emitirCambio() {
+    this.dataChange.emit(this.data); // Emite el evento con la data actualizada
+  }
+
+  filtroDataMostrar() {
+    if (this.showNonActive) {
       return this.data;
     }
-    return this.data.filter((dia: any) => dia.active);
+    return this.data.filter((dia: DayConfig) => dia.active);
   }
 }
