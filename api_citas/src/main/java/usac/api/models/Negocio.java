@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
 @Table(name = "negocio")
-@SQLDelete(sql = "UPDATE negocio SET deleted_at = NULL WHERE id = ?")
+@SQLDelete(sql = "UPDATE negocio SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class Negocio extends Auditor {
     
@@ -49,6 +49,7 @@ public class Negocio extends Auditor {
     @OneToMany(mappedBy = "negocio", orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @Where(clause = "deleted_at IS NULL")
     private List<HorarioNegocio> horarios;
 
     public Negocio() {

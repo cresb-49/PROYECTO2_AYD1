@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Table(name = "horario_negocio", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"dia", "negocio"})
 })
-@SQLDelete(sql = "UPDATE horario_negocio SET deleted_at = NULL WHERE id = ?")
+@SQLDelete(sql = "UPDATE horario_negocio SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class HorarioNegocio extends Auditor {
 

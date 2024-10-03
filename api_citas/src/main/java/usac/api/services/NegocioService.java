@@ -48,7 +48,8 @@ public class NegocioService extends usac.api.services.Service {
 
         // Obtener la lista actual de horarios
         List<HorarioNegocio> horariosActuales = negocioEncontrado.getHorarios();
-
+        System.out.println("Horarios actuales");
+        System.out.println(horariosActuales);
         // Crear una lista de los horarios a eliminar (los que ya no están en la nueva
         // lista)
         List<HorarioNegocio> horariosAEliminar = horariosActuales.stream()
