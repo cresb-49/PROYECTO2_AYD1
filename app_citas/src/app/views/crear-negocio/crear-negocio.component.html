@@ -42,7 +42,7 @@
       </div>
       <div class="relative z-0 w-full mb-4 group">
         <h5 class="text-xl font-bold dark:text-white mb-4">Configuración del Horario</h5>
-        <app-schedule-conf [data]="negocioData.horarios"></app-schedule-conf>
+        <app-schedule-conf [data]="negocioData.horarios"  (dataChange)="onDataChange($event)"></app-schedule-conf>
       </div>
     </div>
     <button type="submit"

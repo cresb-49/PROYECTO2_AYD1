@@ -37,7 +37,7 @@ export class CrearNegocioComponent implements OnInit {
     logo: '',
     asignacion_manual: false,
     direccion: '',
-    horarios:[]
+    horarios: []
   };
 
   negocioData: ManageNegocio = {
@@ -64,6 +64,7 @@ export class CrearNegocioComponent implements OnInit {
     this.negocioDataSubject.pipe(
       debounceTime(300) // Evitar múltiples comparaciones inmediatas
     ).subscribe(newData => {
+      console.log(newData);
       this.activeButtonSave = !this.compararObjetos(newData, this.negocioOriginalData);
     });
   }
@@ -76,13 +77,19 @@ export class CrearNegocioComponent implements OnInit {
             id: response.data.id,
             nombre: response.data.nombre,
             logo: response.data.logo,
-            asignacion_manual: response.data.asignacion_manual,
+            asignacion_manual: response.data.asignacionManual,
             direccion: response.data.direccion,
-            horarios: this.calcularHorario(response.data.horarios),
+            horarios: [...this.calcularHorario(response.data.horarios)],
           };
-          console.log(this.negocioData);
           this.imageSrc = response.data.logo;
-          this.negocioOriginalData = { ...this.negocioData }; // Guardamos la copia original
+          this.negocioOriginalData = {
+            id: response.data.id,
+            nombre: response.data.nombre,
+            logo: response.data.logo,
+            asignacion_manual: response.data.asignacionManual,
+            direccion: response.data.direccion,
+            horarios: [...this.calcularHorario(response.data.horarios)],
+          }; // Guardamos la copia original
 
           this.negocioDataSubject.next(this.negocioData); // Emitir el valor inicial de negocioData
         },
@@ -93,8 +100,8 @@ export class CrearNegocioComponent implements OnInit {
     );
   }
 
-  calcularHorario(horarios:any):DayConfig[]{
-    let negocioHas:DayConfig[] = horarios.map((horario: any) => {
+  calcularHorario(horarios: any): DayConfig[] {
+    let negocioHas: DayConfig[] = horarios.map((horario: any) => {
       return {
         id: horario.dia.id,
         day: horario.dia.nombre,
@@ -105,11 +112,11 @@ export class CrearNegocioComponent implements OnInit {
     })
     //En el listado de dias buscamos por medio de id si ya esta agregado si no esta agregado
     //se agrega con active en false y init y end en 00:00
-    this.dataDias.forEach((dia)=>{
-      let index = negocioHas.findIndex((diaHas)=>{
+    this.dataDias.forEach((dia) => {
+      let index = negocioHas.findIndex((diaHas) => {
         return diaHas.id === dia.id
       })
-      if(index === -1){
+      if (index === -1) {
         negocioHas.push({
           id: dia.id,
           day: dia.nombre,
@@ -143,6 +150,11 @@ export class CrearNegocioComponent implements OnInit {
   // Se actualiza el checkbox y emitimos el cambio
   onAsignacionManualChange(): void {
     this.negocioData.asignacion_manual = !this.negocioData.asignacion_manual;
+    this.negocioDataSubject.next(this.negocioData);
+  }
+
+  onDataChange(newData: DayConfig[]) {
+    this.negocioData.horarios = newData;
     this.negocioDataSubject.next(this.negocioData);
   }
 
@@ -188,7 +200,7 @@ export class CrearNegocioComponent implements OnInit {
           this.dataDias.push({
             id: dia.id,
             nombre: dia.nombre,
-          }as Dia);
+          } as Dia);
         });
         console.log(this.dataDias);
       },
