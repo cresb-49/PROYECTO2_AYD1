@@ -59,16 +59,7 @@ export class UserService {
   }
 
   getUsers(): any {
-    let data = null;
-    this.httpService.get<any>('usuario/private/getUsuarios', null, true).subscribe({
-      next: (response: ApiResponse) => {
-        data = response.data;
-      },
-      error: (error: ErrorApiResponse) => {
-        this.toastr.error(error.error, 'Error al obtener los usuarios');
-      }
-    });
-    return data;
+    return this.httpService.get<any>('usuario/private/getUsuarios', null, true);
   }
 
   getPerfil(id: number | string) {
