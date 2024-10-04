@@ -4,6 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user/user.service';
 import { TableAction, TableComponent, TableHeader } from '../../components/table/table.component';
 import { OptionsModal, PopUpModalComponent } from '../../components/pop-up-modal/pop-up-modal.component';
+import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
+import { ToastrService } from 'ngx-toastr';
+
+export interface UserInfo {
+  id: number;
+  nombres: string;
+  apellidos: string;
+  email: string;
+}
 
 @Component({
   standalone: true,
@@ -14,40 +23,52 @@ import { OptionsModal, PopUpModalComponent } from '../../components/pop-up-modal
 })
 export class SeeUsersComponent implements OnInit {
   hideModal = true;
-  usuarios: any[] = [];
   tableHeaders: TableHeader[] = [
-    { name: 'Nombre', key: 'name', main: true },
-    { name: 'Apellido', key: 'lastname' },
+    { name: 'Nombre', key: 'nombres', main: true },
+    { name: 'Apellido', key: 'apellidos' },
     { name: 'Correo', key: 'email' }
   ]
 
-  optionsModal:OptionsModal = {
+  optionsModal: OptionsModal = {
     question: '¿Estás seguro de que deseas eliminar este usuario?',
     textYes: 'Sí, estoy seguro',
     textNo: 'No, cancelar',
     confirmAction: () => { }
   }
 
-  data = [
-    { id: 1, name: 'Juan', lastname: 'Perez', email: 'juan.perez@empresa.com', role: 'Admin' },
-    { id: 2, name: 'Maria', lastname: 'Gonzalez', email: 'maria.gonzalez@empresa.com', role: 'User' },
-    { id: 3, name: 'Pedro', lastname: 'Jimenez', email: 'pedro.jimenez@empresa.com', role: 'Admin' },
-    { id: 4, name: 'Luis', lastname: 'Gutierrez', email: 'luis.gutierrez@empresa.com', role: 'User' },
-    { id: 5, name: 'Ana', lastname: 'Martinez', email: 'ana.martinez@empresa.com', role: 'Admin' },
-  ]
+  usuarios: UserInfo[] = [];
 
   actionsTable: TableAction[] = [
-    { name: 'Editar', icon: 'edit', route: '/edit-user', key: 'name' },
+    { name: 'Editar', icon: 'edit', route: '/edit-user', key: 'id' },
     { name: 'Eliminar', icon: 'delete', action: (data: any) => this.openModal(data), return: true }
   ]
-  constructor(private userService: UserService) { }
+  constructor(
+    private userService: UserService,
+    private toastr: ToastrService
+  ) { }
 
   ngOnInit() {
     this.obtenerUsuarios();
   }
 
   obtenerUsuarios() {
-    // this.usuarios = this.userService.getUsers();
+    this.userService.getUsers().subscribe({
+      next: (response: ApiResponse) => {
+        console.log('Response:', response);
+        const data = response.data;
+        for(let d of data) {
+          this.usuarios.push({
+            id: d.id,
+            nombres: d.nombres,
+            apellidos: d.apellidos,
+            email: d.email
+          });
+        }
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error al obtener los usuarios');
+      }
+    });
   }
 
   openModal(data: any) {

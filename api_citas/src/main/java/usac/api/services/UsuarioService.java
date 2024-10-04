@@ -464,7 +464,7 @@ public class UsuarioService extends usac.api.services.Service {
         }
 
         if (this.usuarioRepository.existsByCui(crear.getCui())) {
-            throw new Exception("El numero de telefono ya existe.");
+            throw new Exception("El CUI ya existe.");
         }
 
         if (crear.getNit() != null) {
