@@ -6,6 +6,7 @@ package usac.api.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Optional;
@@ -17,9 +18,16 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import usac.api.models.*;
+import usac.api.models.Cancha;
+import usac.api.models.Dia;
+import usac.api.models.HorarioCancha;
+import usac.api.models.Negocio;
+import usac.api.models.Rol;
+import usac.api.models.TipoEmpleado;
+import usac.api.models.Usuario;
 import usac.api.repositories.DiaRepository;
 import usac.api.repositories.RolRepository;
+import usac.api.services.CanchaService;
 import usac.api.services.DiaService;
 import usac.api.services.EmpleadoService;
 import usac.api.services.NegocioService;
@@ -43,6 +51,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private DiaRepository diaRepository;
     @Autowired
     private EmpleadoService empleadoService;
+    @Autowired
+    private CanchaService canchaService;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -155,13 +165,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "Pac",
                     "12345");
 
-            TipoEmpleado tipoEmpleado1 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Organizador"));
-            TipoEmpleado tipoEmpleado2 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Limpieza"));
-            TipoEmpleado tipoEmpleado3 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Seguridad"));
-            TipoEmpleado tipoEmpleado4 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Cocina"));
-            TipoEmpleado tipoEmpleado5 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Recepcion"));
-
-
             // 5 Usuarios de prueba en modo cliente
             Usuario cliente1 = new Usuario("123456789", "1234567891234",
                     "12345679",
@@ -222,6 +225,22 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "empleadoprueba5@email.com",
                     "Empleado", "Prueba5",
                     "12345");
+
+            TipoEmpleado tipoEmpleado1 = new TipoEmpleado("Organizador");
+            TipoEmpleado tipoEmpleado2 = new TipoEmpleado("Limpieza");
+            TipoEmpleado tipoEmpleado3 = new TipoEmpleado("Seguridad");
+            TipoEmpleado tipoEmpleado4 = new TipoEmpleado("Cocina");
+            TipoEmpleado tipoEmpleado5 = new TipoEmpleado("Recepcion");
+
+            try {
+                this.empleadoService.createTipoEmpleado(tipoEmpleado1);
+                this.empleadoService.createTipoEmpleado(tipoEmpleado2);
+                this.empleadoService.createTipoEmpleado(tipoEmpleado3);
+                this.empleadoService.createTipoEmpleado(tipoEmpleado4);
+                this.empleadoService.createTipoEmpleado(tipoEmpleado5);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
             try {
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
@@ -256,7 +275,33 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 System.err.println(e.getMessage());
             }
             //Inicio de datos de las canchas
-
+            Cancha cancha1 = new Cancha(100.0, "Cancha de futbol 5");
+            Cancha cancha2 = new Cancha(150.0, "Cancha de futbol 7");
+            Cancha cancha3 = new Cancha(200.0, "Cancha de futbol 11 con cesped natural");
+            Cancha cancha4 = new Cancha(250.0, "Cancha de futbol 11 con cesped sintetico");
+            Cancha cancha5 = new Cancha(300.0, "Cancha de futbol 11 con cesped artificial");
+            //Horario generico para las canchas
+            ArrayList<HorarioCancha> horarios = new ArrayList<>();
+            horarios.add(new HorarioCancha(null, lunes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horarios.add(new HorarioCancha(null, martes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horarios.add(new HorarioCancha(null, miercoles, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horarios.add(new HorarioCancha(null, jueves, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horarios.add(new HorarioCancha(null, viernes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horarios.add(new HorarioCancha(null, sabado, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+            horarios.add(new HorarioCancha(null, domingo, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+            //Se crean las canchas
+            try {
+                //Verificamos si ya existen 5 canchas
+                if (this.canchaService.countCanchas() < 5) {
+                    this.canchaService.crearCancha(cancha1, horarios);
+                    this.canchaService.crearCancha(cancha2, horarios);
+                    this.canchaService.crearCancha(cancha3, horarios);
+                    this.canchaService.crearCancha(cancha4, horarios);
+                    this.canchaService.crearCancha(cancha5, horarios);
+                }
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
             /*
              * Categoria categoria = new Categoria("Hogar");
              * this.insertarCategoria(categoria);

@@ -5,12 +5,15 @@
 package usac.api.models;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
+
+import java.util.List;
 
 /**
  * @author carlo
@@ -32,6 +35,12 @@ public class Empleado extends Auditor {
     @JoinColumn(name = "tipo_empleado", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private TipoEmpleado tipoEmpleado;
+
+    @OneToMany(mappedBy = "empleado", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @Where(clause = "deleted_at IS NULL")
+    private List<HorarioEmpleado> horarios;
 
     public Empleado() {
     }
@@ -57,4 +66,11 @@ public class Empleado extends Auditor {
         this.tipoEmpleado = tipoEmpleado;
     }
 
+    public List<HorarioEmpleado> getHorarios() {
+        return horarios;
+    }
+
+    public void setHorarios(List<HorarioEmpleado> horarios) {
+        this.horarios = horarios;
+    }
 }

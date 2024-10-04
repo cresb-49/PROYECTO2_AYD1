@@ -11,20 +11,15 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -32,7 +27,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,7 +43,6 @@ import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
-import usac.api.repositories.EmpleadoRepository;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
@@ -768,7 +761,7 @@ public class UsuarioServiceTest {
         when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(true);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            usuarioService.crearEmpleado(usuario, tipoEmpleado);
+             usuarioService.crearEmpleado(usuario, null);
         });
         assertEquals("El Email ya existe.", exception.getMessage());
     }

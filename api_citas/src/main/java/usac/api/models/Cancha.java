@@ -10,11 +10,13 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 /**
- *
  * @author Carlos
  */
 @Entity
@@ -22,19 +24,22 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE cancha SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class Cancha extends Auditor {
-    
+
     @Column(nullable = false, precision = 2)
     @NotNull(message = "El costo por hora no puede ser nulo.")
     @Min(value = 0, message = "El costo por hora no puede ser negativo.")
     private Double costoHora;
-    
+
     @Column(length = 250, nullable = false)
     @NotBlank(message = "La descripción de la cancha no puede estar vacía.")
     @NotNull(message = "La descripción de la cancha no puede ser nula")
     private String descripcion;
 
     @OneToMany(mappedBy = "cancha", orphanRemoval = true)
-    private List<HorarioCancha> canchaHorarios;
+    @Cascade(CascadeType.ALL)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @Where(clause = "deleted_at IS NULL")
+    private List<HorarioCancha> horarios;
 
     public Cancha() {
     }
@@ -58,5 +63,13 @@ public class Cancha extends Auditor {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public List<HorarioCancha> getHorarios() {
+        return horarios;
+    }
+
+    public void setHorarios(List<HorarioCancha> horarios) {
+        this.horarios = horarios;
     }
 }
