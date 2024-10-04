@@ -149,14 +149,49 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
             Usuario admin2 = new Usuario(
                     "777666555",
-                    "1234567891234",
+                    "1234567891233",
                     "12345678",
                     "carlosbpac@gmail.com",
                     "Carlos",
                     "Pac",
                     "12345");
 
+            // 5 Usuarios de prueba en modo cliente
+            Usuario cliente1 = new Usuario("123456789", "1234567891234",
+                    "12345679",
+                    "usuarioprueba1@email.com",
+                    "Usuario", "Prueba1",
+                    "12345");
+
+            Usuario cliente2 = new Usuario("987654321", "9876543214321",
+                    "98765432",
+                    "usuarioprueba2@email.com",
+                    "Usuario", "Prueba2",
+                    "54321");
+
+            Usuario cliente3 = new Usuario("456789123", "4567891238765",
+                    "45678912",
+                    "usuarioprueba3@email.com",
+                    "Usuario", "Prueba3",
+                    "67890");
+
+            Usuario cliente4 = new Usuario("321654987", "3216549870987",
+                    "32165498",
+                    "usuarioprueba4@email.com",
+                    "Usuario", "Prueba4",
+                    "09876");
+
+            Usuario cliente5 = new Usuario("654987321", "6549873217654",
+                    "65498732",
+                    "usuarioprueba5@email.com",
+                    "Usuario", "Prueba5",
+                    "56789");
             try {
+                this.usuarioService.crearUsuarioCliente(cliente1);
+                this.usuarioService.crearUsuarioCliente(cliente2);
+                this.usuarioService.crearUsuarioCliente(cliente3);
+                this.usuarioService.crearUsuarioCliente(cliente4);
+                this.usuarioService.crearUsuarioCliente(cliente5);
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
             } catch (Exception e) {
