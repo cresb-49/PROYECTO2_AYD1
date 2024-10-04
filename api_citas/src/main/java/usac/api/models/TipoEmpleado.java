@@ -7,22 +7,25 @@ package usac.api.models;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 /**
- *
  * @author carlos
  */
 @Entity
-@Table(name = "tipo_empleado")
+@Table(name = "tipo_empleado", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"nombre"})
+})
 @SQLDelete(sql = "UPDATE tipo_empleado SET deleted_at = NULL WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class TipoEmpleado extends Auditor {
-    
+
     @Column(length = 250, nullable = false)
     @NotBlank(message = "El nombre del tipo de empleado no puede estar vacío.")
     @NotNull(message = "El nombre del tipo de empleado no puede ser nulo")

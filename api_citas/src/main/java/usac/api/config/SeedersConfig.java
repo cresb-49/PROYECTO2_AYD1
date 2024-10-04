@@ -17,18 +17,15 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import usac.api.models.Dia;
-import usac.api.models.Negocio;
-import usac.api.models.Rol;
-import usac.api.models.Usuario;
+import usac.api.models.*;
 import usac.api.repositories.DiaRepository;
 import usac.api.repositories.RolRepository;
 import usac.api.services.DiaService;
+import usac.api.services.EmpleadoService;
 import usac.api.services.NegocioService;
 import usac.api.services.UsuarioService;
 
 /**
- *
  * @author Luis Monterroso
  */
 @Component
@@ -44,6 +41,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private DiaService diaService;
     @Autowired
     private DiaRepository diaRepository;
+    @Autowired
+    private EmpleadoService empleadoService;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -70,7 +69,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     }
 
     /*
-     * 
+     *
      * public EstadoEnvio insertarEstadoEnvio(EstadoEnvio estadoEnvio) throws
      * Exception {
      * try {
@@ -84,7 +83,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      * throw new Exception("Error");
      * }
      * }
-     * 
+     *
      * public Categoria insertarCategoria(Categoria cat) throws Exception {
      * try {
      * Optional<Categoria> opCat =
@@ -97,7 +96,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      * throw new Exception("Error");
      * }
      * }
-     * 
+     *
      * public TiendaConfig insertarTiendaConfig(TiendaConfig config) throws
      * Exception {
      * try {
@@ -107,12 +106,12 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      * return this.tiendaConfigReporitory.save(config);
      * }
      * return conf;
-     * 
+     *
      * } catch (Exception e) {
      * throw new Exception("Error");
      * }
      * }
-     * 
+     *
      * public Permiso insertarPermisoSiNoExiste(Permiso pa) {
      * Permiso permiso =
      * this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
@@ -155,6 +154,13 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "Carlos",
                     "Pac",
                     "12345");
+
+            TipoEmpleado tipoEmpleado1 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Organizador"));
+            TipoEmpleado tipoEmpleado2 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Limpieza"));
+            TipoEmpleado tipoEmpleado3 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Seguridad"));
+            TipoEmpleado tipoEmpleado4 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Cocina"));
+            TipoEmpleado tipoEmpleado5 = this.empleadoService.createTipoEmpleado(new TipoEmpleado("Recepcion"));
+
 
             // 5 Usuarios de prueba en modo cliente
             Usuario cliente1 = new Usuario("123456789", "1234567891234",
@@ -224,11 +230,12 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearUsuarioCliente(cliente3);
                 this.usuarioService.crearUsuarioCliente(cliente4);
                 this.usuarioService.crearUsuarioCliente(cliente5);
-                this.usuarioService.crearEmpleado(empleado1);
-                this.usuarioService.crearEmpleado(empleado2);
-                this.usuarioService.crearEmpleado(empleado3);
-                this.usuarioService.crearEmpleado(empleado4);
-                this.usuarioService.crearEmpleado(empleado5);
+
+                this.usuarioService.crearEmpleado(empleado1, tipoEmpleado1);
+                this.usuarioService.crearEmpleado(empleado2, tipoEmpleado2);
+                this.usuarioService.crearEmpleado(empleado3, tipoEmpleado3);
+                this.usuarioService.crearEmpleado(empleado4, tipoEmpleado4);
+                this.usuarioService.crearEmpleado(empleado5, tipoEmpleado5);
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
@@ -253,42 +260,42 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             /*
              * Categoria categoria = new Categoria("Hogar");
              * this.insertarCategoria(categoria);
-             * 
+             *
              * //estado de envio
              * EstadoEnvio estadoEnvio = new EstadoEnvio("PENDIENTE");
              * this.insertarEstadoEnvio(estadoEnvio);
              * EstadoEnvio estadoEnvio2 = new EstadoEnvio("ENTREGADO");
              * this.insertarEstadoEnvio(estadoEnvio2);
-             * 
+             *
              * // IMAGEN DEFAULT DE LA TIENDA
              * byte[] img = getClass().getResourceAsStream("/img/logo.png").readAllBytes();
-             * 
+             *
              * TiendaConfig tiendaConfig = new TiendaConfig("TiendaAyD1", img, 12.00,
              * "2da calle XXX-XXX-XX Quetgo",
              * "image/png", 25.0);
              * this.insertarTiendaConfig(tiendaConfig);
-             * 
+             *
              * Usuario user1 = new Usuario("Carlos",
              * "Pac", "carlosbpac@gmail.com",
              * null, "12345",
              * null, null, false);
-             * 
+             *
              * Usuario ayudante = new Usuario("Luis",
              * "Monterroso", "luismonteg1@hotmail.com",
              * null, "12345",
              * null, null, false);
-             * 
-             * 
+             *
+             *
              * // Crear los usuarios, un catch por usuario para que ignore las * excepciones
              * que puedan haber
-             * 
+             *
              * try {
              * this.usuarioService.crearAdministrador(admin);
              * } catch (Exception e) {
              * }
              * try {
              * this.usuarioService.crearUsuarioNormal(user1);
-             * 
+             *
              * } catch (Exception e) {
              * }
              * try {
@@ -296,10 +303,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
              * new UsuarioAyudanteRequest(ayudante, new ArrayList<>()));
              * } catch (Exception e) {
              * }
-             * 
+             *
              * // Creacion de todos los permisos que tiene el sistema
              * for (PermisoEnum permiso : PermisoEnum.values()) {
-             * 
+             *
              * Permiso insercion = this.insertarPermisoSiNoExiste(
              * new Permiso(
              * permiso.getNombrePermiso(),

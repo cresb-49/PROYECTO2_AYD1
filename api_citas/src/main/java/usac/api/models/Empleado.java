@@ -4,23 +4,21 @@
  */
 package usac.api.models;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 /**
- *
  * @author carlo
  */
 @Entity
-@Table(name = "empleado")
+@Table(name = "empleado", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"usuario"})
+})
 @SQLDelete(sql = "UPDATE empleado SET deleted_at = NULL WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class Empleado extends Auditor {
@@ -29,7 +27,7 @@ public class Empleado extends Auditor {
     @JoinColumn(name = "usuario", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario usuario;
-    
+
     @OneToOne
     @JoinColumn(name = "tipo_empleado", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
