@@ -167,33 +167,68 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "98765432",
                     "usuarioprueba2@email.com",
                     "Usuario", "Prueba2",
-                    "54321");
+                    "12345");
 
             Usuario cliente3 = new Usuario("456789123", "4567891238765",
                     "45678912",
                     "usuarioprueba3@email.com",
                     "Usuario", "Prueba3",
-                    "67890");
+                    "12345");
 
             Usuario cliente4 = new Usuario("321654987", "3216549870987",
                     "32165498",
                     "usuarioprueba4@email.com",
                     "Usuario", "Prueba4",
-                    "09876");
+                    "12345");
 
             Usuario cliente5 = new Usuario("654987321", "6549873217654",
                     "65498732",
                     "usuarioprueba5@email.com",
                     "Usuario", "Prueba5",
-                    "56789");
+                    "12345");
+
+            Usuario empleado1 = new Usuario("987653321", "9876543219876",
+                    "98763432",
+                    "empleadoprueba1@email.com",
+                    "Empleado", "Prueba1",
+                    "12345");
+
+            Usuario empleado2 = new Usuario("123456780", "1234567801234",
+                    "12385678",
+                    "empleadoprueba2@email.com",
+                    "Empleado", "Prueba2",
+                    "12345");
+
+            Usuario empleado3 = new Usuario("876543219", "8765432198765",
+                    "87654321",
+                    "empleadoprueba3@email.com",
+                    "Empleado", "Prueba3",
+                    "12345");
+
+            Usuario empleado4 = new Usuario("135792468", "1357924681357",
+                    "13579246",
+                    "empleadoprueba4@email.com",
+                    "Empleado", "Prueba4",
+                    "12345");
+
+            Usuario empleado5 = new Usuario("246801357", "2468013572468",
+                    "24680135",
+                    "empleadoprueba5@email.com",
+                    "Empleado", "Prueba5",
+                    "12345");
             try {
+                this.usuarioService.crearAdministrador(admin);
+                this.usuarioService.crearAdministrador(admin2);
                 this.usuarioService.crearUsuarioCliente(cliente1);
                 this.usuarioService.crearUsuarioCliente(cliente2);
                 this.usuarioService.crearUsuarioCliente(cliente3);
                 this.usuarioService.crearUsuarioCliente(cliente4);
                 this.usuarioService.crearUsuarioCliente(cliente5);
-                this.usuarioService.crearAdministrador(admin);
-                this.usuarioService.crearAdministrador(admin2);
+                this.usuarioService.crearEmpleado(empleado1);
+                this.usuarioService.crearEmpleado(empleado2);
+                this.usuarioService.crearEmpleado(empleado3);
+                this.usuarioService.crearEmpleado(empleado4);
+                this.usuarioService.crearEmpleado(empleado5);
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
@@ -213,6 +248,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
+            //Inicio de datos de las canchas
 
             /*
              * Categoria categoria = new Categoria("Hogar");
