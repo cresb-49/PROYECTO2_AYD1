@@ -15,12 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -28,6 +32,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,10 +44,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import usac.api.models.Rol;
+import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
+import usac.api.repositories.EmpleadoRepository;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
@@ -60,6 +67,9 @@ public class UsuarioServiceTest {
     // Mock de dependencias externas
     @Mock
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private EmpleadoService empleadoService;
 
     @Mock
     private Encriptador encriptador;
@@ -714,16 +724,21 @@ public class UsuarioServiceTest {
         Rol empleadoRol = new Rol();
         empleadoRol.setNombre("EMPLEADO");
 
+        TipoEmpleado tipoEmpleado = new TipoEmpleado();
+        tipoEmpleado.setNombre("Organizador");
+
         when(rolService.getRolByNombre("EMPLEADO")).thenReturn(empleadoRol);
+        when(empleadoService.getTipoEmpleadoByNombre("Organizador")).thenReturn(tipoEmpleado);
         when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(false);
         when(encriptador.encriptar("empleadopassword")).thenReturn("encryptedpassword");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
 
-        Usuario usuarioCreado = usuarioService.crearEmpleado(usuario);
+        Usuario usuarioCreado = usuarioService.crearEmpleado(usuario, tipoEmpleado);
 
         assertNotNull(usuarioCreado);
         assertEquals("empleado@test.com", usuarioCreado.getEmail());
         verify(rolService, times(1)).getRolByNombre("EMPLEADO");
+        verify(empleadoService, times(1)).getTipoEmpleadoByNombre("Organizador");
         verify(usuarioRepository, times(1)).save(any(Usuario.class));
     }
 
@@ -747,10 +762,13 @@ public class UsuarioServiceTest {
         usuario.setEmail("empleado@test.com");
         usuario.setPassword("empleadopassword");
 
+        TipoEmpleado tipoEmpleado = new TipoEmpleado();
+        tipoEmpleado.setNombre("Organizador");
+
         when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(true);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            usuarioService.crearEmpleado(usuario);
+            usuarioService.crearEmpleado(usuario, tipoEmpleado);
         });
         assertEquals("El Email ya existe.", exception.getMessage());
     }
