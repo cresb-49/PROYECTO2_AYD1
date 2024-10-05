@@ -48,7 +48,15 @@ public class Rol extends Auditor {
     @Schema(hidden = true)
     private List<RolUsuario> usuariosConElRol;
 
+    @OneToMany(mappedBy = "rol", orphanRemoval = true)//indicamos que la relacion debera ser por medio del atributo "Paciente" del objeto Tratamiento
+    @Cascade(CascadeType.ALL)
+    private List<RolPermiso> permisosRol;
+
     public Rol() {
+    }
+
+    public Rol(Long id) {
+        super(id);
     }
 
     public Rol(String nombre) {
@@ -69,6 +77,14 @@ public class Rol extends Auditor {
 
     public void setUsuariosConElRol(List<RolUsuario> usuariosConElRol) {
         this.usuariosConElRol = usuariosConElRol;
+    }
+
+    public List<RolPermiso> getPermisosRol() {
+        return permisosRol;
+    }
+
+    public void setPermisosRol(List<RolPermiso> permisosRol) {
+        this.permisosRol = permisosRol;
     }
 
 }

@@ -5,6 +5,7 @@
 package usac.api.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
@@ -52,16 +53,33 @@ public class Service {
         return true;
     }
 
-    /*
-    public boolean validarModelo(Object object) throws Exception {
-        // extraemos las validaciones
-        Set<ConstraintViolation<Object>> validaciones = validator.validate(object);
-        // validamos los valores
-        if (!validaciones.isEmpty()) {
-            throw new Exception(extraerErrores(validaciones));
+    /**
+     * Valida si el id del objeto no es nulo o menor a cero, si lo es entonces
+     * lanzaa una excepcion.
+     *
+     * @param <T>
+     * @param entidad
+     * @throws Exception
+     */
+    public <T extends Auditor> void validarId(T entidad) throws Exception {
+        if (entidad.getId() == null || entidad.getId() <= 0) {
+            throw new Exception("Id invalido");
         }
-        return true;
-    }*/
+    }
+
+    /**
+     * Valida si el id del objeto no es nulo o menor a cero, si lo es entonces
+     * lanzaa una excepcion.
+     *
+     * @param <T>
+     * @param optional
+     * @throws Exception
+     */
+    public void validarNull(Object objeto) throws Exception {
+        if (objeto == null) {
+            throw new Exception("Informacion no encontrada.");
+        }
+    }
 
     /**
      * Selecciona solamente os objetos que tengan desactivatedAt = null
