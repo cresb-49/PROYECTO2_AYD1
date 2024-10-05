@@ -11,7 +11,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,6 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import usac.api.models.Rol;
+import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.PasswordChangeRequest;
@@ -60,6 +60,9 @@ public class UsuarioServiceTest {
     // Mock de dependencias externas
     @Mock
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private EmpleadoService empleadoService;
 
     @Mock
     private Encriptador encriptador;
@@ -714,16 +717,21 @@ public class UsuarioServiceTest {
         Rol empleadoRol = new Rol();
         empleadoRol.setNombre("EMPLEADO");
 
+        TipoEmpleado tipoEmpleado = new TipoEmpleado();
+        tipoEmpleado.setNombre("Organizador");
+
         when(rolService.getRolByNombre("EMPLEADO")).thenReturn(empleadoRol);
+        when(empleadoService.getTipoEmpleadoByNombre("Organizador")).thenReturn(tipoEmpleado);
         when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(false);
         when(encriptador.encriptar("empleadopassword")).thenReturn("encryptedpassword");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
 
-        Usuario usuarioCreado = usuarioService.crearEmpleado(usuario);
+        Usuario usuarioCreado = usuarioService.crearEmpleado(usuario, tipoEmpleado);
 
         assertNotNull(usuarioCreado);
         assertEquals("empleado@test.com", usuarioCreado.getEmail());
         verify(rolService, times(1)).getRolByNombre("EMPLEADO");
+        verify(empleadoService, times(1)).getTipoEmpleadoByNombre("Organizador");
         verify(usuarioRepository, times(1)).save(any(Usuario.class));
     }
 
@@ -747,10 +755,13 @@ public class UsuarioServiceTest {
         usuario.setEmail("empleado@test.com");
         usuario.setPassword("empleadopassword");
 
+        TipoEmpleado tipoEmpleado = new TipoEmpleado();
+        tipoEmpleado.setNombre("Organizador");
+
         when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(true);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            usuarioService.crearEmpleado(usuario);
+             usuarioService.crearEmpleado(usuario, null);
         });
         assertEquals("El Email ya existe.", exception.getMessage());
     }
