@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,8 @@ public class RolServiceTest {
 
     @Mock
     private RolRepository rolRepository;
+    @Mock
+    private Service service;
 
     @BeforeEach
     void setUp() {
@@ -60,9 +63,13 @@ public class RolServiceTest {
     /**
      * Prueba que lanza excepción cuando el rol no es encontrado.
      */
+    /**
+     * Prueba que lanza excepción cuando el rol no es encontrado y se valida con
+     * el método validarNull.
+     */
     @Test
-    void testGetRolByNombre_RolNoEncontrado() {
-        // Simular que no se encuentra el rol
+    void testGetRolByNombre_RolNoEncontrado() throws Exception {
+        // Simular que no se encuentra el rol (retornar Optional.empty())
         when(rolRepository.findOneByNombre("USUARIO")).thenReturn(Optional.empty());
 
         // Llamar al método y verificar que lanza una excepción
@@ -71,7 +78,9 @@ public class RolServiceTest {
         });
 
         // Verificar el mensaje de la excepción
-        assertEquals("Rol no encontrado.", exception.getMessage());
+        assertEquals("Informacion no encontrada.", exception.getMessage());
+
+        // Verificar que se llamó al método findOneByNombre una vez
         verify(rolRepository, times(1)).findOneByNombre("USUARIO");
     }
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import usac.api.models.*;
 import usac.api.models.dto.LoginDTO;
+import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.repositories.UsuarioRepository;
@@ -47,12 +48,12 @@ public class UsuarioService extends usac.api.services.Service {
      * con un código de recuperación único.
      *
      * @param correo El correo electrónico del usuario que ha solicitado la
-     *               recuperación de su contraseña.
+     * recuperación de su contraseña.
      * @return Un mensaje indicando si el correo de recuperación fue enviado con
      * éxito.
      * @throws Exception Si el correo está en blanco, el correo electrónico del
-     *                   usuario no es encontrado, el usuario está desactivado, o si ocurre un
-     *                   error durante el envío del correo de recuperación.
+     * usuario no es encontrado, el usuario está desactivado, o si ocurre un
+     * error durante el envío del correo de recuperación.
      */
     @Transactional(rollbackOn = Exception.class)
     public String enviarMailDeRecuperacion(String correo) throws Exception {
@@ -102,12 +103,12 @@ public class UsuarioService extends usac.api.services.Service {
      * su estado y generando un token JWT si la autenticación es exitosa.
      *
      * @param log El objeto Usuario que contiene las credenciales de inicio de
-     *            sesión.
+     * sesión.
      * @return Un objeto LoginDTO que contiene el usuario autenticado y el token
      * JWT generado.
      * @throws Exception Si el correo electrónico o la contraseña son
-     *                   incorrectos, el usuario está desactivado, o si ocurre un error de
-     *                   autenticación.
+     * incorrectos, el usuario está desactivado, o si ocurre un error de
+     * autenticación.
      */
     public LoginDTO iniciarSesion(Usuario log) throws Exception {
         try {
@@ -146,11 +147,11 @@ public class UsuarioService extends usac.api.services.Service {
      * contraseña antes de guardarla.
      *
      * @param usuPassChange El objeto Usuario que contiene el ID y la nueva
-     *                      contraseña a establecer.
+     * contraseña a establecer.
      * @return Un mensaje indicando si el cambio de contraseña fue exitoso.
      * @throws Exception Si el ID del usuario es inválido, si el usuario no es
-     *                   encontrado, si el usuario está desactivado, o si ocurre un error durante
-     *                   el proceso de actualización de la contraseña.
+     * encontrado, si el usuario está desactivado, o si ocurre un error durante
+     * el proceso de actualización de la contraseña.
      */
     @Transactional(rollbackOn = Exception.class)
     public String cambiarPassword(UserChangePasswordRequest usuPassChange) throws Exception {
@@ -193,11 +194,11 @@ public class UsuarioService extends usac.api.services.Service {
      * recuperación válido.
      *
      * @param cambioPassword El objeto PasswordChangeRequest que contiene el
-     *                       código de recuperación y la nueva contraseña.
+     * código de recuperación y la nueva contraseña.
      * @return Un mensaje indicando si el cambio de contraseña fue exitoso.
      * @throws Exception Si el código de recuperación es inválido, el usuario
-     *                   está desactivado, o si ocurre algún error durante el proceso de
-     *                   actualización de la contraseña.
+     * está desactivado, o si ocurre algún error durante el proceso de
+     * actualización de la contraseña.
      */
     @Transactional(rollbackOn = Exception.class)
     public String recuperarPassword(PasswordChangeRequest cambioPassword) throws Exception {
@@ -237,8 +238,8 @@ public class UsuarioService extends usac.api.services.Service {
      * @param usuario El objeto Usuario con los nuevos datos a actualizar.
      * @return El objeto Usuario actualizado.
      * @throws Exception Si el ID es inválido, el usuario no es encontrado, ya
-     *                   existe otro usuario con el mismo correo electrónico, o si ocurre un error
-     *                   durante la actualización.
+     * existe otro usuario con el mismo correo electrónico, o si ocurre un error
+     * durante la actualización.
      */
     @Transactional(rollbackOn = Exception.class)
     public Usuario updateUsuario(Usuario usuario) throws Exception {
@@ -263,7 +264,7 @@ public class UsuarioService extends usac.api.services.Service {
         if (this.usuarioRepository.existsUsuarioByEmailAndIdNot(usuario.getEmail(),
                 usuario.getId())) {
             throw new Exception(String.format("No se editó el usuario %s, "
-                            + "debido a que ya existe otro usuario con el mismo email.",
+                    + "debido a que ya existe otro usuario con el mismo email.",
                     usuario.getEmail()));
         }
 
@@ -271,7 +272,7 @@ public class UsuarioService extends usac.api.services.Service {
         if (this.usuarioRepository.existsUsuarioByPhoneAndIdNot(usuario.getPhone(),
                 usuario.getId())) {
             throw new Exception(String.format("No se editó el usuario"
-                            + " %s, debido a que ya existe otro usuario con el mismo teléfono.",
+                    + " %s, debido a que ya existe otro usuario con el mismo teléfono.",
                     usuario.getEmail()));
         }
 
@@ -279,7 +280,7 @@ public class UsuarioService extends usac.api.services.Service {
         if (this.usuarioRepository.existsUsuarioByCuiAndIdNot(usuario.getCui(),
                 usuario.getId())) {
             throw new Exception(String.format("No se editó el usuario"
-                            + " %s, debido a que ya existe otro usuario con el mismo cui.",
+                    + " %s, debido a que ya existe otro usuario con el mismo cui.",
                     usuario.getEmail()));
         }
 
@@ -288,14 +289,14 @@ public class UsuarioService extends usac.api.services.Service {
             if (this.usuarioRepository.existsUsuarioByNitAndIdNot(usuario.getNit(),
                     usuario.getId())) {
                 throw new Exception(String.format("No se editó el usuario"
-                                + " %s, debido a que ya existe otro usuario con el mismo nit.",
+                        + " %s, debido a que ya existe otro usuario con el mismo nit.",
                         usuario.getEmail()));
             }
         }
 
         // Mantenemos la contraseña original y roles del usuario
         usuario.setPassword(usuarioEncontrado.getPassword());
-        usuario.setRoles(usuarioEncontrado.getRoles());
+        usuario.setRol(usuarioEncontrado.getRol());
 
         // Validamos el modelo del usuario
         this.validarModelo(usuario);
@@ -408,10 +409,10 @@ public class UsuarioService extends usac.api.services.Service {
      * asignando el rol correspondiente.
      *
      * @param crear El objeto Usuario que contiene los datos del nuevo
-     *              administrador a crear.
+     * administrador a crear.
      * @return El objeto Usuario creado con el rol de Administrador.
      * @throws Exception Si los datos del usuario no son válidos o si ocurre un
-     *                   error durante la creación.
+     * error durante la creación.
      */
     public Usuario crearAdministrador(Usuario crear) throws Exception {
         // Validamos el modelo de usuario
@@ -428,21 +429,20 @@ public class UsuarioService extends usac.api.services.Service {
      * Crea un nuevo usuario con el rol de empleado, validando el modelo y
      * asignando el rol correspondiente.
      *
-     * @param crear El objeto Usuario que contiene los datos del nuevo
-     *              administrador a crear.
+     * @param nuevoEmpleadoRequest
      * @return El objeto Usuario creado con el rol de Empleado.
      * @throws Exception Si los datos del usuario no son válidos o si ocurre un
-     *                   error durante la creación.
+     * error durante la creación.
      */
-    public Usuario crearEmpleado(Usuario crear, TipoEmpleado tipoEmpleado) throws Exception {
+    public Usuario crearEmpleado(NuevoEmpleadoRequest nuevoEmpleadoRequest) throws Exception {
         // Validamos el modelo de usuario
-        this.validarModelo(crear);
+        this.validarModelo(nuevoEmpleadoRequest.getUsuario());
         // Obtenemos el rol para asignarlo al nuevo usuario
         Rol rol = this.rolService.getRolByNombre("EMPLEADO");
         // Guardamos el usuario con el rol de Administrador
-        Usuario usuarioGuardado = this.guardarUsuario(crear, rol);
+        Usuario usuarioGuardado = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rol);
         //Buscamos el tipo de empleado en base a su nombre
-        TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(tipoEmpleado.getNombre());
+        TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
         // Creamos el registro de tipo de empleado
         Empleado empleado = new Empleado(usuarioGuardado, tipoEmpleadoGuardado);
         // Guardamos el empleado
@@ -480,10 +480,7 @@ public class UsuarioService extends usac.api.services.Service {
         }
 
         // Asignamos un rol al usuario
-        RolUsuario rolUsuario = new RolUsuario(rol, crear);
-        ArrayList<RolUsuario> rols = new ArrayList<>();
-        rols.add(rolUsuario);
-        crear.setRoles(rols);
+        crear.setRol(rol);
         // Encriptar la contraseña
         crear.setPassword(this.encriptador.encriptar(crear.getPassword()));
         // Guardar el usuario

@@ -4,22 +4,19 @@
  */
 package usac.api.models;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.DynamicUpdate;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  *
@@ -30,16 +27,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @DynamicUpdate
 public class Usuario extends Auditor {
 
+    @ManyToOne//indicador de relacion muchos a uno
+    @JoinColumn(name = "rol", nullable = false) //indicamos que el id del paciente se guardara con un solo field de tabla
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Rol rol;
 
-    @NotBlank(message = "El cui del cliente no puede estar vacío.")
-    @NotNull(message = "El cui del cliente no puede ser nulo")
+    @NotBlank(message = "El nit del cliente no puede estar vacío.")
+    @NotNull(message = "El nit del cliente no puede ser nulo")
     @Size(min = 6, max = 12, message = "El nit del cliente debe tener entre 6 y 12 caracteres.")
     @Column(length = 13, unique = true)
     private String nit;
 
     @NotBlank(message = "El cui del cliente no puede estar vacío.")
     @NotNull(message = "El cui del cliente no puede ser nulo")
-    @Size(min = 13, max = 13, message = "El cui del cliente debe tener entre 13 caracteres.")
+    @Size(min = 13, max = 13, message = "El cui del cliente debe tener 13 caracteres.")
     @Column(length = 13, unique = true)
     private String cui;
 
@@ -74,13 +75,8 @@ public class Usuario extends Auditor {
     @Column(length = 250)
     private String tokenRecuperacion;
 
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER, orphanRemoval = true)
-    @Cascade(CascadeType.ALL)
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-    private List<RolUsuario> roles;
-
     public Usuario(String nit, String cui, String phone, String email, String nombres, String apellidos,
-            String password) {
+            String password, Rol rol) {
         this.nit = nit;
         this.cui = cui;
         this.phone = phone;
@@ -88,6 +84,7 @@ public class Usuario extends Auditor {
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.password = password;
+        this.rol = rol;
     }
 
     public Usuario() {
@@ -132,6 +129,7 @@ public class Usuario extends Auditor {
     public void setNombres(String nombres) {
         this.nombres = nombres;
     }
+
     public String getApellidos() {
         return apellidos;
     }
@@ -156,12 +154,12 @@ public class Usuario extends Auditor {
         this.tokenRecuperacion = tokenRecuperacion;
     }
 
-    public List<RolUsuario> getRoles() {
-        return roles;
+    public Rol getRol() {
+        return rol;
     }
 
-    public void setRoles(List<RolUsuario> roles) {
-        this.roles = roles;
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 
 }

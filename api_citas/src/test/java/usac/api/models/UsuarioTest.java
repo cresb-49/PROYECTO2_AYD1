@@ -4,8 +4,6 @@
  */
 package usac.api.models;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -64,7 +62,7 @@ public class UsuarioTest {
         usuario.setCui("123");  // CUI demasiado corto
         Set<ConstraintViolation<Usuario>> violations = validator.validate(usuario);
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("El cui del cliente debe tener entre 13 caracteres.")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("El cui del cliente debe tener 13 caracteres.")));
     }
 
     @Test
@@ -113,14 +111,14 @@ public class UsuarioTest {
     }
 
     @Test
-    void testRoles() {
-        // Verificar que se puedan asignar roles correctamente
-        List<RolUsuario> roles = new ArrayList<>();
-        RolUsuario rol = new RolUsuario();
-        roles.add(rol);
-        usuario.setRoles(roles);
+    void testRolAsignadoAlUsuario() {
+        // Crear un rol y asignarlo al usuario
+        Rol rol = new Rol();
+        rol.setNombre("CLIENTE");
+        usuario.setRol(rol);
 
-        assertNotNull(usuario.getRoles());
-        assertEquals(1, usuario.getRoles().size());
+        // Verificar que el rol fue asignado correctamente
+        assertNotNull(usuario.getRol());
+        assertEquals("CLIENTE", usuario.getRol().getNombre());
     }
 }

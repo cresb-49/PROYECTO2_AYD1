@@ -42,13 +42,21 @@ public class Rol extends Auditor {
             message = "El nombre de rol solo puede ser CLIENTE, ADMIN, AYUDANTE")
     private String nombre;
 
-    @OneToMany(mappedBy = "rol", orphanRemoval = true)//indicamos que la relacion debera ser por medio del atributo "Paciente" del objeto Tratamiento
+    @OneToMany(mappedBy = "rol", orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Schema(hidden = true)
-    private List<RolUsuario> usuariosConElRol;
+    private List<Usuario> ususarios;
+
+    @OneToMany(mappedBy = "rol", orphanRemoval = true)//indicamos que la relacion debera ser por medio del atributo "Paciente" del objeto Tratamiento
+    @Cascade(CascadeType.ALL)
+    private List<RolPermiso> permisosRol;
 
     public Rol() {
+    }
+
+    public Rol(Long id) {
+        super(id);
     }
 
     public Rol(String nombre) {
@@ -63,12 +71,20 @@ public class Rol extends Auditor {
         this.nombre = nombre;
     }
 
-    public List<RolUsuario> getUsuariosConElRol() {
-        return usuariosConElRol;
+    public List<RolPermiso> getPermisosRol() {
+        return permisosRol;
     }
 
-    public void setUsuariosConElRol(List<RolUsuario> usuariosConElRol) {
-        this.usuariosConElRol = usuariosConElRol;
+    public void setPermisosRol(List<RolPermiso> permisosRol) {
+        this.permisosRol = permisosRol;
+    }
+
+    public List<Usuario> getUsusarios() {
+        return ususarios;
+    }
+
+    public void setUsusarios(List<Usuario> ususarios) {
+        this.ususarios = ususarios;
     }
 
 }

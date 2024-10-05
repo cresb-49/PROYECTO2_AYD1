@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
+import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.services.UsuarioService;
@@ -210,9 +211,9 @@ public class UsuarioController {
         @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
     @PostMapping("/private/crearEmpleado")
-    public ResponseEntity<?> crearEmpleado(@RequestBody Usuario crear) {
+    public ResponseEntity<?> crearEmpleado(@RequestBody NuevoEmpleadoRequest crear) {
         try {
-            Usuario respuesta = usuarioService.crearAdministrador(crear);
+            Usuario respuesta = usuarioService.crearEmpleado(crear);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
