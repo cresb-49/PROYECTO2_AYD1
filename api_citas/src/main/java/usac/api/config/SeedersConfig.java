@@ -25,6 +25,7 @@ import usac.api.models.Negocio;
 import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
+import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.repositories.DiaRepository;
 import usac.api.repositories.RolRepository;
 import usac.api.services.CanchaService;
@@ -145,16 +146,16 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             Dia domingo = this.insertarDia(new Dia("Domingo"));
 
             // siders roles
-            this.insertarRol(new Rol("CLIENTE"));
-            this.insertarRol(new Rol("ADMIN"));
-            this.insertarRol(new Rol("EMPLEADO"));
+            Rol clienteRol = this.insertarRol(new Rol("CLIENTE"));
+            Rol adminRol = this.insertarRol(new Rol("ADMIN"));
+            Rol empleadoRol = this.insertarRol(new Rol("EMPLEADO"));
 
             // Seeder de usuarios del sistema
             Usuario admin = new Usuario("456123789", "3322114455669",
                     "89456123",
                     "elrincondelgamer77@gmail.com",
                     "admin", "admin",
-                    "12345");
+                    "12345", adminRol);
 
             Usuario admin2 = new Usuario(
                     "777666555",
@@ -163,68 +164,68 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "carlosbpac@gmail.com",
                     "Carlos",
                     "Pac",
-                    "12345");
+                    "12345", adminRol);
 
             // 5 Usuarios de prueba en modo cliente
             Usuario cliente1 = new Usuario("123456789", "1234567891234",
                     "12345679",
                     "usuarioprueba1@email.com",
                     "Usuario", "Prueba1",
-                    "12345");
+                    "12345", clienteRol);
 
             Usuario cliente2 = new Usuario("987654321", "9876543214321",
                     "98765432",
                     "usuarioprueba2@email.com",
                     "Usuario", "Prueba2",
-                    "12345");
+                    "12345", clienteRol);
 
             Usuario cliente3 = new Usuario("456789123", "4567891238765",
                     "45678912",
                     "usuarioprueba3@email.com",
                     "Usuario", "Prueba3",
-                    "12345");
+                    "12345", clienteRol);
 
             Usuario cliente4 = new Usuario("321654987", "3216549870987",
                     "32165498",
                     "usuarioprueba4@email.com",
                     "Usuario", "Prueba4",
-                    "12345");
+                    "12345", clienteRol);
 
             Usuario cliente5 = new Usuario("654987321", "6549873217654",
                     "65498732",
                     "usuarioprueba5@email.com",
                     "Usuario", "Prueba5",
-                    "12345");
+                    "12345", clienteRol);
 
             Usuario empleado1 = new Usuario("987653321", "9876543219876",
                     "98763432",
                     "empleadoprueba1@email.com",
                     "Empleado", "Prueba1",
-                    "12345");
+                    "12345", empleadoRol);
 
             Usuario empleado2 = new Usuario("123456780", "1234567801234",
                     "12385678",
                     "empleadoprueba2@email.com",
                     "Empleado", "Prueba2",
-                    "12345");
+                    "12345", empleadoRol);
 
             Usuario empleado3 = new Usuario("876543219", "8765432198765",
                     "87654321",
                     "empleadoprueba3@email.com",
                     "Empleado", "Prueba3",
-                    "12345");
+                    "12345", empleadoRol);
 
             Usuario empleado4 = new Usuario("135792468", "1357924681357",
                     "13579246",
                     "empleadoprueba4@email.com",
                     "Empleado", "Prueba4",
-                    "12345");
+                    "12345", empleadoRol);
 
             Usuario empleado5 = new Usuario("246801357", "2468013572468",
                     "24680135",
                     "empleadoprueba5@email.com",
                     "Empleado", "Prueba5",
-                    "12345");
+                    "12345", empleadoRol);
 
             TipoEmpleado tipoEmpleado1 = new TipoEmpleado("Organizador");
             TipoEmpleado tipoEmpleado2 = new TipoEmpleado("Limpieza");
@@ -250,11 +251,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearUsuarioCliente(cliente4);
                 this.usuarioService.crearUsuarioCliente(cliente5);
 
-                this.usuarioService.crearEmpleado(empleado1, tipoEmpleado1);
-                this.usuarioService.crearEmpleado(empleado2, tipoEmpleado2);
-                this.usuarioService.crearEmpleado(empleado3, tipoEmpleado3);
-                this.usuarioService.crearEmpleado(empleado4, tipoEmpleado4);
-                this.usuarioService.crearEmpleado(empleado5, tipoEmpleado5);
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, tipoEmpleado1));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, tipoEmpleado2));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, tipoEmpleado3));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5));
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }

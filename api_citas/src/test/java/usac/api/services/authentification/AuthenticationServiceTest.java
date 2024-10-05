@@ -4,7 +4,6 @@
  */
 package usac.api.services.authentification;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,7 +20,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import usac.api.models.Rol;
-import usac.api.models.RolUsuario;
 import usac.api.models.Usuario;
 import usac.api.repositories.UsuarioRepository;
 
@@ -56,13 +54,7 @@ public class AuthenticationServiceTest {
         // Simulación de roles
         Rol rolAdmin = new Rol();
         rolAdmin.setNombre("ADMIN");
-
-        RolUsuario rolUsuario = new RolUsuario();
-        rolUsuario.setRol(rolAdmin);
-
-        ArrayList<RolUsuario> roles = new ArrayList<>();
-        roles.add(rolUsuario);
-        usuario.setRoles(roles);
+        usuario.setRol(rolAdmin);
 
         // Simulamos la búsqueda del usuario en el repositorio
         when(usuarioRepository.findByEmail("test@example.com")).thenReturn(Optional.of(usuario));

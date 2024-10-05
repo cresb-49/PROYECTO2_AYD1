@@ -1,7 +1,6 @@
 package usac.api.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -108,7 +107,7 @@ public class RolTest {
     @Test
     void testUsuariosConElRolInicialmenteNull() {
         rol = new Rol();
-        assertNull(rol.getUsuariosConElRol());
+        assertNull(rol.getUsusarios());
     }
 
     /**
@@ -126,15 +125,22 @@ public class RolTest {
      * lista de usuarios con el rol.
      */
     @Test
-    void testSetAndGetUsuariosConElRol() {
-        rol = new Rol();
-        List<RolUsuario> usuariosConRol = new ArrayList<>();
-        RolUsuario rolUsuario1 = new RolUsuario();
-        RolUsuario rolUsuario2 = new RolUsuario();
-        usuariosConRol.add(rolUsuario1);
-        usuariosConRol.add(rolUsuario2);
-        rol.setUsuariosConElRol(usuariosConRol);
-        assertEquals(2, rol.getUsuariosConElRol().size());
+    void testSetAndGetUsuarios() {
+        // Crear un nuevo objeto de Rol
+        Rol rol = new Rol();
+
+        // Crear una lista de usuarios y agregar algunos usuarios
+        List<Usuario> usuarios = new ArrayList<>();
+        Usuario usuario1 = new Usuario();
+        Usuario usuario2 = new Usuario();
+        usuarios.add(usuario1);
+        usuarios.add(usuario2);
+
+        // Establecer la lista de usuarios en el rol
+        rol.setUsusarios(usuarios);
+
+        // Verificar que se han establecido los usuarios correctamente
+        assertEquals(2, rol.getUsusarios().size());
     }
 
     /**

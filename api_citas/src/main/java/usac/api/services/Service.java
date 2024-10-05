@@ -62,7 +62,7 @@ public class Service {
      * @throws Exception
      */
     public <T extends Auditor> void validarId(T entidad) throws Exception {
-        if (entidad.getId() == null || entidad.getId() <= 0) {
+        if (entidad == null || entidad.getId() == null || entidad.getId() <= 0) {
             throw new Exception("Id invalido");
         }
     }

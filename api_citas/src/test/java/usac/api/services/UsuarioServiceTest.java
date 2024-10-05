@@ -41,6 +41,7 @@ import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
+import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.repositories.UsuarioRepository;
@@ -726,7 +727,7 @@ public class UsuarioServiceTest {
         when(encriptador.encriptar("empleadopassword")).thenReturn("encryptedpassword");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
 
-        Usuario usuarioCreado = usuarioService.crearEmpleado(usuario, tipoEmpleado);
+        Usuario usuarioCreado = usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, tipoEmpleado));
 
         assertNotNull(usuarioCreado);
         assertEquals("empleado@test.com", usuarioCreado.getEmail());
@@ -761,7 +762,7 @@ public class UsuarioServiceTest {
         when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(true);
 
         Exception exception = assertThrows(Exception.class, () -> {
-             usuarioService.crearEmpleado(usuario, null);
+            usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, null));
         });
         assertEquals("El Email ya existe.", exception.getMessage());
     }

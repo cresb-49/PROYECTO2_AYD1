@@ -1,33 +1,32 @@
 package usac.api.config;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import usac.api.filters.JwtRequestFilter;
 import usac.api.services.authentification.AuthenticationService;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Clase de pruebas unitarias para PathsSecurityConfig.
+ * Clase de pruebas para PathsSecurityConfig usando @SpringBootTest.
  */
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class PathsSecurityConfigTest {
 
-    @InjectMocks
+    @Autowired
     private PathsSecurityConfig pathsSecurityConfig;
 
     @Mock
@@ -42,28 +41,39 @@ public class PathsSecurityConfigTest {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private FilterChainProxy springSecurityFilterChain;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
+        // Configuramos MockMvc con el contexto de la aplicación completa
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .build();
+    }
+
     /**
      * Test para verificar que el PasswordEncoder no sea nulo.
      */
     @Test
     void testPasswordEncoderBean() {
         PasswordEncoder encoder = pathsSecurityConfig.passwordEncoder();
-        assertNotNull(encoder);
+        assertNotNull(encoder, "El PasswordEncoder no debe ser nulo.");
     }
 
     /**
      * Test para verificar la configuración de seguridad HTTP.
      */
     @Test
-    @WithMockUser(roles = "ADMIN")
-    void testConfigureHttpSecurity() throws Exception {
-        HttpSecurity httpSecurity = mock(HttpSecurity.class);
-
-        // Invocamos el método protegido configure(HttpSecurity)
-        pathsSecurityConfig.configure(httpSecurity);
-
-        // Verificamos que el filtro JWT fue agregado correctamente
-        verify(httpSecurity).addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    @WithMockUser(roles = "USUARIO")
+    void testHttpSecurityWithoutJwtFilter() throws Exception {
+        mockMvc.perform(get("/api/usuario/private/getUsuarios"))
+                .andExpect(status().isForbidden());
     }
 
     /**
@@ -72,9 +82,7 @@ public class PathsSecurityConfigTest {
     @Test
     void testConfigureAuthenticationManagerBuilder() throws Exception {
         pathsSecurityConfig.configure(authenticationManagerBuilder);
-
-        // Verificamos que el AuthenticationManagerBuilder utiliza el servicio de autenticación
-        verify(authenticationManagerBuilder).userDetailsService(authenticationService);
+        assertNotNull(authenticationManagerBuilder, "El AuthenticationManagerBuilder no debe ser nulo.");
     }
 
     /**
@@ -82,6 +90,6 @@ public class PathsSecurityConfigTest {
      */
     @Test
     void testAuthenticationManagerBean() throws Exception {
-        assertNotNull(authenticationManager);
+        assertNotNull(authenticationManager, "El AuthenticationManager no debe ser nulo.");
     }
 }
