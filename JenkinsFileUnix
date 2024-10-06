@@ -15,10 +15,10 @@ pipeline {
             steps {
                 echo 'Simulating Spring Boot Application build...'
                 // Aquí se comenta la compilación real del backend
-                // dir('api_citas') {
-                //     echo 'Building Spring Boot Application...'
-                //     bat 'mvn clean package -DskipTests' // Compilar el proyecto y generar el archivo .war
-                // }
+                dir('api_citas') {
+                    echo 'Building Spring Boot Application...'
+                    sh 'mvn clean package -DskipTests' // Compilar el proyecto y generar el archivo .war
+                }
             }
         }
         stage('Deploy Backend to Tomcat') {
@@ -45,7 +45,7 @@ pipeline {
                 // Comentar o agregar pasos aquí
                 dir('app_citas') {
                     echo 'Building Angular Application...'
-                    sh 'npm install'
+                    // sh 'npm install'
                     sh 'npm run build --prod'
                 }
             }
