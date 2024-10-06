@@ -20,6 +20,8 @@ pipeline {
                     sh 'mvn clean package -DskipTests' // Compilar el proyecto y generar el archivo .war
                     dir('target') {
                         sh 'mv apiPY2-0.0.1-SNAPSHOT.war ROOT.war' // Renombrar el archivo .war
+                        sh 'ls -la' // Listar archivos en el directorio
+                        sh 'ROOT.war /opt/tomcat/webapps/'
                     }
                 }
             }
