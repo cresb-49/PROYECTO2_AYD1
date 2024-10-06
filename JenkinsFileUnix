@@ -45,9 +45,16 @@ pipeline {
                 // Comentar o agregar pasos aquí
                 dir('app_citas') {
                     echo 'Building Angular Application...'
-                    echo "NODE_PATH = ${env.NODE_PATH}"
-                    sh '$NODE_PATH/npm install'
-                    sh 'npm run build --prod'
+                    // echo "NODE_PATH = ${env.NODE_PATH}"
+                    // sh '$NODE_PATH/npm install'
+                    // sh 'npm run build --prod'
+                    sh '''
+                    export NVM_DIR="$HOME/.nvm"
+                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                    nvm use 20.17.0
+                    npm install
+                    npm run build --prod
+                    '''
                 }
             }
         }
