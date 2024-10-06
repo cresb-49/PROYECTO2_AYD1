@@ -1,12 +1,18 @@
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
 import usac.api.config.AppProperties;
 import usac.api.config.CorsConfig;
 
@@ -42,7 +48,9 @@ public class CorsConfigTest {
     @Test
     void testAddCorsMappings() {
         // Simulamos el valor de la propiedad "hostFront" en AppProperties
-        when(appProperties.getHostFront()).thenReturn("4200");
+        when(appProperties.getHostFrontDev()).thenReturn("4200");
+        when(appProperties.getHostFrontPro()).thenReturn("3000");
+
 
         // Simulamos el comportamiento del método addMapping que devuelve un CorsRegistration
         when(corsRegistry.addMapping("/**")).thenReturn(corsRegistration);
@@ -60,8 +68,9 @@ public class CorsConfigTest {
         verify(corsRegistry, times(1)).addMapping("/**");
 
         // Verificamos que se permiten los orígenes correspondientes
-        String expectedOrigin = "http://localhost:4200";
-        verify(corsRegistration, times(1)).allowedOrigins(expectedOrigin);
+        String expectedOriginDev = "http://localhost:4200";
+        String expectedOriginPro = "http://localhost:3000";
+        verify(corsRegistration, times(1)).allowedOrigins(expectedOriginDev, expectedOriginPro);
 
         // Verificamos que los métodos permitidos están correctamente configurados
         verify(corsRegistration, times(1)).allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH");

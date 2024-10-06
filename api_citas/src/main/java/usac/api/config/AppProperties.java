@@ -15,13 +15,23 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
-    private String hostFront;
+    private String hostFrontDev;
+    private String hostFrontPro;
 
-    public String getHostFront() {
-        return hostFront;
+
+    public String getHostFrontDev() {
+        return hostFrontDev;
     }
 
-    public void setHostFront(String hostFront) {
-        this.hostFront = hostFront;
+    public void setHostFrontDev(String hostFrontDev) {
+        this.hostFrontDev = hostFrontDev;
+    }
+
+    public String getHostFrontPro() {
+        return hostFrontPro;
+    }
+
+    public void setHostFrontPro(String hostFrontPro) {
+        this.hostFrontPro = hostFrontPro;
     }
 }
