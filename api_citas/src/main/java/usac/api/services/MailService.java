@@ -34,7 +34,7 @@ public class MailService extends Service {
         try {
             Context context = new Context();//crear nuevo contexto
             String url = String.format("http://localhost:%s/password_reset/form?c=%s",
-                    appProperties.getHostFront(), codigoActivacion);
+                    appProperties.getHostFrontDev(), codigoActivacion);//TODO VErificar cuando es prod y cuando es dev
 
             context.setVariable("url", url);//adjuntar las variables     
             String html = templateEngine.process("CorreoDeRecuperacion", context);
