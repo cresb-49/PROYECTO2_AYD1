@@ -50,7 +50,9 @@ pipeline {
                     // sh 'npm run build --prod'
                     sh '''
                     export NVM_DIR="$HOME/.nvm"
-                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                    if [ -s "$NVM_DIR/nvm.sh" ]; then
+                      . "$NVM_DIR/nvm.sh"
+                    fi
                     nvm use 20.17.0
                     npm install
                     npm run build --prod
