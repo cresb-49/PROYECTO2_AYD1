@@ -145,7 +145,8 @@ export class AuthService {
   }
 
   private getPayloadRoles(roles: any[]): string[] {
-    return roles.map((role: any) => role.rol.nombre);
+    // return roles.map((role: any) => role.rol.nombre);
+    return [];
   }
 
   private clearLocalStorage(): void {
