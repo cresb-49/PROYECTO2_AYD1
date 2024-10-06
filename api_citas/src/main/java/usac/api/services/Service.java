@@ -5,6 +5,7 @@
 package usac.api.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
@@ -36,13 +37,48 @@ public class Service {
      * @throws Exception
      */
     public boolean validarModelo(Object object) throws Exception {
-        // extraemos las validaciones
-        Set<ConstraintViolation<Object>> validaciones = validator.validate(object);
-        // validamos los valores
-        if (!validaciones.isEmpty()) {
-            throw new Exception(extraerErrores(validaciones));
+        // El validador automáticamente valida las restricciones anotadas en el modelo
+        Set<ConstraintViolation<Object>> violations = validator.validate(object);
+
+        if (!violations.isEmpty()) {
+            // Si hay violaciones, construimos el mensaje de error
+            StringBuilder errors = new StringBuilder();
+            for (ConstraintViolation<Object> violation : violations) {
+                errors.append(violation.getMessage()).append("\n");
+            }
+            // Lanzamos la excepción con los errores encontrados
+            throw new Exception(errors.toString());
         }
+
         return true;
+    }
+
+    /**
+     * Valida si el id del objeto no es nulo o menor a cero, si lo es entonces
+     * lanzaa una excepcion.
+     *
+     * @param <T>
+     * @param entidad
+     * @throws Exception
+     */
+    public <T extends Auditor> void validarId(T entidad) throws Exception {
+        if (entidad == null || entidad.getId() == null || entidad.getId() <= 0) {
+            throw new Exception("Id invalido");
+        }
+    }
+
+    /**
+     * Valida si el id del objeto no es nulo o menor a cero, si lo es entonces
+     * lanzaa una excepcion.
+     *
+     * @param <T>
+     * @param optional
+     * @throws Exception
+     */
+    public void validarNull(Object objeto) throws Exception {
+        if (objeto == null) {
+            throw new Exception("Informacion no encontrada.");
+        }
     }
 
     /**
@@ -112,7 +148,7 @@ public class Service {
         }
     }
 
-    private boolean isUserAdmin(String email) {
+    public boolean isUserAdmin(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
     }

@@ -2,6 +2,22 @@ import { Component, Input, input, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+
+export interface TableHeader {
+  name: string;
+  key: string;
+  main?: boolean;
+}
+
+export interface TableAction {
+  name: string;
+  icon: string;
+  route?: string;
+  action?: (value: any) => void;
+  return?: boolean;
+  key?: string;
+}
+
 @Component({
   standalone: true,
   imports: [RouterModule, CommonModule],
@@ -13,7 +29,7 @@ export class TableComponent implements OnInit {
 
   @Input() useDataModel: boolean = false;
 
-  @Input() headers: any[] = [
+  @Input() headers: TableHeader[] = [
     { name: 'Product Name', key: 'name', main: true },
     { name: 'Color', key: 'color' },
     { name: 'Category', key: 'category' },
@@ -28,8 +44,8 @@ export class TableComponent implements OnInit {
     { name: 'Product 5', color: 'purple', category: 'category 5', price: 500 }
   ]
 
-  @Input() actions: any[] = [
-    { name: 'Edit', icon: 'edit', route: '/edit-empleado', key: 'name'},
+  @Input() actions: TableAction[] = [
+    { name: 'Edit', icon: 'edit', route: '/edit-empleado', key: 'name' },
     { name: 'Delete', icon: 'delete', action: this.helloOnTable, return: true },
   ]
 
@@ -60,5 +76,13 @@ export class TableComponent implements OnInit {
       result = result[keys[i]];
     }
     return result;
+  }
+
+  executeAction(action: any, value: any): void {
+    if (!action.route) {
+      if (action.action) {
+        action.action(action.return ? value : null);
+      }
+    }
   }
 }

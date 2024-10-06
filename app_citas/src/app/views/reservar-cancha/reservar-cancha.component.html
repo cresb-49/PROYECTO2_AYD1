@@ -1,47 +1,49 @@
-<h4 class="text-2xl font-bold dark:text-white">Reservar una Cancha</h4>
-<form class="w-full mt-4">
-  <!-- Primera sección del formulario -->
-  <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    <div class="relative z-0 w-full mb-5 group">
-      <label for="codigo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código</label>
-      <input type="text" id="codigo-input" readonly
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-    </div>
-    <div class="relative z-0 w-full mb-5 group">
-      <label for="costo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo</label>
-      <input type="number" id="costo-input" readonly
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-    </div>
-  </div>
-
-  <!-- Segunda sección del formulario -->
-  <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="relative z-0 w-full mb-5 group">
-      <h4 class="text-2xl font-bold dark:text-white">Horarios Disponibles</h4>
-      <app-schedule-conf [isShowData]="true" [showNonActive]="false"></app-schedule-conf>
-    </div>
-    <div class="relative z-0 w-full mb-5 group">
-      <h4 class="text-2xl font-bold dark:text-white mb-4">Selecciona el Horario</h4>
-      <div class="relative z-0 w-full mb-2 group">
-        <label for="fecha-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha</label>
-        <input type="date" id="fecha-input"
+<section class="px-20">
+  <h4 class="text-2xl font-bold dark:text-white">Reservar una Cancha</h4>
+  <form class="w-full mt-4">
+    <!-- Primera sección del formulario -->
+    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="relative z-0 w-full mb-5 group">
+        <label for="codigo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código</label>
+        <input type="text" id="codigo-input" readonly
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2">
-        <div class="relative z-0 w-full mb-2 group">
-          <label for="inicio-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Inicio</label>
-          <input type="time" id="inicio-input"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
-        <div class="relative z-0 w-full mb-2 group">
-          <label for="fin-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fin</label>
-          <input type="time" id="fin-input"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
+      <div class="relative z-0 w-full mb-5 group">
+        <label for="costo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo</label>
+        <input type="number" id="costo-input" readonly
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
-      <button type="submit"
-        class="mt-4 mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center  dark:focus:ring-blue-800"
-        [ngClass]="{
+    </div>
+
+    <!-- Segunda sección del formulario -->
+    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="relative z-0 w-full mb-5 group">
+        <h4 class="text-2xl font-bold dark:text-white">Horarios Disponibles</h4>
+        <app-schedule-conf [isShowData]="true" [showNonActive]="false"></app-schedule-conf>
+      </div>
+      <div class="relative z-0 w-full mb-5 group">
+        <h4 class="text-2xl font-bold dark:text-white mb-4">Selecciona el Horario</h4>
+        <div class="relative z-0 w-full mb-2 group">
+          <label for="fecha-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha</label>
+          <input type="date" id="fecha-input"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2">
+          <div class="relative z-0 w-full mb-2 group">
+            <label for="inicio-input"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Inicio</label>
+            <input type="time" id="inicio-input"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          </div>
+          <div class="relative z-0 w-full mb-2 group">
+            <label for="fin-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fin</label>
+            <input type="time" id="fin-input"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          </div>
+        </div>
+        <button type="submit"
+          class="mt-4 mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center  dark:focus:ring-blue-800"
+          [ngClass]="{
           'cursor-not-allowed': !enableReserve ,
           'hover:bg-blue-800': enableReserve ,
           'dark:hover:bg-blue-700': enableReserve,
@@ -50,8 +52,10 @@
           'dark:bg-blue-600': enableReserve,
           'dark:bg-blue-500': !enableReserve
           }" [disabled]="!enableReserve">
-        Reservar
-      </button>
+          Reservar
+        </button>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+
+</section>

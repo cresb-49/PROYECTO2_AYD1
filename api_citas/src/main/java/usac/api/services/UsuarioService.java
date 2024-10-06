@@ -1,24 +1,27 @@
 package usac.api.services;
 
-import usac.api.tools.Encriptador;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import usac.api.models.Rol;
-import usac.api.models.RolUsuario;
-import usac.api.models.Usuario;
+
+import usac.api.models.*;
 import usac.api.models.dto.LoginDTO;
+import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
+import usac.api.tools.Encriptador;
 
 @Service
 public class UsuarioService extends usac.api.services.Service {
@@ -37,6 +40,8 @@ public class UsuarioService extends usac.api.services.Service {
     private Encriptador encriptador;
     @Autowired
     private JwtGeneratorService jwtGenerator;
+    @Autowired
+    private EmpleadoService empleadoService;
 
     /**
      * Envía un correo electrónico de recuperación de contraseña a un usuario
@@ -80,10 +85,10 @@ public class UsuarioService extends usac.api.services.Service {
         // Si la actualización es exitosa, enviamos el correo de recuperación
         if (actualizacion != null && actualizacion.getId() > 0) {
             // Usamos el servicio de correo para enviar el correo en segundo plano
-            mailService.enviarCorreoEnSegundoPlano(
+            mailService.enviarCorreoDeRecuperacion(
                     actualizacion.getEmail(),
-                    actualizacion.getTokenRecuperacion(),
-                    2);
+                    actualizacion.getTokenRecuperacion()
+            );
 
             // Retornamos un mensaje de confirmación
             return "Te hemos enviado un correo electrónico con las instrucciones para recuperar tu cuenta. Por favor revisa tu bandeja de entrada.";
@@ -149,15 +154,9 @@ public class UsuarioService extends usac.api.services.Service {
      * el proceso de actualización de la contraseña.
      */
     @Transactional(rollbackOn = Exception.class)
-    public String cambiarPassword(Usuario usuPassChange) throws Exception {
-        // Validamos que el ID del usuario no sea nulo o inválido
-        if (usuPassChange.getId() == null || usuPassChange.getId() <= 0) {
-            throw new Exception("Id inválido.");
-        }
-
-        // Validamos que la nueva contraseña no esté vacía y cumpla con los requisitos
-        this.validarAtributo(usuPassChange, "password");
-
+    public String cambiarPassword(UserChangePasswordRequest usuPassChange) throws Exception {
+        // validar el modelo
+        boolean validarModelo = this.validarModelo(usuPassChange);
         // Buscamos al usuario por su ID
         Usuario usuario = usuarioRepository.findById(usuPassChange.getId()).orElse(null);
 
@@ -170,8 +169,13 @@ public class UsuarioService extends usac.api.services.Service {
         this.isDesactivated(usuario);
         this.verificarUsuarioJwt(usuario);
 
+        // Verificamos que la contraseña actual sea correcta
+        if (!this.encriptador.compararPassword(usuPassChange.getPassword(), usuario.getPassword())) {
+            throw new Exception("Contraseña actual incorrecta.");
+        }
+
         // Encriptamos la nueva contraseña y actualizamos el campo en el modelo de usuario
-        usuario.setPassword(this.encriptador.encriptar(usuPassChange.getPassword()));
+        usuario.setPassword(this.encriptador.encriptar(usuPassChange.getNewPassword()));
 
         // Guardamos el usuario con la nueva contraseña
         Usuario update = this.usuarioRepository.save(usuario);
@@ -257,13 +261,42 @@ public class UsuarioService extends usac.api.services.Service {
         this.isDesactivated(usuarioEncontrado);
 
         // Verificamos si existe otro usuario con el mismo correo electrónico
-        if (this.usuarioRepository.existsUsuarioByEmailAndIdNot(usuario.getEmail(), usuario.getId())) {
-            throw new Exception(String.format("No se editó el usuario %s, debido a que ya existe otro usuario con el mismo email.", usuario.getEmail()));
+        if (this.usuarioRepository.existsUsuarioByEmailAndIdNot(usuario.getEmail(),
+                usuario.getId())) {
+            throw new Exception(String.format("No se editó el usuario %s, "
+                    + "debido a que ya existe otro usuario con el mismo email.",
+                    usuario.getEmail()));
+        }
+
+        // Verificamos si existe otro usuario con el mismo phone
+        if (this.usuarioRepository.existsUsuarioByPhoneAndIdNot(usuario.getPhone(),
+                usuario.getId())) {
+            throw new Exception(String.format("No se editó el usuario"
+                    + " %s, debido a que ya existe otro usuario con el mismo teléfono.",
+                    usuario.getEmail()));
+        }
+
+        // Verificamos si existe otro usuario con el mismo correo cui
+        if (this.usuarioRepository.existsUsuarioByCuiAndIdNot(usuario.getCui(),
+                usuario.getId())) {
+            throw new Exception(String.format("No se editó el usuario"
+                    + " %s, debido a que ya existe otro usuario con el mismo cui.",
+                    usuario.getEmail()));
+        }
+
+        if (usuario.getNit() != null) {
+            // Verificamos si existe otro usuario con el mismo nit
+            if (this.usuarioRepository.existsUsuarioByNitAndIdNot(usuario.getNit(),
+                    usuario.getId())) {
+                throw new Exception(String.format("No se editó el usuario"
+                        + " %s, debido a que ya existe otro usuario con el mismo nit.",
+                        usuario.getEmail()));
+            }
         }
 
         // Mantenemos la contraseña original y roles del usuario
         usuario.setPassword(usuarioEncontrado.getPassword());
-        usuario.setRoles(usuarioEncontrado.getRoles());
+        usuario.setRol(usuarioEncontrado.getRol());
 
         // Validamos el modelo del usuario
         this.validarModelo(usuario);
@@ -393,6 +426,32 @@ public class UsuarioService extends usac.api.services.Service {
     }
 
     /**
+     * Crea un nuevo usuario con el rol de empleado, validando el modelo y
+     * asignando el rol correspondiente.
+     *
+     * @param nuevoEmpleadoRequest
+     * @return El objeto Usuario creado con el rol de Empleado.
+     * @throws Exception Si los datos del usuario no son válidos o si ocurre un
+     * error durante la creación.
+     */
+    public Usuario crearEmpleado(NuevoEmpleadoRequest nuevoEmpleadoRequest) throws Exception {
+        // Validamos el modelo de usuario
+        this.validarModelo(nuevoEmpleadoRequest.getUsuario());
+        // Obtenemos el rol para asignarlo al nuevo usuario
+        Rol rol = this.rolService.getRolByNombre("EMPLEADO");
+        // Guardamos el usuario con el rol de Administrador
+        Usuario usuarioGuardado = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rol);
+        //Buscamos el tipo de empleado en base a su nombre
+        TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
+        // Creamos el registro de tipo de empleado
+        Empleado empleado = new Empleado(usuarioGuardado, tipoEmpleadoGuardado);
+        // Guardamos el empleado
+        this.empleadoService.createEmpleado(empleado);
+        // Retornamos el usuario guardado
+        return usuarioGuardado;
+    }
+
+    /**
      * Guarda un usuario asignandole un rol
      *
      * @param crear
@@ -405,11 +464,23 @@ public class UsuarioService extends usac.api.services.Service {
         if (this.usuarioRepository.existsByEmail(crear.getEmail())) {
             throw new Exception("El Email ya existe.");
         }
+
+        if (this.usuarioRepository.existsByPhone(crear.getPhone())) {
+            throw new Exception("El numero de telefono ya existe.");
+        }
+
+        if (this.usuarioRepository.existsByCui(crear.getCui())) {
+            throw new Exception("El CUI ya existe.");
+        }
+
+        if (crear.getNit() != null) {
+            if (this.usuarioRepository.existsByNit(crear.getNit())) {
+                throw new Exception("El nit ya existe.");
+            }
+        }
+
         // Asignamos un rol al usuario
-        RolUsuario rolUsuario = new RolUsuario(rol, crear);
-        ArrayList<RolUsuario> rols = new ArrayList<>();
-        rols.add(rolUsuario);
-        crear.setRoles(rols);
+        crear.setRol(rol);
         // Encriptar la contraseña
         crear.setPassword(this.encriptador.encriptar(crear.getPassword()));
         // Guardar el usuario
