@@ -23,7 +23,8 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowedOrigins(
-                        "http://localhost:" + this.appProperties.getHostFront())
+                        "http://localhost:" + this.appProperties.getHostFrontDev(),
+                        "http://localhost:" + this.appProperties.getHostFrontPro())
                 .allowedMethods(
                         "GET",
                         "POST",

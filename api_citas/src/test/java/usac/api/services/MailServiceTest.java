@@ -6,6 +6,7 @@ package usac.api.services;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,7 +14,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.thymeleaf.context.Context;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -23,7 +23,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import org.thymeleaf.context.IContext;
+
 import usac.api.config.AppProperties;
 
 /**
@@ -62,7 +64,7 @@ public class MailServiceTest {
         String codigoActivacion = "123456";
 
         // Simulamos el comportamiento de las propiedades de la aplicación
-        when(appProperties.getHostFront()).thenReturn("8080");
+        when(appProperties.getHostFrontDev()).thenReturn("8080");
 
         // Simulamos la creación del contexto y el procesamiento del template
         IContext context = new Context();  // Context implementa IContext

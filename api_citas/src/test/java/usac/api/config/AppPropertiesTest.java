@@ -31,11 +31,15 @@ public class AppPropertiesTest {
     @Test
     void testSetAndGetHostFront() {
         // Establecer el valor de hostFront
-        String expectedHostFront = "http://localhost:4200";
-        appProperties.setHostFront(expectedHostFront);
+        String expectedHostFrontDev = "http://localhost:4200";
+        String expectedHostFrontPro = "http://localhost:3000";
+        appProperties.setHostFrontDev(expectedHostFrontDev);
+        appProperties.setHostFrontPro(expectedHostFrontPro);
+
 
         // Verificar que se puede obtener el valor correctamente
-        assertEquals(expectedHostFront, appProperties.getHostFront());
+        assertEquals(expectedHostFrontDev, appProperties.getHostFrontDev());
+        assertEquals(expectedHostFrontPro, appProperties.getHostFrontPro());
     }
 
     /**
@@ -44,6 +48,6 @@ public class AppPropertiesTest {
     @Test
     void testDefaultHostFront() {
         // Verificar que el valor por defecto de hostFront es null antes de la configuración
-        assertEquals(null, appProperties.getHostFront());
+        assertEquals(null, appProperties.getHostFrontDev());
     }
 }
