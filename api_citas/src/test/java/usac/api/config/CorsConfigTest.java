@@ -51,12 +51,11 @@ public class CorsConfigTest {
         when(appProperties.getHostFrontDev()).thenReturn("4200");
         when(appProperties.getHostFrontPro()).thenReturn("3000");
 
-
         // Simulamos el comportamiento del método addMapping que devuelve un CorsRegistration
         when(corsRegistry.addMapping("/**")).thenReturn(corsRegistration);
 
         // Simular el comportamiento encadenado de CorsRegistration
-        when(corsRegistration.allowedOrigins(anyString())).thenReturn(corsRegistration);
+        when(corsRegistration.allowedOrigins(anyString(), anyString())).thenReturn(corsRegistration);
         when(corsRegistration.allowedMethods(any())).thenReturn(corsRegistration);
         when(corsRegistration.allowedHeaders(anyString())).thenReturn(corsRegistration);
         when(corsRegistration.allowCredentials(anyBoolean())).thenReturn(corsRegistration);
