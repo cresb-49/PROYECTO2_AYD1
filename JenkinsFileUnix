@@ -56,6 +56,8 @@ pipeline {
         }
         stage('Build Frontend') {
             steps {
+                echo 'Skipping frontend build step for now...'
+                // Comentar o agregar pasos aquí
                 // dir('app_citas') {
                 //     echo 'Building Angular Application...'
                 //     sh 'npm install'
@@ -65,6 +67,8 @@ pipeline {
         }
         stage('Restart Nginx') {
             steps {
+                echo 'Skipping Nginx restart for now...'
+                // Comentar o agregar pasos aquí
                 // Para que nginx no de error en el reinicio, hay que moverse primero a la carpeta de instalación
                 // y luego ejecutar el comando de reinicio de esa forma no dará error
                 // dir('/usr/local/nginx') {
