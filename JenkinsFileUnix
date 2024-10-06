@@ -38,11 +38,11 @@ pipeline {
             steps {
                 echo 'Skipping frontend build step for now...'
                 // Comentar o agregar pasos aquí
-                // dir('app_citas') {
-                //     echo 'Building Angular Application...'
-                //     sh 'npm install'
-                //     sh 'npm run build --prod'
-                // }
+                dir('app_citas') {
+                    echo 'Building Angular Application...'
+                    sh 'npm install'
+                    sh 'npm run build --prod'
+                }
             }
         }
         stage('Restart Nginx') {
