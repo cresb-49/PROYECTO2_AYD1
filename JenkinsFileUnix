@@ -1,6 +1,11 @@
 pipeline {
     agent any
     stages {
+        stage("List env vars"){
+			steps{
+				sh "printenv | sort"
+			}
+		}
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/cresb-49/PROYECTO2_AYD1.git'
