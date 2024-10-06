@@ -1,0 +1,77 @@
+pipeline {
+    agent any
+    stages {
+        stage('Prepare Workspace') {
+            steps {
+                script {
+                    def userHome = "/home/${env.USER}"
+                    def repoDir = "${userHome}/PROYECTO2_AYD1"
+                    
+                    echo "Verificando si el directorio ${repoDir} existe..."
+                    sh """
+                        if [ ! -d "${repoDir}" ]; then
+                            mkdir -p "${repoDir}"
+                            echo "Directorio ${repoDir} creado."
+                        else
+                            echo "Directorio ${repoDir} ya existe."
+                        fi
+                    """
+                }
+            }
+        }
+        stage('Checkout') {
+            steps {
+                dir("/home/${env.USER}/PROYECTO2_AYD1") {
+                    git branch: 'main', url: 'https://github.com/cresb-49/PROYECTO2_AYD1.git'
+                }
+            }
+        }
+        stage('Build Backend') {
+            steps {
+                echo 'Simulating Spring Boot Application build...'
+                // Aquí se comenta la compilación real del backend
+                // dir('api_citas') {
+                //     echo 'Building Spring Boot Application...'
+                //     bat 'mvn clean package -DskipTests' // Compilar el proyecto y generar el archivo .war
+                // }
+            }
+        }
+        stage('Deploy Backend to Tomcat') {
+            steps {
+                echo 'Simulating Backend Deployment to Tomcat...'
+                script {
+                    // Si quieres que Jenkins actúe como si hubiera hecho el despliegue
+                    // def warFile = 'api_citas/target/api_citas.war'
+                    // def tomcatWebapps = '/home/$USER/tomcat/webapps'
+                    
+                    // Este es solo un ejemplo de lo que ocurriría si realmente copiaras el archivo WAR
+                    // sh "cp ${warFile} ${tomcatWebapps}"
+                    
+                    // Simular reinicio de Tomcat
+                    // sh '/home/$USER/tomcat/bin/shutdown.sh'
+                    // sh '/home/$USER/tomcat/bin/startup.sh'
+                    echo 'Tomcat restarted (simulation)'
+                }
+            }
+        }
+        stage('Build Frontend') {
+            steps {
+                // dir('app_citas') {
+                //     echo 'Building Angular Application...'
+                //     sh 'npm install'
+                //     sh 'npm run build --prod'
+                // }
+            }
+        }
+        stage('Restart Nginx') {
+            steps {
+                // Para que nginx no de error en el reinicio, hay que moverse primero a la carpeta de instalación
+                // y luego ejecutar el comando de reinicio de esa forma no dará error
+                // dir('/usr/local/nginx') {
+                //     echo 'Restarting Nginx...'
+                //     sh 'nginx -s reload'
+                // }
+            }
+        }
+    }
+}
