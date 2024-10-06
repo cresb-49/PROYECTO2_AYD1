@@ -45,7 +45,8 @@ pipeline {
                 // Comentar o agregar pasos aquí
                 dir('app_citas') {
                     echo 'Building Angular Application...'
-                    sh '${NODE_PATH}/npm install'
+                    echo "NODE_PATH = ${env.NODE_PATH}"
+                    sh '$NODE_PATH/npm install'
                     sh 'npm run build --prod'
                 }
             }
