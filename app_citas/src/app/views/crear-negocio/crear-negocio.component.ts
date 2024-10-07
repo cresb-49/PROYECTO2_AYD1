@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DayConfig, ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
 import { FormsModule } from '@angular/forms';
-import { Dia, Horario, Negocio, NegocioService, PayloadNegocio } from '../../services/negocio/negocio.service';
+import { Horario, Negocio, NegocioService, PayloadNegocio } from '../../services/negocio/negocio.service';
 import { ToastrService } from 'ngx-toastr';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { BehaviorSubject, debounceTime } from 'rxjs';
-import { DiaService } from '../../services/dia/dia.service';
+import { Dia, DiaService } from '../../services/dia/dia.service';
 
 export interface ManageNegocio {
   id: number;
