@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CardActionsComponent } from '../../components/card-actions/card-actions.component';
+import { CanchaService } from '../../services/cancha/cancha.service';
+import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 
 @Component({
   standalone: true,
@@ -23,14 +25,28 @@ export class SeeCourtsComponent implements OnInit {
     { description: 'Modificar', route: '/edit-cancha', enabled: true },
   ];
 
-  constructor() { }
+  constructor(
+    private canchaService: CanchaService
+  ) { }
 
   ngOnInit() {
+    this.getCanchas();
+  }
+
+  private getCanchas() {
+    this.canchaService.getCanchas().subscribe({
+      next: (response: ApiResponse) => {
+        console.log(response);
+      },
+      error: (error: ErrorApiResponse) => {
+        console.error(error);
+      }
+    });
   }
 
   setValueAction(cancha: any): any[] {
     //Clonamos el arreglo de acciones
-    let acciones:any[] = [];
+    let acciones: any[] = [];
 
     //Iteramos el arreglo de acciones para agregar el id de la cancha
     this.acciones_canchas.forEach(accion => {

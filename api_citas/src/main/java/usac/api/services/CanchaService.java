@@ -96,4 +96,8 @@ public class CanchaService extends usac.api.services.Service {
     public int countCanchas() {
         return (int) canchaRepository.count();
     }
+
+    public List<Cancha> getCanchas() {
+        return this.ignorarEliminados(canchaRepository.findAll());
+    }
 }
