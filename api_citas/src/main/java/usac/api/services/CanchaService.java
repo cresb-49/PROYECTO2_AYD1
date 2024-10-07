@@ -1,16 +1,16 @@
 package usac.api.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import usac.api.models.Cancha;
 import usac.api.models.HorarioCancha;
-import usac.api.models.HorarioNegocio;
 import usac.api.repositories.CanchaRepository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class CanchaService extends usac.api.services.Service {
@@ -49,6 +49,13 @@ public class CanchaService extends usac.api.services.Service {
         throw new Exception("No se pudo crear la cancha");
     }
 
+    /**
+     * Método para actualizar una cancha
+     * @param cancha
+     * @param horarios
+     * @return
+     * @throws Exception
+     */
     public Cancha actualizarCancha(Cancha cancha, List<HorarioCancha> horarios) throws Exception {
         // Validar que la cancha tenga un id
         if (cancha.getId() == null || cancha == null) {
@@ -91,6 +98,24 @@ public class CanchaService extends usac.api.services.Service {
             return canchaActualizada;
         }
         throw new Exception("No se pudo actualizar la cancha");
+    }
+
+    /**
+     * Método para obtener una cancha por su id
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Cancha getCanchaById(Long id) throws Exception {
+        Cancha cancha = canchaRepository.findById(id).orElse(null);
+        if (cancha == null) {
+            throw new Exception("No se encontró la cancha");
+        }
+        return cancha;
+    }
+
+    public void deleteCanchaById(Long id) throws Exception {
+        throw new Exception("No implementado");
     }
 
     public int countCanchas() {
