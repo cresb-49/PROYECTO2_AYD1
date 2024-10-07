@@ -115,7 +115,11 @@ public class CanchaService extends usac.api.services.Service {
     }
 
     public void deleteCanchaById(Long id) throws Exception {
-        throw new Exception("No implementado");
+        Cancha cancha = canchaRepository.findById(id).orElse(null);
+        if (cancha == null) {
+            throw new Exception("No se encontró la cancha");
+        }
+        canchaRepository.delete(cancha);
     }
 
     public int countCanchas() {

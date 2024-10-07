@@ -56,4 +56,8 @@ export class CanchaService {
     return this.httpService.patch<any>('cancha/private/cancha', payload, true);
   }
 
+  deleteCancha(id: number) {
+    return this.httpService.delete<any>(`cancha/private/cancha/${id}`, true);
+  }
+
 }
