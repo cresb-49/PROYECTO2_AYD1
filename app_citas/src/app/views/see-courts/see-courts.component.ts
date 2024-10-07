@@ -5,6 +5,8 @@ import { CardActionsComponent } from '../../components/card-actions/card-actions
 import { Cancha, CanchaService } from '../../services/cancha/cancha.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../services/auth/auth.service';
+import { NativeUserRoles } from '../../services/auth/types';
 
 @Component({
   standalone: true,
@@ -14,25 +16,31 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./see-courts.component.css']
 })
 export class SeeCourtsComponent implements OnInit {
-  canchas = [
-    { id: 1, name: 'Cancha 1', description: 'Cancha de futbol', price: 100 },
-    { id: 2, name: 'Cancha 2', description: 'Cancha de futbol', price: 200 },
-    { id: 3, name: 'Cancha 3', description: 'Cancha de futbol', price: 300 },
-    { id: 4, name: 'Cancha 4', description: 'Cancha de futbol', price: 400 },
-    { id: 5, name: 'Cancha 5', description: 'Cancha de futbol', price: 500 },
-  ];
-  acciones_canchas = [
-    { description: 'Reservar', route: '/reservar-cancha', enabled: true },
-    { description: 'Modificar', route: '/edit-cancha', enabled: true },
+  canchas: any[] = [];
+  acciones_canchas:any[] = [
+
   ];
 
   constructor(
     private canchaService: CanchaService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private authService: AuthService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.getCanchas();
+    const isCliente = await this.isCliente();
+    if (isCliente) {
+      this.acciones_canchas.push({ description: 'Reservar', route: '/reservar-cancha', enabled: true });
+    }else{
+      this.acciones_canchas.push({ description: 'Editar', route: '/edit-cancha', enabled: true });
+      this.acciones_canchas.push({ description: 'Eliminar', route: '/eliminar-cancha', enabled: true });
+    }
+  }
+
+  isCliente() {
+    const roles = this.authService.getUserRoles();
+    return roles.includes(NativeUserRoles.CLIENTE);
   }
 
   private getCanchas() {

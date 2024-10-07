@@ -32,4 +32,8 @@ export class CanchaService {
     return this.httpService.get<any>('cancha/public/canchas')
   }
 
+  getCancha(id: number) {
+    return this.httpService.get<any>(`cancha/public/cancha/${id}`)
+  }
+
 }
