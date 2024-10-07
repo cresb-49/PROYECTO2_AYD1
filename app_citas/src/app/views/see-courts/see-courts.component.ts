@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CardActionsComponent } from '../../components/card-actions/card-actions.component';
-import { CanchaService } from '../../services/cancha/cancha.service';
+import { Cancha, CanchaService } from '../../services/cancha/cancha.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   standalone: true,
@@ -26,7 +27,8 @@ export class SeeCourtsComponent implements OnInit {
   ];
 
   constructor(
-    private canchaService: CanchaService
+    private canchaService: CanchaService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit() {
@@ -36,10 +38,18 @@ export class SeeCourtsComponent implements OnInit {
   private getCanchas() {
     this.canchaService.getCanchas().subscribe({
       next: (response: ApiResponse) => {
-        console.log(response);
+        const data: Cancha[] = response.data ?? [];
+        for (let d of data) {
+          this.canchas.push({
+            id: d.id,
+            name: `Cancha ${d.id}`,
+            description: d.descripcion,
+            price: d.costoHora
+          });
+        }
       },
       error: (error: ErrorApiResponse) => {
-        console.error(error);
+        this.toastr.error(error.error, 'Error al obtener las canchas');
       }
     });
   }
