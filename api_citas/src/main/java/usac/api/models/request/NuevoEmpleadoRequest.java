@@ -4,7 +4,11 @@
  */
 package usac.api.models.request;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
+
+import usac.api.models.HorarioEmpleado;
 import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 
@@ -17,13 +21,15 @@ public class NuevoEmpleadoRequest {
 
     private Usuario usuario;
     private TipoEmpleado tipoEmpleado;
+    private List<HorarioEmpleado> horarios;
 
     public NuevoEmpleadoRequest() {
     }
 
-    public NuevoEmpleadoRequest(Usuario usuario, TipoEmpleado tipoEmpleado) {
+    public NuevoEmpleadoRequest(Usuario usuario, TipoEmpleado tipoEmpleado,List<HorarioEmpleado> horarios) {
         this.usuario = usuario;
         this.tipoEmpleado = tipoEmpleado;
+        this.horarios = horarios;
     }
 
     public Usuario getUsuario() {
@@ -40,6 +46,14 @@ public class NuevoEmpleadoRequest {
 
     public void setTipoEmpleado(TipoEmpleado tipoEmpleado) {
         this.tipoEmpleado = tipoEmpleado;
+    }
+
+    public List<HorarioEmpleado> getHorarios() {
+        return horarios;
+    }
+
+    public void setHorarios(List<HorarioEmpleado> horarios) {
+        this.horarios = horarios;
     }
 
 }

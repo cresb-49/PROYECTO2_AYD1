@@ -13,7 +13,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import usac.api.models.*;
+import usac.api.models.Empleado;
+import usac.api.models.HorarioEmpleado;
+import usac.api.models.Rol;
+import usac.api.models.TipoEmpleado;
+import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
@@ -445,10 +449,18 @@ public class UsuarioService extends usac.api.services.Service {
         TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
         // Creamos el registro de tipo de empleado
         Empleado empleado = new Empleado(usuarioGuardado, tipoEmpleadoGuardado);
+        //Horarios del empleado
+        ArrayList<HorarioEmpleado> horariosEmpleadoCreado = new ArrayList<>();
+        for (HorarioEmpleado horario : nuevoEmpleadoRequest.getHorarios()) {
+            horariosEmpleadoCreado.add(new HorarioEmpleado(horario.getDia(),empleado, horario.getEntrada(), horario.getSalida()));
+        }
+        empleado.setHorarios(horariosEmpleadoCreado);
         // Guardamos el empleado
         this.empleadoService.createEmpleado(empleado);
-        // Retornamos el usuario guardado
-        return usuarioGuardado;
+        if(usuarioGuardado != null && usuarioGuardado.getId() !=null){
+            return usuarioGuardado;
+        }
+        throw new Exception("No se pudo crear el empleado");
     }
 
     /**

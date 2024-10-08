@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import usac.api.models.Cancha;
 import usac.api.models.Dia;
 import usac.api.models.HorarioCancha;
+import usac.api.models.HorarioEmpleado;
 import usac.api.models.Negocio;
 import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
@@ -242,6 +243,13 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
+            ArrayList<HorarioEmpleado> horarios = new ArrayList<>();
+            horarios.add(new HorarioEmpleado(lunes,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(martes,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(miercoles,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(jueves,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(viernes,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(sabado,null, LocalTime.of(8, 0), LocalTime.of(13, 0)));
             try {
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
@@ -251,11 +259,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearUsuarioCliente(cliente4);
                 this.usuarioService.crearUsuarioCliente(cliente5);
 
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, tipoEmpleado1));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, tipoEmpleado2));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, tipoEmpleado3));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, tipoEmpleado1,horarios));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, tipoEmpleado2,horarios));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, tipoEmpleado3,horarios));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4,horarios));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5,horarios));
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
@@ -282,23 +290,23 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             Cancha cancha4 = new Cancha(250.0, "Cancha de futbol 11 con cesped sintetico");
             Cancha cancha5 = new Cancha(300.0, "Cancha de futbol 11 con cesped artificial");
             //Horario generico para las canchas
-            ArrayList<HorarioCancha> horarios = new ArrayList<>();
-            horarios.add(new HorarioCancha(null, lunes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, martes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, miercoles, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, jueves, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, viernes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, sabado, LocalTime.of(8, 0), LocalTime.of(17, 0)));
-            horarios.add(new HorarioCancha(null, domingo, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+            ArrayList<HorarioCancha> horariosEmpleados = new ArrayList<>();
+            horariosEmpleados.add(new HorarioCancha(null, lunes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, martes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, miercoles, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, jueves, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, viernes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, sabado, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, domingo, LocalTime.of(8, 0), LocalTime.of(17, 0)));
             //Se crean las canchas
             try {
                 //Verificamos si ya existen 5 canchas
                 if (this.canchaService.countCanchas() < 5) {
-                    this.canchaService.crearCancha(cancha1, horarios);
-                    this.canchaService.crearCancha(cancha2, horarios);
-                    this.canchaService.crearCancha(cancha3, horarios);
-                    this.canchaService.crearCancha(cancha4, horarios);
-                    this.canchaService.crearCancha(cancha5, horarios);
+                    this.canchaService.crearCancha(cancha1, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha2, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha3, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha4, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha5, horariosEmpleados);
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
