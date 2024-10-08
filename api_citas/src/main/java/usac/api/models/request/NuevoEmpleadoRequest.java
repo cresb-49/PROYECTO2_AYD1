@@ -4,6 +4,7 @@
  */
 package usac.api.models.request;
 
+import javax.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
 import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
@@ -16,8 +17,13 @@ import usac.api.models.Usuario;
 @Component
 public class NuevoEmpleadoRequest {
 
+    @NotNull(message = "El usuario no puede ser nulo")
     private Usuario usuario;
+
+    @NotNull(message = "El rol no puede ser nulo")
     private Rol rol;
+
+    @NotNull(message = "El tipo del empleado no puede ser nulo.")
     private TipoEmpleado tipoEmpleado;
 
     public NuevoEmpleadoRequest() {

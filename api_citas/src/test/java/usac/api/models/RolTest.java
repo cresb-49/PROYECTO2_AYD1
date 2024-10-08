@@ -58,17 +58,6 @@ public class RolTest {
     }
 
     /**
-     * Prueba para validar que se lanza una excepción cuando el nombre del rol
-     * tiene un valor incorrecto.
-     */
-    @Test
-    void testNombreRolValorIncorrecto() {
-        rol = new Rol("INVALIDO");
-        List<ConstraintViolation<Rol>> violations = new ArrayList<>(validator.validate(rol));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("El nombre de rol solo puede ser CLIENTE, ADMIN, AYUDANTE")));
-    }
-
-    /**
      * Prueba para validar que se permite un nombre de rol válido (CLIENTE,
      * ADMIN o AYUDANTE).
      */
@@ -77,17 +66,6 @@ public class RolTest {
         rol = new Rol("CLIENTE");
         List<ConstraintViolation<Rol>> violations = new ArrayList<>(validator.validate(rol));
         assertTrue(violations.isEmpty());
-    }
-
-    /**
-     * Prueba para validar que no se permite asignar un nombre de rol con
-     * caracteres especiales.
-     */
-    @Test
-    void testNombreRolConCaracteresEspecialesNoPermitido() {
-        rol = new Rol("ADM!N");
-        List<ConstraintViolation<Rol>> violations = new ArrayList<>(validator.validate(rol));
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("El nombre de rol solo puede ser CLIENTE, ADMIN, AYUDANTE")));
     }
 
     /**

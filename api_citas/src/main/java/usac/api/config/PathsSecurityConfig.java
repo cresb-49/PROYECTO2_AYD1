@@ -46,6 +46,7 @@ public class PathsSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/**/public/**").permitAll()
                 .antMatchers("/api/**/private/**").hasAnyRole("ADMIN")
                 .antMatchers("/api/**/private/restricted/**").hasAnyRole("ADMIN", "EMPLEADO")
+                .antMatchers("/api/**/private/no_restricted/**").hasAnyRole("ADMIN", "EMPLEADO")
                 .antMatchers("/api/**/protected/**").hasAnyRole("CLIENTE", "ADMIN", "EMPLEADO")
                 .antMatchers("/api/**/cliente/**").hasRole("CLIENTE")
                 .anyRequest().authenticated()

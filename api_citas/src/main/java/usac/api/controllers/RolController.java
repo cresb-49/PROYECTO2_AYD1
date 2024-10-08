@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,9 +62,10 @@ public class RolController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = Rol.class))}),
         @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
-    @PostMapping("/private/restricted/actualizarRol")
+    @PatchMapping("/private/restricted/actualizarRol")
     public ResponseEntity<?> actualizarRol(@RequestBody Rol update) {
         try {
+            this.validadorPermiso.verificarPermiso();
             Rol respuesta = rolService.actualizarRol(update);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
@@ -80,6 +84,38 @@ public class RolController {
         try {
             this.validadorPermiso.verificarPermiso();
             Rol respuesta = rolService.actualizarPermisosRol(update);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Obtiene un rol en el sistema mediante su Id.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Rol encontrado exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Rol.class))}),
+        @ApiResponse(responseCode = "400", description = "Rol no encontrado o solicitud incorrecta.")
+    })
+    @GetMapping("/private/restricted/getRolById")
+    public ResponseEntity<?> getRolById(@PathVariable Long id) {
+        try {
+            Rol respuesta = rolService.getRolById(id);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Obtiene un rol en el sistema mediante su nombre.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Rol encontrado exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Rol.class))}),
+        @ApiResponse(responseCode = "400", description = "Rol no encontrado o solicitud incorrecta.")
+    })
+    @GetMapping("/private/no_restricted/getRolByNombre/{nombre}")
+    public ResponseEntity<?> getRolByNombre(@PathVariable String nombre) {
+        try {
+            Rol respuesta = rolService.getRolByNombre(nombre);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();

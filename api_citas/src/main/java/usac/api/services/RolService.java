@@ -5,7 +5,9 @@
 package usac.api.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import usac.api.models.Permiso;
@@ -44,15 +46,15 @@ public class RolService extends Service {
     /**
      * Busca un rol por su nombre
      *
-     * @param nombre
+     * @param idRol
      * @return
      * @throws Exception
      */
-    public Rol getRolById(Rol idRol) throws Exception {
+    public Rol getRolById(Long idRol) throws Exception {
         //validamos el id
-        this.validarId(idRol);
+        this.validarId(new Rol(idRol));
         // Buscamos el usuario en la base de datos
-        Rol rol = rolRepository.findById(idRol.getId()).orElse(null);
+        Rol rol = rolRepository.findById(idRol).orElse(null);
         // si el rol no existe lanzamos error
         this.validarNull(rol);
         return rol;
@@ -67,16 +69,21 @@ public class RolService extends Service {
     @Transactional(rollbackOn = Exception.class)
     public Rol actualizarPermisosRol(RolPermisoUpdateRequest rolPermisoRequest) throws Exception {
         // Buscamos el rol en la base de datos
-        Rol rol = this.getRolById(new Rol(rolPermisoRequest.getIdRol()));
+        Rol rol = this.getRolById(rolPermisoRequest.getIdRol());
 
         List<RolPermiso> permisosNuevos = new ArrayList<>();
-        // por cada permiso que se haya especificado creamos un nuevo permiso
+        // Usamos un Set para evitar permisos duplicados por su id
+        Set<Long> permisosIdsUnicos = new HashSet<>();
+        // Por cada permiso que se haya especificado, creamos un nuevo permiso si su id no está duplicado
         for (Permiso item : rolPermisoRequest.getPermisos()) {
-            //mandamos a traer el permiso, se verifica si existe
-            Permiso permiso = this.permisoService.getPermisoById(
-                    new Permiso(item.getId()));
-            permisosNuevos.add(new RolPermiso(
-                    rol, permiso));
+            // Traemos el permiso, se verifica si existe
+            Permiso permiso = this.permisoService.getPermisoById(new Permiso(item.getId()));
+
+            // Verificamos si el id del permiso ya ha sido agregado
+            if (!permisosIdsUnicos.contains(permiso.getId())) {
+                permisosNuevos.add(new RolPermiso(rol, permiso));
+                permisosIdsUnicos.add(permiso.getId());  // Lo añadimos al Set para que no se repita
+            } 
         }
 
         if (rol.getPermisosRol() == null) {
@@ -122,7 +129,7 @@ public class RolService extends Service {
         //validar id
         this.validarId(rol);
 
-        Rol rolEnconrtrado = this.getRolById(rol);
+        Rol rolEnconrtrado = this.getRolById(rol.getId());
 
         if (this.rolRepository.existsByNombreAndIdNot(rol.getNombre(), rol.getId())) // guardamos el rol
         {
@@ -130,7 +137,7 @@ public class RolService extends Service {
         }
 
         rol.setPermisosRol(rolEnconrtrado.getPermisosRol());
-        rol.setUsusarios(rol.getUsusarios());
+        rol.setUsusarios(rolEnconrtrado.getUsusarios());
 
         Rol saveRolFinal = this.saveRol(rol);
         return saveRolFinal;

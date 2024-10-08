@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,21 +18,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import usac.api.enums.PermisoEnum;
 
 import usac.api.models.Cancha;
 import usac.api.models.Dia;
 import usac.api.models.HorarioCancha;
 import usac.api.models.Negocio;
+import usac.api.models.Permiso;
 import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 import usac.api.models.request.NuevoEmpleadoRequest;
+import usac.api.models.request.RolPermisoUpdateRequest;
 import usac.api.repositories.DiaRepository;
+import usac.api.repositories.PermisoRepository;
 import usac.api.repositories.RolRepository;
 import usac.api.services.CanchaService;
 import usac.api.services.DiaService;
 import usac.api.services.EmpleadoService;
 import usac.api.services.NegocioService;
+import usac.api.services.RolService;
 import usac.api.services.UsuarioService;
 
 /**
@@ -42,6 +48,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
     @Autowired
     private RolRepository rolRepository;
+    @Autowired
+    private RolService rolService;
+    @Autowired
+    private PermisoRepository permisoRepository;
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
@@ -77,6 +87,16 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
         } catch (Exception e) {
             throw new Exception("Error");
         }
+    }
+
+    public Permiso insertarPermisoSiNoExiste(Permiso pa) {
+        Permiso permiso
+                = this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
+        if (permiso == null) {
+            return this.permisoRepository.save(
+                    pa);
+        }
+        return permiso;
     }
 
     /*
@@ -123,15 +143,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      * }
      * }
      *
-     * public Permiso insertarPermisoSiNoExiste(Permiso pa) {
-     * Permiso permiso =
-     * this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
-     * if (permiso == null) {
-     * return this.permisoRepository.save(
-     * pa);
-     * }
-     * return permiso;
-     * }
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -258,6 +269,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4, customRol));
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5, customRol));
             } catch (Exception e) {
+                e.printStackTrace();
                 System.err.println(e.getMessage());
             }
             // Se crea el modelo del negocio de la APP
@@ -303,6 +315,25 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
+            }
+
+            List<Permiso> permisos = new ArrayList<>();
+
+            // Creacion de todos los permisos que tiene el sistema
+            for (PermisoEnum permiso : PermisoEnum.values()) {
+
+                Permiso insercion = this.insertarPermisoSiNoExiste(
+                        new Permiso(
+                                permiso.getNombrePermiso(),
+                                permiso.getRuta()));
+                permisos.add(insercion);
+            }
+
+            try {
+                // Asignacion de permisos a los usuarios
+                this.rolService.actualizarPermisosRol(
+                        new RolPermisoUpdateRequest(customRol.getId(), permisos));
+            } catch (Exception e) {
             }
             /*
              * Categoria categoria = new Categoria("Hogar");
@@ -351,21 +382,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
              * } catch (Exception e) {
              * }
              *
-             * // Creacion de todos los permisos que tiene el sistema
-             * for (PermisoEnum permiso : PermisoEnum.values()) {
              *
-             * Permiso insercion = this.insertarPermisoSiNoExiste(
-             * new Permiso(
-             * permiso.getNombrePermiso(),
-             * permiso.getRuta()));
-             * try {
-             * // Asignacion de permisos a los usuarios
-             * Usuario ayudante2 = this.usuarioService.getByEmail(
-             * "luismonteg1@hotmail.com");
-             * this.usuarioService.agregarPermisoUsuario(ayudante2,
-             * insercion);
-             * } catch (Exception e) {
-             * }
              * }
              */
         } catch (Exception ex) {

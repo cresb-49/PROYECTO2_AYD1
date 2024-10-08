@@ -15,7 +15,7 @@ public enum PermisoEnum {
     ACTUALIZAR_ROLES("Actualizar roles",
             "/api/rol/protected/actualizarRol"),
     ACTUALIZAR_PERMISOS_ROLES("Actualizar permisos en roles",
-            "/api/rol/protected/actualizarRol");
+            "/api/rol/protected/actualizarPermisosRol");
 
     private final String nombrePermiso;
     private final String ruta;

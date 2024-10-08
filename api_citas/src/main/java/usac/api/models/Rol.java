@@ -39,8 +39,6 @@ public class Rol extends Auditor {
     @NotBlank(message = "El nombre del rol no puede estar vacío.")
     @NotNull(message = "El nombre del rol no puede ser nulo")
     @Size(min = 1, max = 250, message = "El nombre del rol debe tener entre 1 y 250 caracteres.")
-    @Pattern(regexp = "^(CLIENTE|ADMIN|AYUDANTE)$",
-            message = "El nombre de rol solo puede ser CLIENTE, ADMIN, AYUDANTE")
     private String nombre;
 
     @OneToMany(mappedBy = "rol", orphanRemoval = true)

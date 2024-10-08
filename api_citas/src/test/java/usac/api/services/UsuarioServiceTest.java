@@ -684,7 +684,7 @@ public class UsuarioServiceTest {
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.crearUsuarioCliente(usuario);
         });
-        assertEquals("El Email ya existe.", exception.getMessage());
+        assertEquals(String.format("El Email %s ya existe.", usuario.getEmail()), exception.getMessage());
     }
 
     @Test
@@ -706,7 +706,7 @@ public class UsuarioServiceTest {
         assertNotNull(usuarioCreado);
         assertEquals("admin@test.com", usuarioCreado.getEmail());
         verify(rolService, times(1)).getRolByNombre("ADMIN");
-        verify(usuarioRepository, times(2)).save(any(Usuario.class));
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
     }
 
     @Test
@@ -734,7 +734,7 @@ public class UsuarioServiceTest {
         assertEquals("empleado@test.com", usuarioCreado.getEmail());
         verify(rolService, times(1)).getRolByNombre("EMPLEADO");
         verify(empleadoService, times(1)).getTipoEmpleadoByNombre("Organizador");
-        verify(usuarioRepository, times(2)).save(any(Usuario.class));
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
     }
 
     @Test
@@ -749,7 +749,7 @@ public class UsuarioServiceTest {
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.crearAdministrador(usuario);
         });
-        assertEquals("El Email ya existe.", exception.getMessage());
+        assertEquals(String.format("El Email %s ya existe.", usuario.getEmail()), exception.getMessage());
     }
 
     @Test
@@ -769,6 +769,6 @@ public class UsuarioServiceTest {
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, null, rol));
         });
-        assertEquals("El Email ya existe.", exception.getMessage());
+        assertEquals(String.format("El Email %s ya existe.", usuario.getEmail()), exception.getMessage());
     }
 }

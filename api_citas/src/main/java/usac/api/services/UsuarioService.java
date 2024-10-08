@@ -25,7 +25,7 @@ import usac.api.tools.Encriptador;
 
 @Service
 public class UsuarioService extends usac.api.services.Service {
-
+    
     @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
@@ -134,7 +134,7 @@ public class UsuarioService extends usac.api.services.Service {
             // Cargamos los detalles del usuario y generamos el token JWT
             UserDetails userDetails = authenticationService.loadUserByUsername(log.getEmail());
             String jwt = jwtGenerator.generateToken(userDetails);
-
+            
             return new LoginDTO(usuario, jwt);
         } catch (AuthenticationException ex) {
             throw new Exception(ex.getMessage());
@@ -283,7 +283,7 @@ public class UsuarioService extends usac.api.services.Service {
                     + " %s, debido a que ya existe otro usuario con el mismo cui.",
                     usuario.getEmail()));
         }
-
+        
         if (usuario.getNit() != null) {
             // Verificamos si existe otro usuario con el mismo nit
             if (this.usuarioRepository.existsUsuarioByNitAndIdNot(usuario.getNit(),
@@ -349,7 +349,7 @@ public class UsuarioService extends usac.api.services.Service {
         }
         // mandamos a traer el estado de la cuenta
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
-
+        
         if (usuario == null) {
             throw new Exception("No hemos encontrado el usuario.");
         }
@@ -371,7 +371,7 @@ public class UsuarioService extends usac.api.services.Service {
         }
         // mandamos a traer el estado de la cuenta
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
-
+        
         if (usuario == null) {
             throw new Exception("No hemos encontrado el usuario.");
         }
@@ -392,16 +392,13 @@ public class UsuarioService extends usac.api.services.Service {
         this.validarModelo(crear);
         // traer rol AYUDANTE
         Rol rol = this.rolService.getRolByNombre("CLIENTE");
-        
-        // Guardamos el usuario sin rol
-        Usuario usuarioGuardado = this.guardarUsuario(crear, null);
-        
+
         //preparamos el rol
         List<RolUsuario> rolesUsuario = new ArrayList<>();
-        rolesUsuario.add(new RolUsuario(usuarioGuardado, rol));
-        
+        rolesUsuario.add(new RolUsuario(crear, rol));
+
         // guardamos el usuario con el rol
-        Usuario userCreado = this.guardarUsuario(usuarioGuardado, rolesUsuario);
+        Usuario userCreado = this.guardarUsuario(crear, rolesUsuario);
         // Generar el JWT para el usuario creado
         UserDetails userDetails = authenticationService.loadUserByUsername(crear.getEmail());
         String jwt = jwtGenerator.generateToken(userDetails);
@@ -426,12 +423,12 @@ public class UsuarioService extends usac.api.services.Service {
         // Validamos el modelo de usuario
         this.validarModelo(crear);
         // Guardamos el usuario con el rol de Administrador
-        Usuario usuarioGuardado = this.guardarUsuario(crear, null);
+//        Usuario usuarioGuardado = this.guardarUsuario(crear, null);
         // Obtenemos el rol 'ADMIN' para asignarlo al nuevo usuario
         Rol rol = this.rolService.getRolByNombre("ADMIN");
-
+        
         List<RolUsuario> rolesUsuario = new ArrayList<>();
-        rolesUsuario.add(new RolUsuario(usuarioGuardado, rol));
+        rolesUsuario.add(new RolUsuario(crear, rol));
 
         // Guardamos el usuario con el rol de Administrador
         return this.guardarUsuario(crear, rolesUsuario);
@@ -448,20 +445,21 @@ public class UsuarioService extends usac.api.services.Service {
      */
     public Usuario crearEmpleado(NuevoEmpleadoRequest nuevoEmpleadoRequest) throws Exception {
         // Validamos el modelo de usuario
+        this.validarModelo(nuevoEmpleadoRequest);
         this.validarModelo(nuevoEmpleadoRequest.getUsuario());
+        this.validarModelo(nuevoEmpleadoRequest.getTipoEmpleado());
         this.validarId(nuevoEmpleadoRequest.getRol());
+
         // Obtenemos el rol para asignarlo al nuevo usuario
         Rol rolEmpleado = this.rolService.getRolByNombre("EMPLEADO");
-        Rol rolPrincipal = this.rolService.getRolById(nuevoEmpleadoRequest.getRol());
+        Rol rolPrincipal = this.rolService.getRolById(nuevoEmpleadoRequest.getRol().getId());
 
-        // Guardamos el usuario con el rol de Administrador
-        Usuario usuarioGuardado = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), null);
-
+        
         List<RolUsuario> rolesUsuario = new ArrayList<>();
-        rolesUsuario.add(new RolUsuario(usuarioGuardado, rolEmpleado));
-        rolesUsuario.add(new RolUsuario(usuarioGuardado, rolPrincipal));
-
-        Usuario usuarioGuardadoFinal = this.guardarUsuario(usuarioGuardado, rolesUsuario);
+        rolesUsuario.add(new RolUsuario(nuevoEmpleadoRequest.getUsuario(), rolEmpleado));
+        rolesUsuario.add(new RolUsuario(nuevoEmpleadoRequest.getUsuario(), rolPrincipal));
+        
+        Usuario usuarioGuardadoFinal = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rolesUsuario);
         //Buscamos el tipo de empleado en base a su nombre
         TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
         // Creamos el registro de tipo de empleado
@@ -483,17 +481,17 @@ public class UsuarioService extends usac.api.services.Service {
     @Transactional(rollbackOn = Exception.class)
     private Usuario guardarUsuario(Usuario crear, List<RolUsuario> roles) throws Exception {
         if (this.usuarioRepository.existsByEmail(crear.getEmail())) {
-            throw new Exception("El Email ya existe.");
+            throw new Exception(String.format("El Email %s ya existe.", crear.getEmail()));
         }
-
+        
         if (this.usuarioRepository.existsByPhone(crear.getPhone())) {
             throw new Exception("El numero de telefono ya existe.");
         }
-
+        
         if (this.usuarioRepository.existsByCui(crear.getCui())) {
             throw new Exception("El CUI ya existe.");
         }
-
+        
         if (crear.getNit() != null) {
             if (this.usuarioRepository.existsByNit(crear.getNit())) {
                 throw new Exception("El nit ya existe.");
@@ -507,5 +505,5 @@ public class UsuarioService extends usac.api.services.Service {
         // Guardar el usuario
         return this.usuarioRepository.save(crear);
     }
-
+    
 }
