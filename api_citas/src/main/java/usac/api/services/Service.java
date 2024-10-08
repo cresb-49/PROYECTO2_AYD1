@@ -58,7 +58,7 @@ public class Service {
      * lanzaa una excepcion.
      *
      * @param <T>
-     * @param entidad
+     * @param entidad entidad que extiende de auditor
      * @throws Exception
      */
     public <T extends Auditor> void validarId(T entidad) throws Exception {

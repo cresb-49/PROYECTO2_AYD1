@@ -1,28 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package usac.api.services;
 
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.validation.Validator;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import usac.api.models.Permiso;
 import usac.api.models.Rol;
+import usac.api.models.request.RolCreateRequest;
+import usac.api.models.request.RolPermisoUpdateRequest;
 import usac.api.repositories.RolRepository;
 
+import static org.mockito.Mockito.*;
+
 /**
- *
- * @author Luis Monterroso
+ * Pruebas unitarias para la clase RolService.
  */
 public class RolServiceTest {
 
@@ -31,75 +29,199 @@ public class RolServiceTest {
 
     @Mock
     private RolRepository rolRepository;
+
     @Mock
-    private Service service;
+    private PermisoService permisoService;
+
+    @Mock
+    private Validator validator; // Se agrega el mock del validador
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this); // Inicializar los mocks
     }
 
     /**
-     * Prueba exitosa para buscar un rol por nombre.
+     * Prueba para actualizar un rol exitosamente.
      */
     @Test
-    void testGetRolByNombre_Success() throws Exception {
-        // Simulación de un rol existente
-        Rol rol = new Rol();
-        rol.setNombre("ADMIN");
+    void testActualizarRol_Success() throws Exception {
+        // Crear un rol de prueba
+        Rol rolMock = new Rol();
+        rolMock.setId(1L);
+        rolMock.setNombre("ROLE_USER");
 
-        // Simulamos la búsqueda por nombre
-        when(rolRepository.findOneByNombre("ADMIN")).thenReturn(Optional.of(rol));
+        // Simular que el rol ya existe
+        when(rolRepository.findById(rolMock.getId())).thenReturn(Optional.of(rolMock));
 
-        // Llamamos al método getRolByNombre
-        Rol result = rolService.getRolByNombre("ADMIN");
+        // Simular que la validación es exitosa
+        when(validator.validate(any())).thenReturn(new HashSet<>());
+
+        // Simular que el nombre del rol no está duplicado
+        when(rolRepository.existsByNombreAndIdNot(rolMock.getNombre(), rolMock.getId())).thenReturn(false);
+
+        // Simular guardado exitoso
+        when(rolRepository.save(any(Rol.class))).thenReturn(rolMock);
+
+        // Ejecutar la actualización
+        Rol rolActualizado = rolService.actualizarRol(rolMock);
 
         // Verificaciones
-        assertNotNull(result);
-        assertEquals("ADMIN", result.getNombre());
-        verify(rolRepository, times(1)).findOneByNombre("ADMIN");
+        assertNotNull(rolActualizado);
+        assertEquals("ROLE_USER", rolActualizado.getNombre());
+        verify(rolRepository, times(1)).save(rolMock);
     }
 
     /**
-     * Prueba que lanza excepción cuando el rol no es encontrado.
-     */
-    /**
-     * Prueba que lanza excepción cuando el rol no es encontrado y se valida con
-     * el método validarNull.
+     * Prueba para lanzar excepción cuando el nombre del rol ya existe.
      */
     @Test
-    void testGetRolByNombre_RolNoEncontrado() throws Exception {
-        // Simular que no se encuentra el rol (retornar Optional.empty())
-        when(rolRepository.findOneByNombre("USUARIO")).thenReturn(Optional.empty());
+    void testActualizarRol_RolNombreYaExiste() throws Exception {
+        // Crear un rol de prueba
+        Rol rolMock = new Rol();
+        rolMock.setId(1L);
+        rolMock.setNombre("ROLE_ADMIN");
 
-        // Llamar al método y verificar que lanza una excepción
-        Exception exception = assertThrows(Exception.class, () -> {
-            rolService.getRolByNombre("USUARIO");
-        });
+        // Simular que el rol ya existe
+        when(rolRepository.findById(rolMock.getId())).thenReturn(Optional.of(rolMock));
 
-        // Verificar el mensaje de la excepción
+        // Simular que la validación es exitosa
+        when(validator.validate(any())).thenReturn(new HashSet<>());
+
+        // Simular que ya existe un rol con el mismo nombre pero distinto ID
+        when(rolRepository.existsByNombreAndIdNot(rolMock.getNombre(), rolMock.getId())).thenReturn(true);
+
+        // Ejecutar la actualización y verificar que lanza la excepción
+        Exception exception = assertThrows(Exception.class, () -> rolService.actualizarRol(rolMock));
+        assertEquals("Ya existe un rol con el nombre especificado.", exception.getMessage());
+
+        // Verificar que no se haya intentado guardar el rol
+        verify(rolRepository, times(0)).save(any(Rol.class));
+    }
+
+    /**
+     * Prueba para lanzar excepción cuando el rol no es encontrado.
+     */
+    @Test
+    void testActualizarRol_RolNoEncontrado() throws Exception {
+        // Crear un rol de prueba
+        Rol rolMock = new Rol();
+        rolMock.setId(1L);
+
+        // Simular que el rol no existe
+        when(rolRepository.findById(rolMock.getId())).thenReturn(Optional.empty());
+
+        // Ejecutar la actualización y verificar que lanza la excepción
+        Exception exception = assertThrows(Exception.class, () -> rolService.actualizarRol(rolMock));
         assertEquals("Informacion no encontrada.", exception.getMessage());
 
-        // Verificar que se llamó al método findOneByNombre una vez
-        verify(rolRepository, times(1)).findOneByNombre("USUARIO");
+        // Verificar que no se haya intentado guardar el rol
+        verify(rolRepository, times(0)).save(any(Rol.class));
     }
 
     /**
-     * Prueba que verifica que solo se llama una vez al repositorio cuando se
-     * busca un rol.
+     * Prueba para lanzar excepción cuando el rol no pasa la validación del
+     * modelo.
      */
     @Test
-    void testGetRolByNombre_RepositoryCallOnce() throws Exception {
-        // Simulación de un rol existente
+    void testActualizarRol_ValidacionFallida() throws Exception {
+        // Crear un rol de prueba
+        Rol rolMock = new Rol();
+        rolMock.setId(1L);
+
+        // Simular que hay violaciones en la validación
+        when(validator.validate(any())).thenReturn(Set.of(mock(javax.validation.ConstraintViolation.class)));
+
+        // Ejecutar la actualización y verificar que lanza la excepción
+        Exception exception = assertThrows(Exception.class, () -> rolService.actualizarRol(rolMock));
+
+        assertNotNull(exception);
+
+        // Verificar que no se haya intentado guardar el rol
+        verify(rolRepository, times(0)).save(any(Rol.class));
+    }
+
+    /**
+     * Prueba para crear un nuevo rol con permisos.
+     */
+    @Test
+    void testCrearRol() throws Exception {
         Rol rol = new Rol();
-        rol.setNombre("USER");
+        rol.setId(1L);
+        rol.setNombre("NEW_ROLE");
 
-        // Simulamos la búsqueda por nombre
-        when(rolRepository.findOneByNombre("USER")).thenReturn(Optional.of(rol));
+        Permiso permiso1 = new Permiso();
+        permiso1.setId(1L);
+        Permiso permiso2 = new Permiso();
+        permiso2.setId(2L);
 
-        // Llamar al método y verificar que el repositorio se llama solo una vez
-        rolService.getRolByNombre("USER");
+        List<Permiso> permisos = List.of(permiso1, permiso2);
 
-        verify(rolRepository, times(1)).findOneByNombre("USER");
+        RolCreateRequest request = new RolCreateRequest();
+        request.setRol(rol);
+        request.setPermisos(permisos);
+
+        // Simular que la validación es exitosa
+        when(validator.validate(any())).thenReturn(new HashSet<>());
+
+        when(rolRepository.save(any(Rol.class))).thenReturn(rol);
+        when(permisoService.getPermisoById(any(Permiso.class))).thenReturn(permiso1, permiso2);
+
+        Rol result = rolService.crearRol(request);
+
+        // Verificar que el rol fue guardado correctamente
+        assertNotNull(result);
+        assertEquals("NEW_ROLE", result.getNombre());
+        verify(rolRepository, times(2)).save(rol); // Dos veces: al crear y al agregar permisos
+    }
+
+    /**
+     * Prueba para actualizar los permisos de un rol.
+     */
+    @Test
+    void testActualizarPermisosRol() throws Exception {
+        Rol rol = new Rol();
+        rol.setId(1L);
+        rol.setNombre("EXISTING_ROLE");
+
+        Permiso permiso1 = new Permiso();
+        permiso1.setId(1L);
+        Permiso permiso2 = new Permiso();
+        permiso2.setId(2L);
+
+        List<Permiso> permisos = List.of(permiso1, permiso2);
+        RolPermisoUpdateRequest updateRequest = new RolPermisoUpdateRequest();
+        updateRequest.setIdRol(1L);
+        updateRequest.setPermisos(permisos);
+
+        when(rolRepository.findById(1L)).thenReturn(Optional.of(rol));
+        when(permisoService.getPermisoById(any(Permiso.class))).thenReturn(permiso1, permiso2);
+
+        // Simular que la validación es exitosa
+        when(validator.validate(any())).thenReturn(new HashSet<>());
+        when(rolRepository.save(rol)).thenReturn(rol);
+
+        Rol result = rolService.actualizarPermisosRol(updateRequest);
+
+        // Verificar que los permisos fueron actualizados
+        assertNotNull(result);
+        assertEquals(2, result.getPermisosRol().size());
+        verify(rolRepository, times(1)).save(rol);
+    }
+
+    /**
+     * Prueba para verificar que se lanza excepción cuando el rol no es
+     * encontrado.
+     */
+    @Test
+    void testActualizarPermisosRol_RolNoEncontrado() throws Exception {
+        RolPermisoUpdateRequest updateRequest = new RolPermisoUpdateRequest();
+        updateRequest.setIdRol(1L);
+
+        when(rolRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(Exception.class, () -> rolService.actualizarPermisosRol(updateRequest));
+
+        assertEquals("Informacion no encontrada.", exception.getMessage());
     }
 }

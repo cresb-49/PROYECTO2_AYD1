@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import usac.api.models.Permiso;
 import usac.api.models.Rol;
 import usac.api.models.RolPermiso;
-import usac.api.models.request.RolPermisoRequest;
+import usac.api.models.request.RolCreateRequest;
+import usac.api.models.request.RolPermisoUpdateRequest;
 import usac.api.repositories.RolRepository;
 
 /**
@@ -64,7 +65,7 @@ public class RolService extends Service {
      * @return
      */
     @Transactional(rollbackOn = Exception.class)
-    public Rol actualizarPermisosRol(RolPermisoRequest rolPermisoRequest) throws Exception {
+    public Rol actualizarPermisosRol(RolPermisoUpdateRequest rolPermisoRequest) throws Exception {
         // Buscamos el rol en la base de datos
         Rol rol = this.getRolById(new Rol(rolPermisoRequest.getIdRol()));
 
@@ -85,21 +86,64 @@ public class RolService extends Service {
             rol.getPermisosRol().clear();
             rol.getPermisosRol().addAll(permisosNuevos);
         }
-        // Guardamos el usuario
-        this.saveRol(rol);
-        return rol;
+        // Guardamos el rol
+        Rol saveRol = this.saveRol(rol);
+        return saveRol;
     }
 
     @Transactional(rollbackOn = Exception.class)
-    private String saveRol(Rol rol) throws Exception {
+    public Rol crearRol(RolCreateRequest createRequest) throws Exception {
+        //validar el modelo de creacion
+        this.validarModelo(createRequest);
+        //validar el rol dentro del modelo de creacion
+        this.validarModelo(createRequest.getRol());
+        // guardamos el rol
+        Rol saveRol = this.saveRol(createRequest.getRol());
+
+        List<RolPermiso> permisos = new ArrayList<>();
+
+        for (Permiso item : createRequest.getPermisos()) {
+            this.validarId(item);
+            Permiso permiso = this.permisoService.getPermisoById(item);
+            permisos.add(new RolPermiso(saveRol, permiso));
+        }
+
+        createRequest.getRol().setPermisosRol(permisos);
+        saveRol.setPermisosRol(permisos);
+
+        Rol saveRolFinal = this.saveRol(saveRol);
+        return saveRolFinal;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public Rol actualizarRol(Rol rol) throws Exception {
+        //validar el modelo de creacion
+        this.validarModelo(rol);
+        //validar id
+        this.validarId(rol);
+
+        Rol rolEnconrtrado = this.getRolById(rol);
+
+        if (this.rolRepository.existsByNombreAndIdNot(rol.getNombre(), rol.getId())) // guardamos el rol
+        {
+            throw new Exception("Ya existe un rol con el nombre especificado.");
+        }
+
+        rol.setPermisosRol(rolEnconrtrado.getPermisosRol());
+        rol.setUsusarios(rol.getUsusarios());
+
+        Rol saveRolFinal = this.saveRol(rol);
+        return saveRolFinal;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    private Rol saveRol(Rol rol) throws Exception {
         Rol rolSave = this.rolRepository.save(rol);
 
         this.validarNull(rolSave);
-
         if (rolSave.getId() <= 0) {
             throw new Exception("No pudimos guardar la informacion del rol.");
         }
-
-        return "Se guardo la informacion del rol con exito.";
+        return rolSave;
     }
 }

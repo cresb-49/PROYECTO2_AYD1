@@ -5,6 +5,7 @@
 package usac.api.models.request;
 
 import org.springframework.stereotype.Component;
+import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 
@@ -16,14 +17,16 @@ import usac.api.models.Usuario;
 public class NuevoEmpleadoRequest {
 
     private Usuario usuario;
+    private Rol rol;
     private TipoEmpleado tipoEmpleado;
 
     public NuevoEmpleadoRequest() {
     }
 
-    public NuevoEmpleadoRequest(Usuario usuario, TipoEmpleado tipoEmpleado) {
+    public NuevoEmpleadoRequest(Usuario usuario, TipoEmpleado tipoEmpleado, Rol rol) {
         this.usuario = usuario;
         this.tipoEmpleado = tipoEmpleado;
+        this.rol = rol;
     }
 
     public Usuario getUsuario() {
@@ -40,6 +43,14 @@ public class NuevoEmpleadoRequest {
 
     public void setTipoEmpleado(TipoEmpleado tipoEmpleado) {
         this.tipoEmpleado = tipoEmpleado;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 
 }

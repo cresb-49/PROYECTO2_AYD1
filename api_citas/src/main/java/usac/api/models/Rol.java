@@ -23,6 +23,7 @@ import org.hibernate.annotations.Where;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.persistence.FetchType;
 
 /**
  *
@@ -46,7 +47,7 @@ public class Rol extends Auditor {
     @Cascade(CascadeType.ALL)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Schema(hidden = true)
-    private List<Usuario> ususarios;
+    private List<RolUsuario> ususarios;
 
     @OneToMany(mappedBy = "rol", orphanRemoval = true)//indicamos que la relacion debera ser por medio del atributo "Paciente" del objeto Tratamiento
     @Cascade(CascadeType.ALL)
@@ -79,11 +80,11 @@ public class Rol extends Auditor {
         this.permisosRol = permisosRol;
     }
 
-    public List<Usuario> getUsusarios() {
+    public List<RolUsuario> getUsusarios() {
         return ususarios;
     }
 
-    public void setUsusarios(List<Usuario> ususarios) {
+    public void setUsusarios(List<RolUsuario> ususarios) {
         this.ususarios = ususarios;
     }
 

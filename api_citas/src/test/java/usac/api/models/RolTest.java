@@ -130,11 +130,9 @@ public class RolTest {
         Rol rol = new Rol();
 
         // Crear una lista de usuarios y agregar algunos usuarios
-        List<Usuario> usuarios = new ArrayList<>();
-        Usuario usuario1 = new Usuario();
-        Usuario usuario2 = new Usuario();
-        usuarios.add(usuario1);
-        usuarios.add(usuario2);
+        List<RolUsuario> usuarios = new ArrayList<>();
+        usuarios.add(new RolUsuario(null, null));
+        usuarios.add(new RolUsuario(null, null));
 
         // Establecer la lista de usuarios en el rol
         rol.setUsusarios(usuarios);

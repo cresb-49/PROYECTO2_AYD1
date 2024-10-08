@@ -296,7 +296,7 @@ public class UsuarioService extends usac.api.services.Service {
 
         // Mantenemos la contraseña original y roles del usuario
         usuario.setPassword(usuarioEncontrado.getPassword());
-        usuario.setRol(usuarioEncontrado.getRol());
+        usuario.setRoles(usuarioEncontrado.getRoles());
 
         // Validamos el modelo del usuario
         this.validarModelo(usuario);
@@ -392,8 +392,16 @@ public class UsuarioService extends usac.api.services.Service {
         this.validarModelo(crear);
         // traer rol AYUDANTE
         Rol rol = this.rolService.getRolByNombre("CLIENTE");
-        // guardamos el usuario
-        Usuario userCreado = this.guardarUsuario(crear, rol);
+        
+        // Guardamos el usuario sin rol
+        Usuario usuarioGuardado = this.guardarUsuario(crear, null);
+        
+        //preparamos el rol
+        List<RolUsuario> rolesUsuario = new ArrayList<>();
+        rolesUsuario.add(new RolUsuario(usuarioGuardado, rol));
+        
+        // guardamos el usuario con el rol
+        Usuario userCreado = this.guardarUsuario(usuarioGuardado, rolesUsuario);
         // Generar el JWT para el usuario creado
         UserDetails userDetails = authenticationService.loadUserByUsername(crear.getEmail());
         String jwt = jwtGenerator.generateToken(userDetails);
@@ -417,12 +425,16 @@ public class UsuarioService extends usac.api.services.Service {
     public Usuario crearAdministrador(Usuario crear) throws Exception {
         // Validamos el modelo de usuario
         this.validarModelo(crear);
-
+        // Guardamos el usuario con el rol de Administrador
+        Usuario usuarioGuardado = this.guardarUsuario(crear, null);
         // Obtenemos el rol 'ADMIN' para asignarlo al nuevo usuario
         Rol rol = this.rolService.getRolByNombre("ADMIN");
 
+        List<RolUsuario> rolesUsuario = new ArrayList<>();
+        rolesUsuario.add(new RolUsuario(usuarioGuardado, rol));
+
         // Guardamos el usuario con el rol de Administrador
-        return this.guardarUsuario(crear, rol);
+        return this.guardarUsuario(crear, rolesUsuario);
     }
 
     /**
@@ -437,18 +449,27 @@ public class UsuarioService extends usac.api.services.Service {
     public Usuario crearEmpleado(NuevoEmpleadoRequest nuevoEmpleadoRequest) throws Exception {
         // Validamos el modelo de usuario
         this.validarModelo(nuevoEmpleadoRequest.getUsuario());
+        this.validarId(nuevoEmpleadoRequest.getRol());
         // Obtenemos el rol para asignarlo al nuevo usuario
-        Rol rol = this.rolService.getRolByNombre("EMPLEADO");
+        Rol rolEmpleado = this.rolService.getRolByNombre("EMPLEADO");
+        Rol rolPrincipal = this.rolService.getRolById(nuevoEmpleadoRequest.getRol());
+
         // Guardamos el usuario con el rol de Administrador
-        Usuario usuarioGuardado = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rol);
+        Usuario usuarioGuardado = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), null);
+
+        List<RolUsuario> rolesUsuario = new ArrayList<>();
+        rolesUsuario.add(new RolUsuario(usuarioGuardado, rolEmpleado));
+        rolesUsuario.add(new RolUsuario(usuarioGuardado, rolPrincipal));
+
+        Usuario usuarioGuardadoFinal = this.guardarUsuario(usuarioGuardado, rolesUsuario);
         //Buscamos el tipo de empleado en base a su nombre
         TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
         // Creamos el registro de tipo de empleado
-        Empleado empleado = new Empleado(usuarioGuardado, tipoEmpleadoGuardado);
+        Empleado empleado = new Empleado(usuarioGuardadoFinal, tipoEmpleadoGuardado);
         // Guardamos el empleado
         this.empleadoService.createEmpleado(empleado);
         // Retornamos el usuario guardado
-        return usuarioGuardado;
+        return usuarioGuardadoFinal;
     }
 
     /**
@@ -460,7 +481,7 @@ public class UsuarioService extends usac.api.services.Service {
      * @throws Exception
      */
     @Transactional(rollbackOn = Exception.class)
-    private Usuario guardarUsuario(Usuario crear, Rol rol) throws Exception {
+    private Usuario guardarUsuario(Usuario crear, List<RolUsuario> roles) throws Exception {
         if (this.usuarioRepository.existsByEmail(crear.getEmail())) {
             throw new Exception("El Email ya existe.");
         }
@@ -480,7 +501,7 @@ public class UsuarioService extends usac.api.services.Service {
         }
 
         // Asignamos un rol al usuario
-        crear.setRol(rol);
+        crear.setRoles(roles);
         // Encriptar la contraseña
         crear.setPassword(this.encriptador.encriptar(crear.getPassword()));
         // Guardar el usuario

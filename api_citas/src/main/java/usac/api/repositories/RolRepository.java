@@ -17,4 +17,8 @@ import usac.api.models.Rol;
 public interface RolRepository extends CrudRepository<Rol, Long> {
 
     Optional<Rol> findOneByNombre(String nombre);
+
+    public boolean existsByNombre(String nombre);
+
+    public boolean existsByNombreAndIdNot(String nombre, Long id);
 }
