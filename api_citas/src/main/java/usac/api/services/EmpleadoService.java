@@ -1,13 +1,16 @@
 package usac.api.services;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import usac.api.models.Empleado;
 import usac.api.models.TipoEmpleado;
 import usac.api.repositories.EmpleadoRepository;
 import usac.api.repositories.TipoEmpleadoRepository;
-
-import javax.transaction.Transactional;
 
 @Service
 public class EmpleadoService extends usac.api.services.Service {
@@ -36,6 +39,7 @@ public class EmpleadoService extends usac.api.services.Service {
         return tipoEmpleado;
     }
 
+    @Deprecated
     @Transactional(rollbackOn = Exception.class)
     public Empleado createEmpleado(Empleado empleado) throws Exception {
         //Validamos el modelo
@@ -46,5 +50,10 @@ public class EmpleadoService extends usac.api.services.Service {
             return empleadoCreado;
         }
         throw new Exception("No se pudo crear el empleado");
+    }
+
+    public List<Empleado> getEmpleados() {
+        List<Empleado> empleados = this.ignorarEliminados(empleadoRepository.findAll());
+        return empleados;
     }
 }
