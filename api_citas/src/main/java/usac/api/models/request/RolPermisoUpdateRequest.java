@@ -13,17 +13,17 @@ import usac.api.models.Permiso;
  * @author Luis Monterroso
  */
 @Component
-public class RolPermisoRequest {
+public class RolPermisoUpdateRequest {
 
     private Long idRol;
     private List<Permiso> permisos;
 
-    public RolPermisoRequest(Long idRol, List<Permiso> permisos) {
+    public RolPermisoUpdateRequest(Long idRol, List<Permiso> permisos) {
         this.idRol = idRol;
         this.permisos = permisos;
     }
 
-    public RolPermisoRequest() {
+    public RolPermisoUpdateRequest() {
     }
 
     public Long getIdRol() {

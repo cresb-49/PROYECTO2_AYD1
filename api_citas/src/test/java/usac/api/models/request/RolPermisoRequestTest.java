@@ -21,7 +21,7 @@ import usac.api.models.Permiso;
  */
 public class RolPermisoRequestTest {
 
-    private RolPermisoRequest rolPermisoRequest;
+    private RolPermisoUpdateRequest rolPermisoRequest;
     private List<Permiso> permisos;
     private Permiso permiso1;
     private Permiso permiso2;
@@ -38,7 +38,7 @@ public class RolPermisoRequestTest {
         permisos.add(permiso2);
 
         // Inicializar objeto de prueba
-        rolPermisoRequest = new RolPermisoRequest();
+        rolPermisoRequest = new RolPermisoUpdateRequest();
     }
 
     /**
@@ -47,7 +47,7 @@ public class RolPermisoRequestTest {
     @Test
     void testConstructorParametrizado() {
         // Crear una instancia de RolPermisoRequest con el constructor que recibe parámetros
-        rolPermisoRequest = new RolPermisoRequest(1L, permisos);
+        rolPermisoRequest = new RolPermisoUpdateRequest(1L, permisos);
 
         // Verificar que los valores se asignan correctamente
         assertEquals(1L, rolPermisoRequest.getIdRol());
