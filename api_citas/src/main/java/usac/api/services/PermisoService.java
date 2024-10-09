@@ -26,7 +26,7 @@ public class PermisoService extends Service {
      * @throws Exception
      */
     public Permiso getPermisoById(Permiso permisoId) throws Exception {
-        this.validarId(permisoId);//validar id
+        this.validarId(permisoId, "Id del permiso invalido.");//validar id
         Permiso permiso = this.permisoRepository.findById(permisoId.getId()).orElse(null);
         this.validarNull(permiso);
         return permiso;

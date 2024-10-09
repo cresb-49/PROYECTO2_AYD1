@@ -31,6 +31,7 @@ import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
+import usac.api.models.request.UsuarioRolAsignacionRequest;
 import usac.api.services.UsuarioService;
 import usac.api.tools.transformers.ApiBaseTransformer;
 
@@ -232,6 +233,27 @@ public class UsuarioController {
             LoginDTO respuesta = usuarioService.iniciarSesion(crear);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Actualiza los roles de un usuario. Si el usuario tiene el rol \"ADMIN\", se\n"
+            + "cambia a \"EMPLEADO\" y se asignan los nuevos roles (sin reasignar\n"
+            + "\"ADMIN\"). Si el usuario tiene el rol \"EMPLEADO\" y se le asigna el rol\n"
+            + "\"ADMIN\", solo se le asigna el rol \"ADMIN\". Si el usuario tiene el rol\n"
+            + "\"CLIENTE\", se lanzará un error y no se le asignarán más roles.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Actualizacion realizada con exito.", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @PatchMapping("/private/asignarRolAUsuario")
+    public ResponseEntity<?> asignarRolAUsuario(@RequestBody UsuarioRolAsignacionRequest asignar) {
+        try {
+            Usuario respuesta = usuarioService.updateRoles(asignar);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
     }

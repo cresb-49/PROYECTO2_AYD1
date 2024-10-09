@@ -3,6 +3,7 @@ package usac.api.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -23,6 +24,8 @@ import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
+import usac.api.models.request.UsuarioRolAsignacionRequest;
+import usac.api.repositories.RolRepository;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
@@ -47,6 +50,8 @@ public class UsuarioService extends usac.api.services.Service {
     private JwtGeneratorService jwtGenerator;
     @Autowired
     private EmpleadoService empleadoService;
+    @Autowired
+    private RolRepository rolRepository;
 
     /**
      * Envía un correo electrónico de recuperación de contraseña a un usuario
@@ -453,7 +458,7 @@ public class UsuarioService extends usac.api.services.Service {
         this.validarModelo(nuevoEmpleadoRequest);
         this.validarModelo(nuevoEmpleadoRequest.getUsuario());
         this.validarModelo(nuevoEmpleadoRequest.getTipoEmpleado());
-        this.validarId(nuevoEmpleadoRequest.getRol());
+        this.validarId(nuevoEmpleadoRequest.getRol(), "Id del rol invalido");
 
         // Obtenemos el rol para asignarlo al nuevo usuario
         Rol rolEmpleado = this.rolService.getRolByNombre("EMPLEADO");
@@ -518,6 +523,113 @@ public class UsuarioService extends usac.api.services.Service {
         crear.setPassword(this.encriptador.encriptar(crear.getPassword()));
         // Guardar el usuario
         return this.usuarioRepository.save(crear);
+    }
+
+    /**
+     * Actualiza los roles de un usuario. Si el usuario tiene el rol "ADMIN", se
+     * cambia a "EMPLEADO" y se asignan los nuevos roles (sin reasignar
+     * "ADMIN"). Si el usuario tiene el rol "EMPLEADO" y se le asigna el rol
+     * "ADMIN", solo se le asigna el rol "ADMIN". Si el usuario tiene el rol
+     * "CLIENTE", se lanzará un error y no se le asignarán más roles.
+     *
+     * Además, el rol "CLIENTE" no puede ser asignado de ninguna forma.
+     *
+     * @param asignacionRequest El objeto que contiene el ID del usuario y la
+     * lista de nuevos roles a asignar.
+     * @return El objeto Usuario con los roles actualizados.
+     * @throws Exception Si el usuario no se encuentra o si tiene el rol
+     * "CLIENTE" o algún rol no existe.
+     */
+    @Transactional(rollbackOn = Exception.class)
+    public Usuario updateRoles(UsuarioRolAsignacionRequest asignacionRequest) throws Exception {
+
+        this.validarModelo(asignacionRequest);
+
+        // Validar que los roles en la solicitud no sean nulos
+        if (asignacionRequest.getRoles() == null || asignacionRequest.getRoles().isEmpty()) {
+            throw new Exception("No se han proporcionado roles para asignar.");
+        }
+
+        // Obtener el usuario por ID desde la asignación
+        Usuario usuario = usuarioRepository.findById(asignacionRequest.getUsuarioId()).orElseThrow(
+                () -> new Exception("Usuario no encontrado."));
+
+        // Buscar el rol base del usuario (ADMIN, CLIENTE o EMPLEADO)
+        RolUsuario asignacionBase = usuario.getRoles().stream()
+                .filter(rol -> rol.getRol().getNombre().equals("ADMIN") || rol.getRol().getNombre().equals("CLIENTE")
+                || rol.getRol().getNombre().equals("EMPLEADO"))
+                .findFirst().orElseThrow(() -> new Exception("El usuario no tiene un rol base asignado"));
+
+        // Guardar el rol base existente
+        Rol rolBase = asignacionBase.getRol();
+
+        // Si el usuario tiene rol "CLIENTE", lanzar una excepción
+        if (rolBase.getNombre().equals("CLIENTE")) {
+            throw new Exception("No es posible asignar más roles a un usuario con rol CLIENTE.");
+        }
+
+        // Si el rol base es "ADMIN", cambiarlo a "EMPLEADO"
+        if (rolBase.getNombre().equals("ADMIN")) {
+            // Buscar el rol "EMPLEADO" en la base de datos
+            rolBase = rolRepository.findOneByNombre("EMPLEADO")
+                    .orElseThrow(() -> new Exception("Rol EMPLEADO no encontrado"));
+        }
+
+        // Buscar los roles por los ids proporcionados en la solicitud
+        List<Rol> rolesAsignados = asignacionRequest.getRoles().stream()
+                .map(nuevoRol -> {
+                    try {
+                        this.validarId(nuevoRol, "Algun id de los nuevos roles es invalido");
+                        Rol rol = rolRepository.findById(nuevoRol.getId())
+                                .orElseThrow(() -> new Exception("Rol no encontrado: " + nuevoRol.getId()));
+
+                        // Verificar si el rol es "CLIENTE" y lanzar excepción si se intenta asignar
+                        if (rol.getNombre().equals("CLIENTE")) {
+                            throw new Exception("No es posible asignar el rol 'CLIENTE'.");
+                        }
+
+                        return rol;
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());  // Lanzar RuntimeException para no romper el flujo
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // Verificar si se le está asignando el rol "ADMIN"
+        boolean asignandoAdmin = rolesAsignados.stream()
+                .anyMatch(rol -> rol.getNombre().equals("ADMIN"));
+
+        // Si el usuario tiene el rol "EMPLEADO" y se le asigna "ADMIN"
+        if (rolBase.getNombre().equals("EMPLEADO") && asignandoAdmin) {
+            // Limpiar los roles actuales del usuario
+            usuario.getRoles().clear();
+
+            // Asignar únicamente el rol "ADMIN"
+            Rol rolAdmin = rolRepository.findOneByNombre("ADMIN")
+                    .orElseThrow(() -> new Exception("Rol ADMIN no encontrado"));
+            usuario.getRoles().add(new RolUsuario(usuario, rolAdmin));
+
+            // Guardar y retornar el usuario con solo el rol "ADMIN"
+            return usuarioRepository.save(usuario);
+        }
+
+        // Limpiar los roles actuales del usuario para evitar duplicados
+        usuario.getRoles().clear();
+
+        // Asignar nuevamente el rol base (que ahora es EMPLEADO si era ADMIN) al usuario
+        usuario.getRoles().add(new RolUsuario(usuario, rolBase));
+
+        // Iterar sobre los nuevos roles proporcionados y asignarlos
+        for (Rol rol : rolesAsignados) {
+            // Si el rol no es "ADMIN" o el rol no es duplicado, asignarlo al usuario
+            if (!(rol.getNombre().equals("ADMIN") && rolBase.getNombre().equals("ADMIN"))
+                    && !(rol.getNombre().equals("EMPLEADO") && rolBase.getNombre().equals("EMPLEADO"))) {
+                usuario.getRoles().add(new RolUsuario(usuario, rol)); // Agregar el nuevo rol al usuario
+            }
+        }
+
+        // Guardar el usuario con los roles actualizados en la base de datos
+        return usuarioRepository.save(usuario);
     }
 
 }

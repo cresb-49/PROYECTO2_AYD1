@@ -81,7 +81,7 @@ public class RolController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = Rol.class))}),
         @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
-    @PostMapping("/private/restricted/actualizarPermisosRol")
+    @PatchMapping("/private/restricted/actualizarPermisosRol")
     public ResponseEntity<?> actualizarPermisosRol(@RequestBody RolPermisoUpdateRequest update) {
         try {
             this.validadorPermiso.verificarPermiso();
@@ -98,7 +98,7 @@ public class RolController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = Rol.class))}),
         @ApiResponse(responseCode = "400", description = "Rol no encontrado o solicitud incorrecta.")
     })
-    @GetMapping("/private/restricted/getRolById")
+    @GetMapping("/private/no_restricted/getRolById/{id}")
     public ResponseEntity<?> getRolById(@PathVariable Long id) {
         try {
             Rol respuesta = rolService.getRolById(id);
