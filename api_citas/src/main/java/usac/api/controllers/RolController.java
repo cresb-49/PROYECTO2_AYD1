@@ -5,10 +5,12 @@
 package usac.api.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -100,6 +102,33 @@ public class RolController {
     public ResponseEntity<?> getRolById(@PathVariable Long id) {
         try {
             Rol respuesta = rolService.getRolById(id);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Obtiene los roles exitentes, exclute el rol ADMIN, EMPLEADO, CLIENTE.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de permisos obtenida exitosamente",
+                content = {
+                    @Content(mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(
+                                            implementation = Rol.class
+                                    )
+                            )
+                    )
+                }
+        ),
+        @ApiResponse(responseCode = "400", description = "Error en la solicitud",
+                content = @Content
+        )
+    })
+    @GetMapping("/private/restricted/getRolesGenericos")
+    public ResponseEntity<?> getRolesGenericos() {
+        try {
+            List<Rol> respuesta = rolService.getRoles();
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();

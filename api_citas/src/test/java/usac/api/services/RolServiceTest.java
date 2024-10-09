@@ -1,5 +1,6 @@
 package usac.api.services;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.HashSet;
 import java.util.List;
@@ -223,5 +224,58 @@ public class RolServiceTest {
         Exception exception = assertThrows(Exception.class, () -> rolService.actualizarPermisosRol(updateRequest));
 
         assertEquals("Informacion no encontrada.", exception.getMessage());
+    }
+
+    /**
+     * Prueba para verificar que se obtienen los roles correctamente, excluyendo
+     * los roles de admin, empleado, y cliente.
+     */
+    @Test
+    void testGetRoles_Success() throws Exception {
+        // Crear una lista de roles de prueba
+        Rol rol1 = new Rol();
+        rol1.setId(1L);
+        rol1.setNombre("ROLE_USER");
+
+        Rol rol2 = new Rol();
+        rol2.setId(2L);
+        rol2.setNombre("ROLE_MANAGER");
+
+        List<Rol> rolesMock = Arrays.asList(rol1, rol2);
+
+        // Simular que el repositorio devuelve los roles excluyendo los específicos
+        when(rolRepository.findAllExcludingAdminEmpleadoCliente()).thenReturn(rolesMock);
+
+        // Ejecutar el método
+        List<Rol> result = rolService.getRoles();
+
+        // Verificar que los roles retornados no son vacíos y son los esperados
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.stream().noneMatch(rol -> rol.getNombre().equals("ADMIN")));
+        assertTrue(result.stream().noneMatch(rol -> rol.getNombre().equals("CLIENTE")));
+        assertTrue(result.stream().noneMatch(rol -> rol.getNombre().equals("EMPLEADO")));
+
+        // Verificar que se llamó al método findAllExcludingAdminEmpleadoCliente en el repositorio
+        verify(rolRepository, times(1)).findAllExcludingAdminEmpleadoCliente();
+    }
+
+    /**
+     * Prueba para verificar que se lanza una excepción cuando ocurre un error
+     * al obtener los roles.
+     */
+    @Test
+    void testGetRoles_Exception() throws Exception {
+        // Simular que el repositorio lanza una RuntimeException
+        when(rolRepository.findAllExcludingAdminEmpleadoCliente()).thenThrow(new RuntimeException("Error al obtener roles"));
+
+        // Ejecutar el método y verificar que lanza una excepción
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> rolService.getRoles());
+
+        // Verificar el mensaje de la excepción
+        assertEquals("Error al obtener roles", exception.getMessage());
+
+        // Verificar que se llamó al método findAllExcludingAdminEmpleadoCliente en el repositorio
+        verify(rolRepository, times(1)).findAllExcludingAdminEmpleadoCliente();
     }
 }

@@ -61,6 +61,16 @@ public class RolService extends Service {
     }
 
     /**
+     * Busca todos los roles excepto el admin, cliente, y empleado
+     *
+     * @return
+     * @throws Exception
+     */
+    public List<Rol> getRoles() throws Exception {
+        return rolRepository.findAllExcludingAdminEmpleadoCliente();
+    }
+
+    /**
      * Agrega permisos a un rol
      *
      * @param rolPermisoRequest
@@ -83,15 +93,15 @@ public class RolService extends Service {
             if (!permisosIdsUnicos.contains(permiso.getId())) {
                 permisosNuevos.add(new RolPermiso(rol, permiso));
                 permisosIdsUnicos.add(permiso.getId());  // Lo añadimos al Set para que no se repita
-            } 
+            }
         }
 
         if (rol.getPermisosRol() == null) {
             rol.setPermisosRol(permisosNuevos);
         } else {
             // asignamos los nuevos permisos al usuario
-            rol.getPermisosRol().clear();
-            rol.getPermisosRol().addAll(permisosNuevos);
+          //  rol.getPermisosRol().clear();
+            rol.setPermisosRol(permisosNuevos);
         }
         // Guardamos el rol
         Rol saveRol = this.saveRol(rol);
