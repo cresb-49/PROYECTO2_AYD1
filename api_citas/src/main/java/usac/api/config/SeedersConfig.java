@@ -27,7 +27,6 @@ import usac.api.models.HorarioEmpleado;
 import usac.api.models.Negocio;
 import usac.api.models.Permiso;
 import usac.api.models.Rol;
-import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.RolPermisoUpdateRequest;
@@ -240,21 +239,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "Empleado", "Prueba5",
                     "12345");
 
-            TipoEmpleado tipoEmpleado1 = new TipoEmpleado("Organizador");
-            TipoEmpleado tipoEmpleado2 = new TipoEmpleado("Limpieza");
-            TipoEmpleado tipoEmpleado3 = new TipoEmpleado("Seguridad");
-            TipoEmpleado tipoEmpleado4 = new TipoEmpleado("Cocina");
-            TipoEmpleado tipoEmpleado5 = new TipoEmpleado("Recepcion");
-
-            try {
-                this.empleadoService.createTipoEmpleado(tipoEmpleado1);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado2);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado3);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado4);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado5);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
             ArrayList<HorarioEmpleado> horarios = new ArrayList<>();
             horarios.add(new HorarioEmpleado(lunes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
             horarios.add(new HorarioEmpleado(martes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
@@ -271,11 +255,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearUsuarioCliente(cliente4);
                 this.usuarioService.crearUsuarioCliente(cliente5);
 
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, tipoEmpleado1, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, tipoEmpleado2, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, tipoEmpleado3, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, horarios, customRol));
 
             } catch (Exception e) {
                 e.printStackTrace();

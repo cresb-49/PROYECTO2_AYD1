@@ -16,6 +16,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.SQLDelete;
@@ -60,21 +61,21 @@ public class Servicio extends Auditor {
     private String detalles;
     
     @OneToOne
-    @JoinColumn(name = "tipo_empleado", nullable = false)
+    @JoinColumn(name = "rol", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private TipoEmpleado tipoEmpleado;
+    private Rol rol;
 
     public Servicio() {
     }
 
-    public Servicio(String nombre, Double duracion, String imagen, Double costo, String detalles, TipoEmpleado tipoEmpleado) {
+    public Servicio(String nombre, Double duracion, String imagen, Double costo, String detalles, Rol rol) {
         this.nombre = nombre;
         this.duracion = duracion;
         this.imagen = imagen;
         this.costo = costo;
         this.detalles = detalles;
-        this.tipoEmpleado = tipoEmpleado;
-    }
+        this.rol = rol;
+    }   
 
     public String getNombre() {
         return nombre;
@@ -116,13 +117,12 @@ public class Servicio extends Auditor {
         this.detalles = detalles;
     }
 
-    public TipoEmpleado getTipoEmpleado() {
-        return tipoEmpleado;
+    public Rol getRol() {
+        return rol;
     }
 
-    public void setTipoEmpleado(TipoEmpleado tipoEmpleado) {
-        this.tipoEmpleado = tipoEmpleado;
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
-    
-    
+   
 }

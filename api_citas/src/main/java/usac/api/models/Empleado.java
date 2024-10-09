@@ -4,16 +4,23 @@
  */
 package usac.api.models;
 
-import javax.persistence.*;
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.CascadeType;
-
-import java.util.List;
 
 /**
  * @author carlo
@@ -31,11 +38,6 @@ public class Empleado extends Auditor {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario usuario;
 
-    @OneToOne
-    @JoinColumn(name = "tipo_empleado", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private TipoEmpleado tipoEmpleado;
-
     @OneToMany(mappedBy = "empleado", orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
@@ -45,9 +47,8 @@ public class Empleado extends Auditor {
     public Empleado() {
     }
 
-    public Empleado(Usuario usuario, TipoEmpleado tipoEmpleado) {
+    public Empleado(Usuario usuario) {
         this.usuario = usuario;
-        this.tipoEmpleado = tipoEmpleado;
     }
 
     public Usuario getUsuario() {
@@ -56,14 +57,6 @@ public class Empleado extends Auditor {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
-    }
-
-    public TipoEmpleado getTipoEmpleado() {
-        return tipoEmpleado;
-    }
-
-    public void setTipoEmpleado(TipoEmpleado tipoEmpleado) {
-        this.tipoEmpleado = tipoEmpleado;
     }
 
     public List<HorarioEmpleado> getHorarios() {
