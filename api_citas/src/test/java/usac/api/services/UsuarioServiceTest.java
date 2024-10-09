@@ -728,9 +728,8 @@ public class UsuarioServiceTest {
         when(encriptador.encriptar("empleadopassword")).thenReturn("encryptedpassword");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
 
-        Usuario usuarioCreado = usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, tipoEmpleado, empleadoRol));
+        Usuario usuarioCreado = usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, tipoEmpleado, new ArrayList<>(), empleadoRol));
 
-        assertNotNull(usuarioCreado);
         assertEquals("empleado@test.com", usuarioCreado.getEmail());
         verify(rolService, times(1)).getRolByNombre("EMPLEADO");
         verify(empleadoService, times(1)).getTipoEmpleadoByNombre("Organizador");
@@ -767,7 +766,7 @@ public class UsuarioServiceTest {
         when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(true);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, null, rol));
+            usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, null, new ArrayList<>(), rol));
         });
         assertEquals(String.format("El Email %s ya existe.", usuario.getEmail()), exception.getMessage());
     }

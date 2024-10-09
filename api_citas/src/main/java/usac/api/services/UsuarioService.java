@@ -13,7 +13,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import usac.api.models.*;
+import usac.api.models.Empleado;
+import usac.api.models.HorarioEmpleado;
+import usac.api.models.Rol;
+import usac.api.models.RolUsuario;
+import usac.api.models.TipoEmpleado;
+import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
@@ -25,7 +30,7 @@ import usac.api.tools.Encriptador;
 
 @Service
 public class UsuarioService extends usac.api.services.Service {
-    
+
     @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
@@ -134,7 +139,7 @@ public class UsuarioService extends usac.api.services.Service {
             // Cargamos los detalles del usuario y generamos el token JWT
             UserDetails userDetails = authenticationService.loadUserByUsername(log.getEmail());
             String jwt = jwtGenerator.generateToken(userDetails);
-            
+
             return new LoginDTO(usuario, jwt);
         } catch (AuthenticationException ex) {
             throw new Exception(ex.getMessage());
@@ -283,7 +288,7 @@ public class UsuarioService extends usac.api.services.Service {
                     + " %s, debido a que ya existe otro usuario con el mismo cui.",
                     usuario.getEmail()));
         }
-        
+
         if (usuario.getNit() != null) {
             // Verificamos si existe otro usuario con el mismo nit
             if (this.usuarioRepository.existsUsuarioByNitAndIdNot(usuario.getNit(),
@@ -349,7 +354,7 @@ public class UsuarioService extends usac.api.services.Service {
         }
         // mandamos a traer el estado de la cuenta
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
-        
+
         if (usuario == null) {
             throw new Exception("No hemos encontrado el usuario.");
         }
@@ -371,7 +376,7 @@ public class UsuarioService extends usac.api.services.Service {
         }
         // mandamos a traer el estado de la cuenta
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
-        
+
         if (usuario == null) {
             throw new Exception("No hemos encontrado el usuario.");
         }
@@ -426,7 +431,7 @@ public class UsuarioService extends usac.api.services.Service {
 //        Usuario usuarioGuardado = this.guardarUsuario(crear, null);
         // Obtenemos el rol 'ADMIN' para asignarlo al nuevo usuario
         Rol rol = this.rolService.getRolByNombre("ADMIN");
-        
+
         List<RolUsuario> rolesUsuario = new ArrayList<>();
         rolesUsuario.add(new RolUsuario(crear, rol));
 
@@ -454,16 +459,25 @@ public class UsuarioService extends usac.api.services.Service {
         Rol rolEmpleado = this.rolService.getRolByNombre("EMPLEADO");
         Rol rolPrincipal = this.rolService.getRolById(nuevoEmpleadoRequest.getRol().getId());
 
-        
         List<RolUsuario> rolesUsuario = new ArrayList<>();
         rolesUsuario.add(new RolUsuario(nuevoEmpleadoRequest.getUsuario(), rolEmpleado));
         rolesUsuario.add(new RolUsuario(nuevoEmpleadoRequest.getUsuario(), rolPrincipal));
-        
+
         Usuario usuarioGuardadoFinal = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rolesUsuario);
+
         //Buscamos el tipo de empleado en base a su nombre
         TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
+
         // Creamos el registro de tipo de empleado
         Empleado empleado = new Empleado(usuarioGuardadoFinal, tipoEmpleadoGuardado);
+        // Guardamos el empleado
+        this.empleadoService.createEmpleado(empleado);
+        //Horarios del empleado
+        ArrayList<HorarioEmpleado> horariosEmpleadoCreado = new ArrayList<>();
+        for (HorarioEmpleado horario : nuevoEmpleadoRequest.getHorarios()) {
+            horariosEmpleadoCreado.add(new HorarioEmpleado(horario.getDia(), empleado, horario.getEntrada(), horario.getSalida()));
+        }
+        empleado.setHorarios(horariosEmpleadoCreado);
         // Guardamos el empleado
         this.empleadoService.createEmpleado(empleado);
         // Retornamos el usuario guardado
@@ -483,15 +497,15 @@ public class UsuarioService extends usac.api.services.Service {
         if (this.usuarioRepository.existsByEmail(crear.getEmail())) {
             throw new Exception(String.format("El Email %s ya existe.", crear.getEmail()));
         }
-        
+
         if (this.usuarioRepository.existsByPhone(crear.getPhone())) {
             throw new Exception("El numero de telefono ya existe.");
         }
-        
+
         if (this.usuarioRepository.existsByCui(crear.getCui())) {
             throw new Exception("El CUI ya existe.");
         }
-        
+
         if (crear.getNit() != null) {
             if (this.usuarioRepository.existsByNit(crear.getNit())) {
                 throw new Exception("El nit ya existe.");
@@ -505,5 +519,5 @@ public class UsuarioService extends usac.api.services.Service {
         // Guardar el usuario
         return this.usuarioRepository.save(crear);
     }
-    
+
 }

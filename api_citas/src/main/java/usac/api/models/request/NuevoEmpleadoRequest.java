@@ -4,8 +4,10 @@
  */
 package usac.api.models.request;
 
+import java.util.List;
 import javax.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
+import usac.api.models.HorarioEmpleado;
 import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
@@ -26,13 +28,17 @@ public class NuevoEmpleadoRequest {
     @NotNull(message = "El tipo del empleado no puede ser nulo.")
     private TipoEmpleado tipoEmpleado;
 
+    @NotNull(message = "Los horarios del empleado no puede ser nulos.")
+    private List<HorarioEmpleado> horarios;
+
     public NuevoEmpleadoRequest() {
     }
 
-    public NuevoEmpleadoRequest(Usuario usuario, TipoEmpleado tipoEmpleado, Rol rol) {
+    public NuevoEmpleadoRequest(Usuario usuario, TipoEmpleado tipoEmpleado, List<HorarioEmpleado> horarios, Rol rol) {
         this.usuario = usuario;
         this.tipoEmpleado = tipoEmpleado;
         this.rol = rol;
+        this.horarios = horarios;
     }
 
     public Usuario getUsuario() {
@@ -57,6 +63,14 @@ public class NuevoEmpleadoRequest {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public List<HorarioEmpleado> getHorarios() {
+        return horarios;
+    }
+
+    public void setHorarios(List<HorarioEmpleado> horarios) {
+        this.horarios = horarios;
     }
 
 }
