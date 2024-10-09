@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;

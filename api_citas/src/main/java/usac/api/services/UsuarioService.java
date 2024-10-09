@@ -17,7 +17,6 @@ import usac.api.models.Empleado;
 import usac.api.models.HorarioEmpleado;
 import usac.api.models.Rol;
 import usac.api.models.RolUsuario;
-import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
@@ -452,7 +451,6 @@ public class UsuarioService extends usac.api.services.Service {
         // Validamos el modelo de usuario
         this.validarModelo(nuevoEmpleadoRequest);
         this.validarModelo(nuevoEmpleadoRequest.getUsuario());
-        this.validarModelo(nuevoEmpleadoRequest.getTipoEmpleado());
         this.validarId(nuevoEmpleadoRequest.getRol());
 
         // Obtenemos el rol para asignarlo al nuevo usuario
@@ -465,11 +463,8 @@ public class UsuarioService extends usac.api.services.Service {
 
         Usuario usuarioGuardadoFinal = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rolesUsuario);
 
-        //Buscamos el tipo de empleado en base a su nombre
-        TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
-
         // Creamos el registro de tipo de empleado
-        Empleado empleado = new Empleado(usuarioGuardadoFinal, tipoEmpleadoGuardado);
+        Empleado empleado = new Empleado(usuarioGuardadoFinal);
         // Guardamos el empleado
         this.empleadoService.createEmpleado(empleado);
         //Horarios del empleado

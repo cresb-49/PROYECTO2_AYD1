@@ -103,4 +103,8 @@ export class UserService {
   changeUserPassword(payload: UpdateUserPassword) {
     return this.httpService.patch<any>('usuario/protected/cambiarPassword', payload, true);
   }
+
+  getRolesGenericos() {
+    return this.httpService.get<any>('rol/private/restricted/getRolesGenericos', null, true);
+  }
 }

@@ -12,6 +12,8 @@ import { CreateUserComponent } from '../../components/create-user/create-user.co
 })
 export class CrearEmpleadoComponent implements OnInit {
 
+  tiposDeEmpleado = [];
+
   constructor() { }
 
   ngOnInit() {
