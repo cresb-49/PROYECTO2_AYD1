@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,22 +18,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import usac.api.enums.PermisoEnum;
 
 import usac.api.models.Cancha;
 import usac.api.models.Dia;
 import usac.api.models.HorarioCancha;
 import usac.api.models.HorarioEmpleado;
 import usac.api.models.Negocio;
+import usac.api.models.Permiso;
 import usac.api.models.Rol;
 import usac.api.models.TipoEmpleado;
 import usac.api.models.Usuario;
 import usac.api.models.request.NuevoEmpleadoRequest;
+import usac.api.models.request.RolPermisoUpdateRequest;
 import usac.api.repositories.DiaRepository;
+import usac.api.repositories.PermisoRepository;
 import usac.api.repositories.RolRepository;
 import usac.api.services.CanchaService;
 import usac.api.services.DiaService;
 import usac.api.services.EmpleadoService;
 import usac.api.services.NegocioService;
+import usac.api.services.RolService;
 import usac.api.services.UsuarioService;
 
 /**
@@ -43,6 +49,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
     @Autowired
     private RolRepository rolRepository;
+    @Autowired
+    private RolService rolService;
+    @Autowired
+    private PermisoRepository permisoRepository;
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
@@ -78,6 +88,16 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
         } catch (Exception e) {
             throw new Exception("Error");
         }
+    }
+
+    public Permiso insertarPermisoSiNoExiste(Permiso pa) {
+        Permiso permiso
+                = this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
+        if (permiso == null) {
+            return this.permisoRepository.save(
+                    pa);
+        }
+        return permiso;
     }
 
     /*
@@ -124,15 +144,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      * }
      * }
      *
-     * public Permiso insertarPermisoSiNoExiste(Permiso pa) {
-     * Permiso permiso =
-     * this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
-     * if (permiso == null) {
-     * return this.permisoRepository.save(
-     * pa);
-     * }
-     * return permiso;
-     * }
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -150,13 +161,14 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             Rol clienteRol = this.insertarRol(new Rol("CLIENTE"));
             Rol adminRol = this.insertarRol(new Rol("ADMIN"));
             Rol empleadoRol = this.insertarRol(new Rol("EMPLEADO"));
+            Rol customRol = this.insertarRol(new Rol("Custom"));
 
             // Seeder de usuarios del sistema
             Usuario admin = new Usuario("456123789", "3322114455669",
                     "89456123",
                     "elrincondelgamer77@gmail.com",
                     "admin", "admin",
-                    "12345", adminRol);
+                    "12345");
 
             Usuario admin2 = new Usuario(
                     "777666555",
@@ -165,68 +177,68 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "carlosbpac@gmail.com",
                     "Carlos",
                     "Pac",
-                    "12345", adminRol);
+                    "12345");
 
             // 5 Usuarios de prueba en modo cliente
             Usuario cliente1 = new Usuario("123456789", "1234567891234",
                     "12345679",
                     "usuarioprueba1@email.com",
                     "Usuario", "Prueba1",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente2 = new Usuario("987654321", "9876543214321",
                     "98765432",
                     "usuarioprueba2@email.com",
                     "Usuario", "Prueba2",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente3 = new Usuario("456789123", "4567891238765",
                     "45678912",
                     "usuarioprueba3@email.com",
                     "Usuario", "Prueba3",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente4 = new Usuario("321654987", "3216549870987",
                     "32165498",
                     "usuarioprueba4@email.com",
                     "Usuario", "Prueba4",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente5 = new Usuario("654987321", "6549873217654",
                     "65498732",
                     "usuarioprueba5@email.com",
                     "Usuario", "Prueba5",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario empleado1 = new Usuario("987653321", "9876543219876",
                     "98763432",
                     "empleadoprueba1@email.com",
                     "Empleado", "Prueba1",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado2 = new Usuario("123456780", "1234567801234",
                     "12385678",
                     "empleadoprueba2@email.com",
                     "Empleado", "Prueba2",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado3 = new Usuario("876543219", "8765432198765",
                     "87654321",
                     "empleadoprueba3@email.com",
                     "Empleado", "Prueba3",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado4 = new Usuario("135792468", "1357924681357",
                     "13579246",
                     "empleadoprueba4@email.com",
                     "Empleado", "Prueba4",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado5 = new Usuario("246801357", "2468013572468",
                     "24680135",
                     "empleadoprueba5@email.com",
                     "Empleado", "Prueba5",
-                    "12345", empleadoRol);
+                    "12345");
 
             TipoEmpleado tipoEmpleado1 = new TipoEmpleado("Organizador");
             TipoEmpleado tipoEmpleado2 = new TipoEmpleado("Limpieza");
@@ -244,12 +256,12 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 System.err.println(e.getMessage());
             }
             ArrayList<HorarioEmpleado> horarios = new ArrayList<>();
-            horarios.add(new HorarioEmpleado(lunes,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
-            horarios.add(new HorarioEmpleado(martes,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
-            horarios.add(new HorarioEmpleado(miercoles,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
-            horarios.add(new HorarioEmpleado(jueves,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
-            horarios.add(new HorarioEmpleado(viernes,null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
-            horarios.add(new HorarioEmpleado(sabado,null, LocalTime.of(8, 0), LocalTime.of(13, 0)));
+            horarios.add(new HorarioEmpleado(lunes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(martes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(miercoles, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(jueves, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(viernes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(sabado, null, LocalTime.of(8, 0), LocalTime.of(13, 0)));
             try {
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
@@ -259,12 +271,14 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearUsuarioCliente(cliente4);
                 this.usuarioService.crearUsuarioCliente(cliente5);
 
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, tipoEmpleado1,horarios));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, tipoEmpleado2,horarios));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, tipoEmpleado3,horarios));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4,horarios));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5,horarios));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, tipoEmpleado1, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, tipoEmpleado2, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, tipoEmpleado3, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5, horarios, customRol));
+
             } catch (Exception e) {
+                e.printStackTrace();
                 System.err.println(e.getMessage());
             }
             // Se crea el modelo del negocio de la APP
@@ -310,6 +324,25 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
+            }
+
+            List<Permiso> permisos = new ArrayList<>();
+
+            // Creacion de todos los permisos que tiene el sistema
+            for (PermisoEnum permiso : PermisoEnum.values()) {
+
+                Permiso insercion = this.insertarPermisoSiNoExiste(
+                        new Permiso(
+                                permiso.getNombrePermiso(),
+                                permiso.getRuta()));
+                permisos.add(insercion);
+            }
+
+            try {
+                // Asignacion de permisos a los usuarios
+                this.rolService.actualizarPermisosRol(
+                        new RolPermisoUpdateRequest(customRol.getId(), permisos));
+            } catch (Exception e) {
             }
             /*
              * Categoria categoria = new Categoria("Hogar");
@@ -358,21 +391,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
              * } catch (Exception e) {
              * }
              *
-             * // Creacion de todos los permisos que tiene el sistema
-             * for (PermisoEnum permiso : PermisoEnum.values()) {
              *
-             * Permiso insercion = this.insertarPermisoSiNoExiste(
-             * new Permiso(
-             * permiso.getNombrePermiso(),
-             * permiso.getRuta()));
-             * try {
-             * // Asignacion de permisos a los usuarios
-             * Usuario ayudante2 = this.usuarioService.getByEmail(
-             * "luismonteg1@hotmail.com");
-             * this.usuarioService.agregarPermisoUsuario(ayudante2,
-             * insercion);
-             * } catch (Exception e) {
-             * }
              * }
              */
         } catch (Exception ex) {

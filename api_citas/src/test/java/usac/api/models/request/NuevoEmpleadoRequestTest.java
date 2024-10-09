@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import usac.api.models.Rol;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +18,7 @@ class NuevoEmpleadoRequestTest {
     private NuevoEmpleadoRequest nuevoEmpleadoRequest;
     private Usuario usuario;
     private TipoEmpleado tipoEmpleado;
+    private Rol rol;
 
     @BeforeEach
     void setUp() {
@@ -24,9 +27,10 @@ class NuevoEmpleadoRequestTest {
         usuario.setEmail("test@example.com");
         tipoEmpleado = new TipoEmpleado();
         tipoEmpleado.setNombre("Gerente");
+        rol = new Rol("EMPLEADO");
 
         // Inicializar NuevoEmpleadoRequest con los objetos
-        nuevoEmpleadoRequest = new NuevoEmpleadoRequest(usuario, tipoEmpleado,new ArrayList<>());
+        nuevoEmpleadoRequest = new NuevoEmpleadoRequest(usuario, tipoEmpleado, new ArrayList<>(), rol);
     }
 
     @Test
@@ -69,8 +73,9 @@ class NuevoEmpleadoRequestTest {
     @Test
     void testConstructorSinParametros() {
         // Verificar que el constructor vacío no inicializa los valores
-        NuevoEmpleadoRequest requestVacio = new NuevoEmpleadoRequest(null, null,null);
+        NuevoEmpleadoRequest requestVacio = new NuevoEmpleadoRequest(null, null, null, null);
         assertNull(requestVacio.getUsuario());
         assertNull(requestVacio.getTipoEmpleado());
+        assertNull(requestVacio.getRol());
     }
 }

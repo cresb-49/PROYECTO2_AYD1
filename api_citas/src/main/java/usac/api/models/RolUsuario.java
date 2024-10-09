@@ -17,32 +17,40 @@ import org.hibernate.annotations.Where;
 
 /**
  *
- * @author Luis Monterroso
+ * @author luid
  */
 @Entity
-@Table(name = "rol_permiso")
-//@SQLDelete(sql = "UPDATE rol_permiso SET deleted_at = NULL WHERE id = ?")
-//@Where(clause = "desactivated_at IS NULL")
-public class RolPermiso extends Auditor {
+@Table(name = "rol_usuario")
+@SQLDelete(sql = "UPDATE rol_usuario SET deleted_at = NULL WHERE id = ?")
+@Where(clause = "deleted_at IS NULL")
+public class RolUsuario extends Auditor {
+
+    @ManyToOne//indicador de relacion muchos a uno
+    @JoinColumn(name = "usuario", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @Schema(hidden = true)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Usuario usuario;
 
     @ManyToOne//indicador de relacion muchos a uno
     @JoinColumn(name = "rol", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @Schema(hidden = true)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Rol rol;
 
-    @ManyToOne//indicador de relacion muchos a uno
-    @JoinColumn(name = "permiso", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Permiso permiso;
-
-    public RolPermiso() {
+    public RolUsuario() {
     }
 
-    public RolPermiso(Rol rol, Permiso permiso) {
+    public RolUsuario(Usuario usuario, Rol rol) {
+        this.usuario = usuario;
         this.rol = rol;
-        this.permiso = permiso;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public Rol getRol() {
@@ -53,11 +61,4 @@ public class RolPermiso extends Auditor {
         this.rol = rol;
     }
 
-    public Permiso getPermiso() {
-        return permiso;
-    }
-
-    public void setPermiso(Permiso permiso) {
-        this.permiso = permiso;
-    }
 }

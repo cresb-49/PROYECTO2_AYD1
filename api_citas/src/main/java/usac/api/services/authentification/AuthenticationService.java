@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import usac.api.models.RolUsuario;
 import usac.api.repositories.UsuarioRepository;
 
 /**
@@ -31,8 +32,16 @@ public class AuthenticationService implements UserDetailsService {
         if (!usuarioBusqueda.isEmpty()) {//si no esta vacia la busqueda
             Usuario usuario = usuarioBusqueda.get();
             User.UserBuilder userBuilder = User.withUsername(username);
+            ArrayList<String> rolesString = new ArrayList<>();
+            
+            //iterar en los roles del usuario y agregarlos a su sesion
+            for (RolUsuario item : usuario.getRoles()) {
+                rolesString.add(item.getRol().getNombre());
+            }
+            
+            
             userBuilder.password(usuario.getPassword()).roles(
-                    usuario.getRol().getNombre()
+                    rolesString.toArray(new String[rolesString.size()])
             );
             return userBuilder.build();
 
