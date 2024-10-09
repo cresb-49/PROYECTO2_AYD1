@@ -12,6 +12,7 @@ import { ScheduleConfComponent } from '../schedule-conf/schedule-conf.component'
 })
 export class CreateUserComponent implements OnInit {
   @Input() confWorkSchedule = false;
+  @Input() isCliente = false;
   activeButtonSave = false;
   constructor() { }
 
