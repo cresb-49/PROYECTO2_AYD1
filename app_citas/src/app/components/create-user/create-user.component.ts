@@ -78,16 +78,53 @@ export class CreateUserComponent implements OnInit {
     this.empleadoDataSubject.pipe(
       debounceTime(300) // Evitar múltiples comparaciones inmediatas
     ).subscribe(newData => {
-      this.activeButtonSave = !this.compararObjetos(newData, this.empleadoOrignal);
-      if (this.activeButtonSave && this.modificar) {
-        this.toastr.info('Hay cambios pendientes por guardar');
+      if(this.modificar){
+        this.activeButtonSave = !this.compararObjetos(newData, this.empleadoOrignal);
+        if (this.activeButtonSave) {
+          this.toastr.info('Hay cambios pendientes por guardar');
+        }
+      }else{
+        this.activeButtonSave = true;
       }
     });
+    if (!this.modificar) {
+      const horario = await this.calcularHorario([]);
+      this.empleado.horario = horario;
+    }
   }
 
   // Comparación profunda entre dos objetos
   compararObjetos(obj1: CreateUpdateEmpleado, obj2: CreateUpdateEmpleado): boolean {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
+  }
+
+  calcularHorario(horarios: any): DayConfig[] {
+    let horarioHas: DayConfig[] = horarios.map((horario: any) => {
+      return {
+        id: horario.dia.id,
+        day: horario.dia.nombre,
+        init: horario.entrada,
+        end: horario.salida,
+        active: true
+      } as DayConfig
+    })
+    //En el listado de dias buscamos por medio de id si ya esta agregado si no esta agregado
+    //se agrega con active en false y init y end en 00:00
+    this.dataDias.forEach((dia) => {
+      let index = horarioHas.findIndex((diaHas) => {
+        return diaHas.id === dia.id
+      })
+      if (index === -1) {
+        horarioHas.push({
+          id: dia.id,
+          day: dia.nombre,
+          init: '00:00',
+          end: '00:00',
+          active: false
+        } as DayConfig)
+      }
+    })
+    return horarioHas;
   }
 
   onNombresChange(newNombre: string) {
@@ -180,20 +217,24 @@ export class CreateUserComponent implements OnInit {
     })
   }
 
-  getDias() {
-    this.diaService.getDias().subscribe({
-      next: (response: ApiResponse) => {
-        const dias = response.data ?? [];
-        dias.forEach((dia: any) => {
-          this.dataDias.push({
-            id: dia.id,
-            nombre: dia.nombre,
-          } as Dia);
-        });
-      },
-      error: (error: ErrorApiResponse) => {
-        this.toastr.error(error.message, 'Error al obtener los días');
-      }
+  getDias(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.diaService.getDias().subscribe({
+        next: (response: ApiResponse) => {
+          const dias = response.data ?? [];
+          dias.forEach((dia: any) => {
+            this.dataDias.push({
+              id: dia.id,
+              nombre: dia.nombre,
+            } as Dia);
+          });
+          resolve(); // Resolvemos la promesa cuando se obtienen los días
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.message, 'Error al obtener los días');
+          reject(error);
+        }
+      });
     });
   }
 }
