@@ -91,7 +91,7 @@ public class Service {
     public <T extends Auditor> List<T> ignorarEliminados(List<T> entidades) {
         // Filtrar entidades donde deletedAt sea null
         return entidades.stream()
-                .filter(entidad -> entidad.getDesactivatedAt() == null)
+                .filter(entidad -> entidad.getDeletedAt() == null)
                 .collect(Collectors.toList());
     }
 

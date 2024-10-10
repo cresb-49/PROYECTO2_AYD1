@@ -114,6 +114,7 @@ public class CanchaService extends usac.api.services.Service {
         return cancha;
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public void deleteCanchaById(Long id) throws Exception {
         Cancha cancha = canchaRepository.findById(id).orElse(null);
         if (cancha == null) {
