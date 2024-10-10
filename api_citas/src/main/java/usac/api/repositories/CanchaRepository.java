@@ -12,4 +12,6 @@ import usac.api.models.Usuario;
 public interface CanchaRepository extends CrudRepository<Cancha,Long> {
     @Override
     public List<Cancha> findAll();
+
+    public Long deleteCanchaById(Long id);
 }

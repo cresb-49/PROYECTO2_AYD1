@@ -30,6 +30,12 @@
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="12345678912" required />
     </div>
+    <div>
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo Electrónico</label>
+      <input type="email" id="email" [(ngModel)]="empleado.email"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="john.doe@company.com" required />
+    </div>
     <div *ngIf="!isCliente">
       <label for="tipo_empleado" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Rol
@@ -41,12 +47,15 @@
       </select>
     </div>
   </div>
+  <h6 class="text-lg font-bold dark:text-white mb-6" *ngIf="modificar">Cambio de Contraseña</h6>
   <div class="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-3">
-    <div>
-      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo Electrónico</label>
-      <input type="email" id="email" [(ngModel)]="empleado.email"
+    <div *ngIf="modificar">
+      <label for="current_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Contraseña Actual
+      </label>
+      <input type="password" id="current_password" [(ngModel)]="empleado.current_password"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        placeholder="john.doe@company.com" required />
+        placeholder="•••••••••" required />
     </div>
     <div>
       <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">

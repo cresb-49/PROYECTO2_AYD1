@@ -7,6 +7,7 @@ import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service'
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth/auth.service';
 import { NativeUserRoles } from '../../services/auth/types';
+import { OptionsModal } from '../../components/pop-up-modal/pop-up-modal.component';
 
 @Component({
   standalone: true,
@@ -16,8 +17,17 @@ import { NativeUserRoles } from '../../services/auth/types';
   styleUrls: ['./see-courts.component.css']
 })
 export class SeeCourtsComponent implements OnInit {
+  hideModal = true;
+
+  optionsModal: OptionsModal = {
+    question: '¿Estás seguro de que deseas eliminar esta cancha?',
+    textYes: 'Sí, estoy seguro',
+    textNo: 'No, cancelar',
+    confirmAction: () => { }
+  }
+
   canchas: any[] = [];
-  acciones_canchas:any[] = [
+  acciones_canchas: any[] = [
 
   ];
 
@@ -32,7 +42,7 @@ export class SeeCourtsComponent implements OnInit {
     const isCliente = await this.isCliente();
     if (isCliente) {
       this.acciones_canchas.push({ description: 'Reservar', route: '/reservar-cancha', enabled: true });
-    }else{
+    } else {
       this.acciones_canchas.push({ description: 'Editar', route: '/edit-cancha', enabled: true });
       this.acciones_canchas.push({ description: 'Eliminar', route: '/eliminar-cancha', enabled: true });
     }
@@ -84,5 +94,24 @@ export class SeeCourtsComponent implements OnInit {
   setDescripcionAction(cancha: any) {
     return `Reservar la cancha ${cancha.name}`;
   }
+
+  openModal(data: any) {
+    this.hideModal = false;
+    this.optionsModal.question = `¿Estás seguro de que deseas eliminar a ${data.name} ${data.lastname}?`;
+    this.optionsModal.confirmAction = () => this.deleteCourt(data);
+  }
+
+  deleteCourt(court: any) {
+    this.canchaService.deleteCancha(court.id).subscribe({
+      next: (response: ApiResponse) => {
+        this.toastr.success('Cancha eliminada');
+        this.getCanchas();
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error al eliminar cancha');
+      }
+    });
+  }
+
 
 }

@@ -28,7 +28,7 @@ export interface UpdateUserPassword {
   newPassword: string;
 }
 
-export interface Rol{
+export interface Rol {
   id: number;
   nombre: string;
 }
@@ -113,7 +113,19 @@ export class UserService {
     return this.httpService.get<any>('rol/private/restricted/getRolesGenericos', null, true);
   }
 
-  getEmpleados(){
+  getEmpleados() {
     return this.httpService.get<any>('empleado/private/empleados', null, true);
+  }
+
+  getEmpleado(id: number) {
+    return this.httpService.get<any>(`empleado/private/empleado/${id}`, null, true);
+  }
+
+  elimiarUsuario(id: number) {
+    return this.httpService.delete<any>(`usuario/private/usuario/${id}`, true);
+  }
+
+  eliminarEmpleado(id: number) {
+    return this.httpService.delete<any>(`empleado/private/empleado/${id}`, true);
   }
 }

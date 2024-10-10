@@ -8,12 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import usac.api.models.Empleado;
+import usac.api.models.Usuario;
 import usac.api.repositories.EmpleadoRepository;
+import usac.api.repositories.UsuarioRepository;
 
 @Service
 public class EmpleadoService extends usac.api.services.Service {
     @Autowired
     private EmpleadoRepository empleadoRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Transactional(rollbackOn = Exception.class)
     public Empleado createEmpleado(Empleado empleado) throws Exception {
@@ -29,6 +33,29 @@ public class EmpleadoService extends usac.api.services.Service {
 
     public List<Empleado> getEmpleados() {
         List<Empleado> empleados = this.ignorarEliminados(empleadoRepository.findAll());
+        empleados = this.ignorarEliminados(empleados);
         return empleados;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public void eliminarEmpleado(Long id) throws Exception {
+        Empleado empleado = this.empleadoRepository.findById(id).orElse(null);
+        if(empleado == null) {
+            throw new Exception("No se encontro el empleado");
+        }
+        Usuario usuario = empleado.getUsuario();
+        if(usuario == null) {
+            throw new Exception("No se encontro el usuario asociado al empleado");
+        }
+        empleadoRepository.deleteEmpleadoById(empleado.getId());
+        usuarioRepository.deleteUsuarioById(usuario.getId());
+    }
+
+    public Empleado getEmpleadoById(Long id) {
+        Empleado empleado = this.empleadoRepository.findById(id).orElse(null);
+        if(empleado == null) {
+            return null;
+        }
+        return empleado;
     }
 }

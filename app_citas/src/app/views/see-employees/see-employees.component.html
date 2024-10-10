@@ -2,3 +2,4 @@
   <h2 class="text-4xl font-bold dark:text-white mb-4">Empleados</h2>
   <app-table [useDataModel]="true" [data]="empleados" [headers]="tableHeaders" [actions]="actions"></app-table>
 </div>
+<app-pop-up-modal [(hideModal)]="hideModal" [options]="optionsModal"></app-pop-up-modal>
