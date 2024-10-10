@@ -82,12 +82,11 @@ public class ServicioService extends usac.api.services.Service {
      * @throws Exception
      */
     public Servicio crearServicio(Servicio servicio) throws Exception {
-        throw new Exception("No implementado");
-        // if(servicio.getId() != null) {
-        //     throw new Exception("El servicio ya tiene un id");
-        // }
-        // this.validarModelo(servicio);
-        // Servicio servicioCreado = this.servicioRepository.save(servicio);
-        // return servicioCreado;
+        if(servicio.getId() != null) {
+            throw new Exception("El servicio ya tiene un id");
+        }
+        this.validarModelo(servicio);
+        Servicio servicioCreado = this.servicioRepository.save(servicio);
+        return servicioCreado;
     }
 }

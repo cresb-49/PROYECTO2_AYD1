@@ -39,6 +39,7 @@ import usac.api.services.DiaService;
 import usac.api.services.EmpleadoService;
 import usac.api.services.NegocioService;
 import usac.api.services.RolService;
+import usac.api.services.ServicioService;
 import usac.api.services.UsuarioService;
 
 /**
@@ -65,6 +66,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private EmpleadoService empleadoService;
     @Autowired
     private CanchaService canchaService;
+    @Autowired
+    private ServicioService servicioService;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -341,11 +344,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             String imagenEjemplo = cargarImagenComoBase64("imagen_ejemplo.jpg");
             // Creacion de los servicios de la tienda
             try {
-                Servicio servicio1 = new Servicio("Servicio 1", 1.0,imagenEjemplo,100.0, "Descripcion del servicio 1",customRol);
-                Servicio servicio2 = new Servicio("Servicio 2", 2.0,imagenEjemplo,200.0, "Descripcion del servicio 2",customRol2);
-                Servicio servicio3 = new Servicio("Servicio 3", 3.0,imagenEjemplo,300.0, "Descripcion del servicio 3",customRol3);
-                Servicio servicio4 = new Servicio("Servicio 4", 4.0,imagenEjemplo,400.0, "Descripcion del servicio 4",customRol4);
-                Servicio servicio5 = new Servicio("Servicio 5", 5.0,imagenEjemplo,500.0, "Descripcion del servicio 5",customRol5);                
+                this.servicioService.crearServicio(new Servicio("Servicio 1", 1.0,imagenEjemplo,100.0, "Descripcion del servicio 1",customRol));
+                this.servicioService.crearServicio(new Servicio("Servicio 2", 2.0,imagenEjemplo,200.0, "Descripcion del servicio 2",customRol2));
+                this.servicioService.crearServicio(new Servicio("Servicio 3", 3.0,imagenEjemplo,300.0, "Descripcion del servicio 3",customRol3));
+                this.servicioService.crearServicio(new Servicio("Servicio 4", 4.0,imagenEjemplo,400.0, "Descripcion del servicio 4",customRol4));
+                this.servicioService.crearServicio(new Servicio("Servicio 5", 5.0,imagenEjemplo,500.0, "Descripcion del servicio 5",customRol5));                
             } catch (Exception e) {
             }
 
