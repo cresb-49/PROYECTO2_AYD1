@@ -1,26 +1,26 @@
-<form class="pb-6">
+<div class="pb-6">
   <div class="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-3">
     <div>
       <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombres</label>
-      <input type="text" id="first_name"
+      <input type="text" id="first_name" [(ngModel)]="empleado.nombres"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="John" required />
     </div>
     <div>
       <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apellidos</label>
-      <input type="text" id="last_name"
+      <input type="text" id="last_name" [(ngModel)]="empleado.apellidos"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="Doe" required />
     </div>
     <div *ngIf="isCliente">
       <label for="company" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIT</label>
-      <input type="text" id="company"
+      <input type="text" id="company" [(ngModel)]="empleado.cui"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="123456789" required />
     </div>
     <div>
       <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Teléfono</label>
-      <input type="tel" id="phone"
+      <input type="tel" id="phone" [(ngModel)]="empleado.phone"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="1234-5678" required />
     </div>
@@ -31,26 +31,13 @@
         placeholder="12345678912" required />
     </div>
     <div *ngIf="!isCliente">
-      <label for="tipo_empleado" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rol del
-        Usuario</label>
-      <select id="tipo_empleado"
+      <label for="tipo_empleado" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Rol
+      </label>
+      <select id="tipo_empleado" [(ngModel)]="empleado.rol"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        <option selected>Seleccionar</option>
-        <option value="1">Tipo 1</option>
-        <option value="2">Tipo 2</option>
-        <option value="3">Tipo 3</option>
-        <option value="4">Tipo 4</option>
-      </select>
-    </div>
-    <div *ngIf="!isCliente">
-      <label for="tipo_empleado" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo Empleado</label>
-      <select id="tipo_empleado"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        <option selected>Seleccionar</option>
-        <option value="1">Tipo 1</option>
-        <option value="2">Tipo 2</option>
-        <option value="3">Tipo 3</option>
-        <option value="4">Tipo 4</option>
+        <option value="0">Selecciona un Rol</option>
+        <option *ngFor="let rol of roles" [value]="rol.id">{{ rol.nombre }}</option>
       </select>
     </div>
   </div>
@@ -95,4 +82,4 @@
           }" [disabled]="!activeButtonSave">
     Crear Usuario
   </button>
-</form>
+</div>

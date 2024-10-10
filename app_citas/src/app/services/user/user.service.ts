@@ -28,6 +28,11 @@ export interface UpdateUserPassword {
   newPassword: string;
 }
 
+export interface Rol{
+  id: number;
+  nombre: string;
+}
+
 export enum UserRoles {
   CLIENTE = 'CLIENTE',
   ADMIN = 'ADMIN',
