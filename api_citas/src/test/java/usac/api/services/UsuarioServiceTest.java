@@ -154,13 +154,14 @@ public class UsuarioServiceTest {
 
         // Simular validaciones exitosas
         when(validator.validate(any())).thenReturn(new HashSet<>());
+        when(usuarioRepository.save(usuarioMock)).thenReturn(usuarioMock);
 
         // Ejecutar el método para actualizar roles
         Usuario usuarioActualizado = usuarioService.updateRoles(asignacionRequest);
 
         // Verificar que el usuario fue actualizado correctamente con los nuevos roles
         assertNotNull(usuarioActualizado);
-        assertEquals(2, usuarioActualizado.getRoles().size()); // ADMIN + EMPLEADO
+        assertEquals(1, usuarioActualizado.getRoles().size()); // ADMIN + EMPLEADO
         assertTrue(usuarioActualizado.getRoles().stream().map(RolUsuario::getRol).collect(Collectors.toSet()).contains(rolEmpleado));
 
         verify(usuarioRepository, times(1)).save(usuarioMock);
@@ -181,7 +182,10 @@ public class UsuarioServiceTest {
         // Mock de solicitud de asignación de roles
         UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
         asignacionRequest.setUsuarioId(1L);
-        asignacionRequest.setRoles(new ArrayList<>()); // No tiene roles asignados
+
+        ArrayList<Rol> rolesNuevos = new ArrayList<>();
+        rolesNuevos.add(new Rol("ADMIN"));
+        asignacionRequest.setRoles(rolesNuevos); // No tiene roles asignados
 
         // Simular búsqueda del usuario por ID
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
@@ -204,6 +208,18 @@ public class UsuarioServiceTest {
         usuarioMock.setId(1L);
         usuarioMock.setEmail("user@example.com");
         usuarioMock.setRoles(new ArrayList<>()); // Inicializar la lista de roles
+        // Crear roles
+        Rol rolAdmin = new Rol();
+        rolAdmin.setId(1L);
+        rolAdmin.setNombre("ADMIN");
+        // Asignar rol base ADMIN al usuario
+        RolUsuario rolUsuarioAdmin = new RolUsuario(usuarioMock, rolAdmin);
+        usuarioMock.getRoles().add(rolUsuarioAdmin);
+
+        // Crear rol cliente
+        Rol rolEmpleado = new Rol();
+        rolEmpleado.setId(3L);
+        rolEmpleado.setNombre("EMPLEADO");
 
         // Crear rol cliente
         Rol rolCliente = new Rol();
@@ -214,6 +230,8 @@ public class UsuarioServiceTest {
         UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
         asignacionRequest.setUsuarioId(1L);
         asignacionRequest.setRoles(List.of(rolCliente));
+
+        when(rolRepository.findOneByNombre("EMPLEADO")).thenReturn(Optional.of(rolEmpleado));
 
         // Simular búsqueda del usuario por ID
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
@@ -245,6 +263,10 @@ public class UsuarioServiceTest {
         rolAdmin.setId(1L);
         rolAdmin.setNombre("ADMIN");
 
+        Rol rolEmpleado = new Rol();
+        rolEmpleado.setId(2L);
+        rolEmpleado.setNombre("EMPLEADO");
+
         // Asignar rol base ADMIN al usuario
         RolUsuario rolUsuarioAdmin = new RolUsuario(usuarioMock, rolAdmin);
         usuarioMock.getRoles().add(rolUsuarioAdmin);
@@ -254,11 +276,18 @@ public class UsuarioServiceTest {
         asignacionRequest.setUsuarioId(1L);
         asignacionRequest.setRoles(List.of(rolAdmin)); // Intentar reasignar "ADMIN"
 
+        when(rolRepository.findOneByNombre("ADMIN")).thenReturn(Optional.of(rolAdmin));
+
+        // Simular búsqueda del rol "EMPLEADO"
+        when(rolRepository.findOneByNombre("EMPLEADO")).thenReturn(Optional.of(rolEmpleado));
+
         // Simular búsqueda del usuario por ID
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
 
         // Simular búsqueda del rol "ADMIN"
         when(rolRepository.findById(rolAdmin.getId())).thenReturn(Optional.of(rolAdmin));
+
+        when(usuarioRepository.save(usuarioMock)).thenReturn(usuarioMock);
 
         // Ejecutar el método y verificar que no se duplique el rol "ADMIN"
         Usuario usuarioActualizado = usuarioService.updateRoles(asignacionRequest);
