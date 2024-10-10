@@ -21,6 +21,8 @@ import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 import { MyInformationComponent } from './views/my-information/my-information.component';
 import { RecoveryPasswordComponent } from './views/recovery-password/recovery-password.component';
 import { SeeUsersComponent } from './views/see-users/see-users.component';
+import { EditarServicioComponent } from './views/editar-servicio/editar-servicio.component';
+import { SeeServiciosComponent } from './views/see-servicios/see-servicios.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -68,7 +70,13 @@ export const routes: Routes = [
         path: 'usuarios', component: SeeUsersComponent
       },
       {
+        path: 'servicios', component: SeeServiciosComponent
+      },
+      {
         path: 'crear-servicio', component: CrearServicioComponent
+      },
+      {
+        path: 'editar-servicio', component: EditarServicioComponent
       },
       {
         path: 'create-user-admin', component: CreateUserAdminComponent
