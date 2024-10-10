@@ -7,12 +7,15 @@ import { CuServicioComponent } from '../../components/cu-servicio/cu-servicio.co
 @Component({
   standalone: true,
   imports: [CommonModule, RouterModule, ScheduleConfComponent, CuServicioComponent],
-  selector: 'app-crear-servicio',
-  templateUrl: './crear-servicio.component.html',
-  styleUrls: ['./crear-servicio.component.css']
+  selector: 'app-editar-servicio',
+  templateUrl: './editar-servicio.component.html',
+  styleUrls: ['./editar-servicio.component.css']
 })
-export class CrearServicioComponent implements OnInit {
+export class EditarServicioComponent implements OnInit {
+
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
+
 }

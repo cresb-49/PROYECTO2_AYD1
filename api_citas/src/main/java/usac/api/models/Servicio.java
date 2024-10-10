@@ -61,6 +61,7 @@ public class Servicio extends Auditor {
     private String detalles;
     
     @OneToOne
+    @NotNull(message = "El rol con el que se relaciona el servicio no puede ser nulo.")
     @JoinColumn(name = "rol", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Rol rol;

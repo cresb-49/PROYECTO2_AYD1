@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
-import usac.api.enums.PermisoEnum;
 
+import usac.api.enums.PermisoEnum;
 import usac.api.models.Cancha;
 import usac.api.models.Dia;
 import usac.api.models.HorarioCancha;
@@ -27,6 +27,7 @@ import usac.api.models.HorarioEmpleado;
 import usac.api.models.Negocio;
 import usac.api.models.Permiso;
 import usac.api.models.Rol;
+import usac.api.models.Servicio;
 import usac.api.models.Usuario;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.RolPermisoUpdateRequest;
@@ -38,6 +39,7 @@ import usac.api.services.DiaService;
 import usac.api.services.EmpleadoService;
 import usac.api.services.NegocioService;
 import usac.api.services.RolService;
+import usac.api.services.ServicioService;
 import usac.api.services.UsuarioService;
 
 /**
@@ -64,6 +66,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private EmpleadoService empleadoService;
     @Autowired
     private CanchaService canchaService;
+    @Autowired
+    private ServicioService servicioService;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -161,6 +165,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             Rol adminRol = this.insertarRol(new Rol("ADMIN"));
             Rol empleadoRol = this.insertarRol(new Rol("EMPLEADO"));
             Rol customRol = this.insertarRol(new Rol("Custom"));
+            Rol customRol2 = this.insertarRol(new Rol("Custom2"));
+            Rol customRol3 = this.insertarRol(new Rol("Custom3"));
+            Rol customRol4 = this.insertarRol(new Rol("Custom4"));
+            Rol customRol5 = this.insertarRol(new Rol("Custom5"));
+
 
             // Seeder de usuarios del sistema
             Usuario admin = new Usuario("456123789", "3322114455669",
@@ -256,10 +265,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearUsuarioCliente(cliente5);
 
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, horarios, customRol));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, horarios, customRol2));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, horarios, customRol3));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, horarios, customRol4));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, horarios, customRol5));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -268,7 +277,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             // Se crea el modelo del negocio de la APP
             // Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a
             // base64
-            String logo = cargarImagenComoBase64();
+            String logo = cargarImagenComoBase64("logo.svg");
             Negocio negocio = new Negocio(logo, "TiendaAyD", false, "2da calle XXX-XXX-XX Quetgo");
             try {
                 ArrayList<Dia> horario = new ArrayList<>();
@@ -324,10 +333,25 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
             try {
                 // Asignacion de permisos a los usuarios
-                this.rolService.actualizarPermisosRol(
-                        new RolPermisoUpdateRequest(customRol.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol2.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol3.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol4.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol5.getId(), permisos));
             } catch (Exception e) {
             }
+
+            String imagenEjemplo = cargarImagenComoBase64("imagen_ejemplo.jpg");
+            // Creacion de los servicios de la tienda
+            try {
+                this.servicioService.crearServicio(new Servicio("Servicio 1", 1.0,imagenEjemplo,100.0, "Descripcion del servicio 1",customRol));
+                this.servicioService.crearServicio(new Servicio("Servicio 2", 2.0,imagenEjemplo,200.0, "Descripcion del servicio 2",customRol2));
+                this.servicioService.crearServicio(new Servicio("Servicio 3", 3.0,imagenEjemplo,300.0, "Descripcion del servicio 3",customRol3));
+                this.servicioService.crearServicio(new Servicio("Servicio 4", 4.0,imagenEjemplo,400.0, "Descripcion del servicio 4",customRol4));
+                this.servicioService.crearServicio(new Servicio("Servicio 5", 5.0,imagenEjemplo,500.0, "Descripcion del servicio 5",customRol5));                
+            } catch (Exception e) {
+            }
+
             /*
              * Categoria categoria = new Categoria("Hogar");
              * this.insertarCategoria(categoria);
@@ -383,9 +407,9 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
         }
     }
 
-    public String cargarImagenComoBase64() {
+    public String cargarImagenComoBase64(String imagen) {
         // Cargar el archivo desde resources
-        try (InputStream inputStream = getClass().getResourceAsStream("/images/logo.svg")) {
+        try (InputStream inputStream = getClass().getResourceAsStream("/images/"+imagen)) {
             if (inputStream == null) {
                 throw new IOException("No se pudo encontrar el archivo logo.svg en el directorio /resources/images");
             }
