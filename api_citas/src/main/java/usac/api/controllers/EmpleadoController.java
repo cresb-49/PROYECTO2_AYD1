@@ -17,7 +17,7 @@ public class EmpleadoController {
     @Autowired
     private EmpleadoService empleadoService;
 
-    @GetMapping("path")
+    @GetMapping("/private/empleados")
     public ResponseEntity<?> getEmpleados() {
         try {    
             return new ApiBaseTransformer(HttpStatus.OK, "OK", empleadoService.getEmpleados(), null, null).sendResponse();  

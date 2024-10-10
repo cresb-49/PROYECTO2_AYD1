@@ -112,4 +112,8 @@ export class UserService {
   getRolesGenericos() {
     return this.httpService.get<any>('rol/private/restricted/getRolesGenericos', null, true);
   }
+
+  getEmpleados(){
+    return this.httpService.get<any>('empleado/private/empleados', null, true);
+  }
 }
