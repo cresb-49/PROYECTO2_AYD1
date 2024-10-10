@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -38,11 +39,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import usac.api.models.Rol;
+
+import usac.api.models.RolUsuario;
+
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UserChangePasswordRequest;
+import usac.api.models.request.UsuarioRolAsignacionRequest;
+import usac.api.repositories.RolRepository;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
@@ -56,6 +62,9 @@ public class UsuarioServiceTest {
     @Spy  // Usa Spy para la clase concreta
     @InjectMocks
     private UsuarioService usuarioService;
+
+    @Mock
+    private RolRepository rolRepository;
 
     // Mock de dependencias externas
     @Mock
@@ -104,6 +113,191 @@ public class UsuarioServiceTest {
 
         // Simular que verificarUsuarioJwt no hace nada usando Spy
         doNothing().when(usuarioService).verificarUsuarioJwt(any(Usuario.class));
+    }
+
+    /**
+     * Prueba para asignar roles al usuario, verificando que los roles sean
+     * actualizados correctamente.
+     */
+    @Test
+    void testUpdateRoles_Success() throws Exception {
+        // Crear usuario local dentro del método e inicializar la lista de roles
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+        usuarioMock.setEmail("user@example.com");
+        usuarioMock.setRoles(new ArrayList<>()); // Inicializar la lista de roles
+
+        // Crear roles
+        Rol rolAdmin = new Rol();
+        rolAdmin.setId(1L);
+        rolAdmin.setNombre("ADMIN");
+
+        Rol rolEmpleado = new Rol();
+        rolEmpleado.setId(2L);
+        rolEmpleado.setNombre("EMPLEADO");
+
+        // Asignar rol base ADMIN al usuario
+        RolUsuario rolUsuarioAdmin = new RolUsuario(usuarioMock, rolAdmin);
+        usuarioMock.getRoles().add(rolUsuarioAdmin);
+
+        // Mock de solicitud de asignación de roles
+        UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
+        asignacionRequest.setUsuarioId(1L);
+        asignacionRequest.setRoles(List.of(rolEmpleado));
+
+        // Simular búsqueda del usuario por ID
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
+
+        // Simular búsqueda del rol "EMPLEADO"
+        when(rolRepository.findOneByNombre("EMPLEADO")).thenReturn(Optional.of(rolEmpleado));
+        when(rolRepository.findById(rolEmpleado.getId())).thenReturn(Optional.of(rolEmpleado));
+
+        // Simular validaciones exitosas
+        when(validator.validate(any())).thenReturn(new HashSet<>());
+        when(usuarioRepository.save(usuarioMock)).thenReturn(usuarioMock);
+
+        // Ejecutar el método para actualizar roles
+        Usuario usuarioActualizado = usuarioService.updateRoles(asignacionRequest);
+
+        // Verificar que el usuario fue actualizado correctamente con los nuevos roles
+        assertNotNull(usuarioActualizado);
+        assertEquals(1, usuarioActualizado.getRoles().size()); // ADMIN + EMPLEADO
+        assertTrue(usuarioActualizado.getRoles().stream().map(RolUsuario::getRol).collect(Collectors.toSet()).contains(rolEmpleado));
+
+        verify(usuarioRepository, times(1)).save(usuarioMock);
+    }
+
+    /**
+     * Prueba para verificar que se lanza una excepción cuando el usuario no
+     * tiene un rol base.
+     */
+    @Test
+    void testUpdateRoles_NoBaseRole() throws Exception {
+        // Crear usuario local dentro del método e inicializar la lista de roles
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+        usuarioMock.setEmail("user@example.com");
+        usuarioMock.setRoles(new ArrayList<>()); // Inicializar la lista de roles
+
+        // Mock de solicitud de asignación de roles
+        UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
+        asignacionRequest.setUsuarioId(1L);
+
+        ArrayList<Rol> rolesNuevos = new ArrayList<>();
+        rolesNuevos.add(new Rol("ADMIN"));
+        asignacionRequest.setRoles(rolesNuevos); // No tiene roles asignados
+
+        // Simular búsqueda del usuario por ID
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
+
+        // Ejecutar el método y verificar que se lanza una excepción
+        Exception exception = assertThrows(Exception.class, () -> usuarioService.updateRoles(asignacionRequest));
+
+        // Verificar el mensaje de la excepción
+        assertEquals("El usuario no tiene un rol base asignado", exception.getMessage());
+    }
+
+    /**
+     * Prueba para verificar que se lanza una excepción cuando se intenta
+     * asignar el rol "CLIENTE".
+     */
+    @Test
+    void testUpdateRoles_CannotAssignClienteRole() throws Exception {
+        // Crear usuario local dentro del método e inicializar la lista de roles
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+        usuarioMock.setEmail("user@example.com");
+        usuarioMock.setRoles(new ArrayList<>()); // Inicializar la lista de roles
+        // Crear roles
+        Rol rolAdmin = new Rol();
+        rolAdmin.setId(1L);
+        rolAdmin.setNombre("ADMIN");
+        // Asignar rol base ADMIN al usuario
+        RolUsuario rolUsuarioAdmin = new RolUsuario(usuarioMock, rolAdmin);
+        usuarioMock.getRoles().add(rolUsuarioAdmin);
+
+        // Crear rol cliente
+        Rol rolEmpleado = new Rol();
+        rolEmpleado.setId(3L);
+        rolEmpleado.setNombre("EMPLEADO");
+
+        // Crear rol cliente
+        Rol rolCliente = new Rol();
+        rolCliente.setId(3L);
+        rolCliente.setNombre("CLIENTE");
+
+        // Mock de solicitud de asignación de roles con el rol "CLIENTE"
+        UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
+        asignacionRequest.setUsuarioId(1L);
+        asignacionRequest.setRoles(List.of(rolCliente));
+
+        when(rolRepository.findOneByNombre("EMPLEADO")).thenReturn(Optional.of(rolEmpleado));
+
+        // Simular búsqueda del usuario por ID
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
+
+        // Simular búsqueda del rol "CLIENTE"
+        when(rolRepository.findById(rolCliente.getId())).thenReturn(Optional.of(rolCliente));
+
+        // Ejecutar el método y verificar que se lanza una excepción
+        Exception exception = assertThrows(Exception.class, () -> usuarioService.updateRoles(asignacionRequest));
+
+        // Verificar el mensaje de la excepción
+        assertEquals("No es posible asignar el rol 'CLIENTE'.", exception.getMessage());
+    }
+
+    /**
+     * Prueba para verificar que el rol "ADMIN" no se pueda asignar cuando ya
+     * está asignado.
+     */
+    @Test
+    void testUpdateRoles_CannotDuplicateAdminRole() throws Exception {
+        // Crear usuario local dentro del método e inicializar la lista de roles
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(1L);
+        usuarioMock.setEmail("user@example.com");
+        usuarioMock.setRoles(new ArrayList<>()); // Inicializar la lista de roles
+
+        // Crear rol Admin
+        Rol rolAdmin = new Rol();
+        rolAdmin.setId(1L);
+        rolAdmin.setNombre("ADMIN");
+
+        Rol rolEmpleado = new Rol();
+        rolEmpleado.setId(2L);
+        rolEmpleado.setNombre("EMPLEADO");
+
+        // Asignar rol base ADMIN al usuario
+        RolUsuario rolUsuarioAdmin = new RolUsuario(usuarioMock, rolAdmin);
+        usuarioMock.getRoles().add(rolUsuarioAdmin);
+
+        // Mock de solicitud de asignación de roles con el rol "ADMIN"
+        UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
+        asignacionRequest.setUsuarioId(1L);
+        asignacionRequest.setRoles(List.of(rolAdmin)); // Intentar reasignar "ADMIN"
+
+        when(rolRepository.findOneByNombre("ADMIN")).thenReturn(Optional.of(rolAdmin));
+
+        // Simular búsqueda del rol "EMPLEADO"
+        when(rolRepository.findOneByNombre("EMPLEADO")).thenReturn(Optional.of(rolEmpleado));
+
+        // Simular búsqueda del usuario por ID
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
+
+        // Simular búsqueda del rol "ADMIN"
+        when(rolRepository.findById(rolAdmin.getId())).thenReturn(Optional.of(rolAdmin));
+
+        when(usuarioRepository.save(usuarioMock)).thenReturn(usuarioMock);
+
+        // Ejecutar el método y verificar que no se duplique el rol "ADMIN"
+        Usuario usuarioActualizado = usuarioService.updateRoles(asignacionRequest);
+
+        // Verificar que el rol "ADMIN" no fue duplicado
+        assertNotNull(usuarioActualizado);
+        assertEquals(1, usuarioActualizado.getRoles().size()); // Solo debe tener el rol "ADMIN"
+        assertTrue(usuarioActualizado.getRoles().stream().map(RolUsuario::getRol).anyMatch(rol -> rol.getNombre().equals("ADMIN")));
+
+        verify(usuarioRepository, times(1)).save(usuarioMock);
     }
 
     @Test

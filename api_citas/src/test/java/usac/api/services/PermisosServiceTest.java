@@ -73,6 +73,6 @@ class PermisoServiceTest {
 
         // Verificar que se lanza una excepción al intentar validar un permiso nulo
         Exception exception = assertThrows(Exception.class, () -> permisoService.getPermisoById(permisoNulo));
-        assertEquals("Id invalido", exception.getMessage());
+        assertEquals("Id del permiso invalido.", exception.getMessage());
     }
 }

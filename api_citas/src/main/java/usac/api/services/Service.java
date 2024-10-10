@@ -61,9 +61,9 @@ public class Service {
      * @param entidad entidad que extiende de auditor
      * @throws Exception
      */
-    public <T extends Auditor> void validarId(T entidad) throws Exception {
+    public <T extends Auditor> void validarId(T entidad, String mensaje) throws Exception {
         if (entidad == null || entidad.getId() == null || entidad.getId() <= 0) {
-            throw new Exception("Id invalido");
+            throw new Exception(mensaje);
         }
     }
 
