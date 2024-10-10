@@ -1,3 +1,4 @@
+package usac.api.config;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-
-import usac.api.config.AppProperties;
-import usac.api.config.CorsConfig;
 
 /**
  * Pruebas unitarias para la clase CorsConfig. Verifica que la configuración
