@@ -4,11 +4,12 @@
  */
 package usac.api.models;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,6 +20,10 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.OneToMany;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  *
@@ -27,6 +32,8 @@ import org.hibernate.annotations.CascadeType;
 @Entity
 @Table(name = "usuario")
 @DynamicUpdate
+@SQLDelete(sql = "UPDATE usuario SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@Where(clause = "desactivated_at IS NULL")
 public class Usuario extends Auditor {
 
     @NotBlank(message = "El nit del cliente no puede estar vacío.")

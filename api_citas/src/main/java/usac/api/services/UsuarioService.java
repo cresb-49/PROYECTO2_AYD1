@@ -627,4 +627,12 @@ public class UsuarioService extends usac.api.services.Service {
         return usuarioRepository.save(usuario);
     }
 
+    @Transactional(rollbackOn = Exception.class)
+    public void eliminarUsuarioById(Long id) throws Exception {
+        Usuario usuario = this.usuarioRepository.findById(id).orElse(null);
+        if (usuario == null) {
+            throw new Exception("No se encontro el usuario");
+        }
+        this.usuarioRepository.deleteUsuarioById(id);
+    }
 }

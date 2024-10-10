@@ -56,6 +56,7 @@ export class SeeUsersComponent implements OnInit {
       next: (response: ApiResponse) => {
         console.log('Response:', response);
         const data = response.data;
+        this.usuarios = [];
         for(let d of data) {
           this.usuarios.push({
             id: d.id,
@@ -78,7 +79,15 @@ export class SeeUsersComponent implements OnInit {
   }
 
   deteleUser(user: any) {
-    console.log('Delete user:', user);
+    this.userService.elimiarUsuario(user.id).subscribe({
+      next: (response: ApiResponse) => {
+        this.toastr.success('Usuario eliminado');
+        this.obtenerUsuarios();
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error al eliminar usuario');
+      }
+    });
   }
 
 }
