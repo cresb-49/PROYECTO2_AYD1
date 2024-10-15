@@ -1,12 +1,7 @@
 <section class="px-20 pb-6">
   <h4 class="text-2xl font-bold dark:text-white">Datos de la Cancha</h4>
   <div class="w-full mt-4">
-    <div class="grid lg:grid-cols-4 lg:gap-6 md:grid-cols-3 md:gap-6 sm:grid-cols-1">
-      <div class="relative z-0 w-full mb-5 group">
-        <label for="base-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Codigo</label>
-        <input type="text" id="base-input" readonly [(ngModel)]="cancha.id"
-          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-      </div>
+    <div class="grid lg:grid-cols-2 lg:gap-6 md:grid-cols-2 md:gap-6 sm:grid-cols-1">
       <div class="relative z-0 w-full mb-5 group">
         <label for="base-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo</label>
         <input type="number" id="base-input" [(ngModel)]="cancha.costoHora" (ngModelChange)="onCostoHoraChange($event)"
@@ -35,9 +30,8 @@
         'bg-blue-400': !activeButtonSave,
         'dark:bg-blue-600': activeButtonSave,
         'dark:bg-blue-500': !activeButtonSave
-      }" [disabled]="!activeButtonSave"
-      (click)="actualizarCancha()">
-      Actualizar Cancha
+      }" [disabled]="!activeButtonSave" (click)="actualizarCancha()">
+      Crear Cancha
     </button>
   </div>
 </section>

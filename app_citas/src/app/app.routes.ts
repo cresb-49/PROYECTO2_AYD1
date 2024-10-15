@@ -23,6 +23,7 @@ import { RecoveryPasswordComponent } from './views/recovery-password/recovery-pa
 import { SeeUsersComponent } from './views/see-users/see-users.component';
 import { EditarServicioComponent } from './views/editar-servicio/editar-servicio.component';
 import { SeeServiciosComponent } from './views/see-servicios/see-servicios.component';
+import { CreateCourtComponent } from './views/create-court/create-court.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -52,7 +53,7 @@ export const routes: Routes = [
         path: 'edit-cancha/:id', component: EditCourtComponent
       },
       {
-        path: 'crear-cancha/:id', component: EditCourtComponent
+        path: 'crear-cancha', component: CreateCourtComponent
       },
       {
         path: 'edit-empleado/:id', component: EditEmployeeComponent

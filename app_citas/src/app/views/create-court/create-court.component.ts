@@ -9,22 +9,23 @@ import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service'
 import { FormsModule } from '@angular/forms';
 import { Dia, DiaService } from '../../services/dia/dia.service';
 import { BehaviorSubject, debounceTime } from 'rxjs';
+
 @Component({
   standalone: true,
   imports: [ScheduleConfComponent, CommonModule, FormsModule],
-  selector: 'app-edit-court',
-  templateUrl: './edit-court.component.html',
-  styleUrls: ['./edit-court.component.css']
+  selector: 'app-create-court',
+  templateUrl: './create-court.component.html',
+  styleUrls: ['./create-court.component.css']
 })
-export class EditCourtComponent implements OnInit {
+export class CreateCourtComponent implements OnInit {
 
-  activeButtonSave = false;
+  activeButtonSave = true;
 
   dataDias: Dia[] = [];
 
   cancha: Cancha = {
     id: 0,
-    costoHora: 0,
+    costoHora: 100,
     descripcion: '',
     horarios: []
   };
@@ -48,16 +49,9 @@ export class EditCourtComponent implements OnInit {
 
   async ngOnInit() {
     await this.getDias();
-    await this.cargarDatosCancha();
     //Se suscribe a los cambios de los datos de la cancha
-    this.canchaSubject.pipe(
-      debounceTime(300)
-    ).subscribe(newData => {
-      this.activeButtonSave = !this.compararObjetos(this.cancha, this.canchaOriginal);
-      if (this.activeButtonSave) {
-        this.toastr.info('Hay cambios pendientes por guardar');
-      }
-    })
+    const horario = await this.calcularHorario([]);
+    this.cancha.horarios = horario;
   }
 
   actualizarCancha() {
@@ -80,16 +74,25 @@ export class EditCourtComponent implements OnInit {
       },
       horarios: horario
     }
-    this.canchaService.updateCancha(payload).subscribe({
-      next: (response: ApiResponse) => {
-        this.toastr.success('Cancha actualizada correctamente');
-        this.cargarDatosCancha();
-        this.activeButtonSave = false;
-      },
-      error: (error: ErrorApiResponse) => {
-        this.toastr.error(error.error, 'Error al actualizar la cancha');
-      }
-    });
+    //Verificamos que almenos tenga un dia en el horario
+    if (horario.length <= 0) {
+      this.toastr.error('Debe de almenos de configurar un dia', 'Error al crear cancha');
+    } else {
+      this.canchaService.createCanche(payload).subscribe({
+        next: async (response: ApiResponse) => {
+          this.toastr.success('Se creo la cancha con exito!!!', 'Cancha Creada');
+          this.cancha = {
+            id: 0,
+            costoHora: 100,
+            descripcion: '',
+            horarios: await this.calcularHorario([])
+          };
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al crear la cancha');
+        }
+      });
+    }
   }
 
   onCostoHoraChange(newData: number) {
@@ -127,6 +130,7 @@ export class EditCourtComponent implements OnInit {
         this.canchaOriginal.costoHora = data.costoHora;
         this.canchaOriginal.descripcion = data.descripcion;
         this.canchaOriginal.horarios = [...this.calcularHorario(data.horarios)];
+        console.log(this.cancha);
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.error, 'Error al obtener la cancha');
@@ -163,20 +167,24 @@ export class EditCourtComponent implements OnInit {
     return negocioHas;
   }
 
-  getDias() {
-    this.diaService.getDias().subscribe({
-      next: (response: ApiResponse) => {
-        const dias = response.data ?? [];
-        dias.forEach((dia: any) => {
-          this.dataDias.push({
-            id: dia.id,
-            nombre: dia.nombre,
-          } as Dia);
-        });
-      },
-      error: (error: ErrorApiResponse) => {
-        this.toastr.error(error.message, 'Error al obtener los días');
-      }
+  getDias(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.diaService.getDias().subscribe({
+        next: (response: ApiResponse) => {
+          const dias = response.data ?? [];
+          dias.forEach((dia: any) => {
+            this.dataDias.push({
+              id: dia.id,
+              nombre: dia.nombre,
+            } as Dia);
+          });
+          resolve(); // Resolvemos la promesa cuando se obtienen los días
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.message, 'Error al obtener los días');
+          reject(error);
+        }
+      });
     });
   }
 }

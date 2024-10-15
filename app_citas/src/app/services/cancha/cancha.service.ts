@@ -23,7 +23,7 @@ export interface Horario {
   cierre: string;
 }
 
-export interface CanchaPayloadUpdate {
+export interface CanchaPayloadUpdateCreate {
   cancha: {
     id: number;
     costoHora: number;
@@ -52,7 +52,11 @@ export class CanchaService {
     return this.httpService.get<any>(`cancha/public/cancha/${id}`)
   }
 
-  updateCancha(payload: CanchaPayloadUpdate) {
+  createCanche(payload: CanchaPayloadUpdateCreate) {
+    return this.httpService.post<any>('cancha/private/cancha', payload, true);
+  }
+
+  updateCancha(payload: CanchaPayloadUpdateCreate) {
     return this.httpService.patch<any>('cancha/private/cancha', payload, true);
   }
 
