@@ -128,4 +128,12 @@ export class UserService {
   eliminarEmpleado(id: number) {
     return this.httpService.delete<any>(`empleado/private/empleado/${id}`, true);
   }
+
+  crearEmpleado(payload: any) {
+    return this.httpService.post<any>('empleado/private/empleado', payload, true);
+  }
+
+  updateEmpleado(payload:any){
+    return this.httpService.patch<any>('empleado/private/empleado', payload, true);
+  }
 }

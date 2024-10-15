@@ -124,8 +124,8 @@ export class CreateUserComponent implements OnInit {
         horarioHas.push({
           id: dia.id,
           day: dia.nombre,
-          init: '00:00',
-          end: '00:00',
+          init: '08:00',
+          end: '18:00',
           active: false
         } as DayConfig)
       }
@@ -193,6 +193,15 @@ export class CreateUserComponent implements OnInit {
     return true;
   }
 
+  accionBoton() {
+    if (this.modificar) {
+      this.modificarEmpleado()
+    } else {
+      this.crearEmpleado()
+    }
+  }
+
+
   crearEmpleado() {
     if (this.compararPassword()) {
       console.log("Crear Empleado: ", this.empleado);
@@ -253,7 +262,6 @@ export class CreateUserComponent implements OnInit {
     this.userService.getEmpleado(Number(id_empleado)).subscribe({
       next: (response: ApiResponse) => {
         const data = response.data;
-        console.log("Empleado: ", data);
         this.empleado.id_empleado = data.id;
         this.empleado.id_usuario = data.usuario.id;
         this.empleado.nombres = data.usuario.nombres;
@@ -274,7 +282,6 @@ export class CreateUserComponent implements OnInit {
         this.empleadoOrignal.cui = data.usuario.cui;
         this.empleadoOrignal.rol = this.filtrarRolesPermitidos([...rolesObtenidos]);
         this.empleadoOrignal.horario = [...this.calcularHorario(data.horarios)];
-
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.error, 'Error al obtener el empleado');
