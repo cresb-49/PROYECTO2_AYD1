@@ -78,8 +78,9 @@ public class ServicioController {
     @PostMapping("private/servicio")
     public ResponseEntity<?> createServicio(@RequestBody Servicio servicio) {
         try {
-            servicioService.crearServicio(servicio);
-            return new ApiBaseTransformer(HttpStatus.OK, "OK", null, null, null).sendResponse();
+            System.out.println("servicio: " + servicio);
+            Servicio servicioCreado = servicioService.crearServicio(servicio);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", servicioCreado, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
