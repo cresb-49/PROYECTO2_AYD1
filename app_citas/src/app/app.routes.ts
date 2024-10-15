@@ -52,6 +52,9 @@ export const routes: Routes = [
         path: 'edit-cancha/:id', component: EditCourtComponent
       },
       {
+        path: 'crear-cancha/:id', component: EditCourtComponent
+      },
+      {
         path: 'edit-empleado/:id', component: EditEmployeeComponent
       },
       {
@@ -76,7 +79,7 @@ export const routes: Routes = [
         path: 'crear-servicio', component: CrearServicioComponent
       },
       {
-        path: 'editar-servicio', component: EditarServicioComponent
+        path: 'editar-servicio/:id', component: EditarServicioComponent
       },
       {
         path: 'create-user-admin', component: CreateUserAdminComponent

@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { OptionsModal } from '../../components/pop-up-modal/pop-up-modal.component';
 import { PopUpModalComponent } from '../../components/pop-up-modal/pop-up-modal.component';
+import { ServicioService } from '../../services/servicio/servicio.service';
 
 @Component({
   standalone: true,
@@ -18,6 +19,7 @@ export class SeeServiciosComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private servicioService: ServicioService,
     private toastr: ToastrService
   ) { }
 
@@ -32,17 +34,17 @@ export class SeeServiciosComponent implements OnInit {
 
   tableHeaders: TableHeader[] = [
     { name: 'Id', key: 'id', main: true },
-    { name: 'Nombre', key: 'nombres' },
-    { name: 'Costo', key: 'apellidos' },
-    { name: 'Duracion', key: 'email' },
-    { name: 'Rol Asignado', key: 'roles' },
+    { name: 'Nombre', key: 'nombre' },
+    { name: 'Costo', key: 'costo' },
+    { name: 'Duracion (horas)', key: 'duracion' },
+    { name: 'Rol Asignado', key: 'rol.nombre' },
   ];
 
   servicios: any[] = [];
 
   actions: TableAction[] = [
-    { name: 'Edit', icon: 'edit', route: '/edit-empleado', key: 'id' },
-    { name: 'Delete', icon: 'delete', action: (data: any) => this.openModal(data), return: true },
+    { name: 'Editar', icon: 'edit', route: '/editar-servicio', key: 'id' },
+    { name: 'Eliminar', icon: 'delete', action: (data: any) => this.openModal(data), return: true },
   ]
 
   ngOnInit() {
@@ -56,10 +58,31 @@ export class SeeServiciosComponent implements OnInit {
   }
 
   deleteServicio(data: any) {
+    this.servicioService.deleteServicio(data.id).subscribe({
+      next: (response: ApiResponse) => {
+        this.servicios = [];
+        this.toastr.success('Servicio eliminado no exito', "Exito");
+        this.getServicios();
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error al eliminar el servicio');
+      }
+    })
 
   }
 
   getServicios() {
+    this.servicioService.getServicios().subscribe(
+      {
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.servicios = data;
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, "Error al obtener los servicios");
+        }
+      }
+    );
   }
 
 }
