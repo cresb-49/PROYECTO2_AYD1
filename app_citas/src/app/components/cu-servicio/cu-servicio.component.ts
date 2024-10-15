@@ -75,6 +75,7 @@ export class CuServicioComponent implements OnInit {
   }
 
   onRolChange(event: any) {
+    this.servicioData.id_rol = Number(event ?? 0)
     this.servicioDataSubject.next(this.servicioData);
   }
 
@@ -106,14 +107,48 @@ export class CuServicioComponent implements OnInit {
   }
 
   crearServicio() {
-    // this.servicioService.crearServicio(this.servicioData).subscribe({
-    //   next: (response: ApiResponse) => {
-    //     this.toastr.success('Servicio creado');
-    //   },
-    //   error: (error: ErrorApiResponse) => {
-    //     this.toastr.error(error.message, 'Error al crear servicio');
-    //   }
-    // });
+    let rolSeleccionado = null;
+    for (const rol of this.roles) {
+      if (rol.id === this.servicioData.id_rol) {
+        rolSeleccionado = rol;
+        break
+      }
+    }
+    if (rolSeleccionado != null) {
+      if (rolSeleccionado.id === 0) {
+        this.toastr.error('Debe de seleccionar un rol para el servicio', 'Error al crear el Servicio');
+      } else {
+        const createServicio: Servicio = {
+          id: this.servicioData.id,
+          costo: this.servicioData.precio,
+          detalles: this.servicioData.detalles,
+          duracion: this.servicioData.duracion,
+          imagen: this.servicioData.imagen,
+          nombre: this.servicioData.nombre,
+          rol: rolSeleccionado
+        };
+        this.servicioService.createServicio(createServicio).subscribe({
+          next: (response: ApiResponse) => {
+            this.toastr.success('Servicio actualizado con exito', "Exito!!!");
+            this.imageSrc = 'no-image-found.png';
+            this.servicioData = {
+              imagen: this.imageSrc,
+              nombre: '',
+              detalles: '',
+              precio: 1,
+              duracion: 0.25,
+              id_rol: 0
+            };
+            this.servicioDataSubject.next(this.servicioData);
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al crear el Servicio');
+          }
+        })
+      }
+    } else {
+      this.toastr.error('Debe de seleccionar un rol para el servicio', 'Error al crear el Servicio');
+    }
   }
 
   actualizarServicio() {
