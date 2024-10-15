@@ -12,7 +12,7 @@ import { CuServicioComponent } from '../../components/cu-servicio/cu-servicio.co
   styleUrls: ['./editar-servicio.component.css']
 })
 export class EditarServicioComponent implements OnInit {
-
+  modificar = true;
   constructor() { }
 
   ngOnInit() {
