@@ -15,7 +15,6 @@ import { ReservarCanchaComponent } from './views/reservar-cancha/reservar-cancha
 import { AgendarCitaComponent } from './views/agendar-cita/agendar-cita.component';
 import { CrearNegocioComponent } from './views/crear-negocio/crear-negocio.component';
 import { CrearServicioComponent } from './views/crear-servicio/crear-servicio.component';
-import { CreateUserAdminComponent } from './views/create-user-admin/create-user-admin.component';
 import { CrearEmpleadoComponent } from './views/crear-empleado/crear-empleado.component';
 import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 import { MyInformationComponent } from './views/my-information/my-information.component';
@@ -24,6 +23,8 @@ import { SeeUsersComponent } from './views/see-users/see-users.component';
 import { EditarServicioComponent } from './views/editar-servicio/editar-servicio.component';
 import { SeeServiciosComponent } from './views/see-servicios/see-servicios.component';
 import { CreateCourtComponent } from './views/create-court/create-court.component';
+import { CrearAdminComponent } from './views/crear-admin/crear-admin.component';
+import { EditAdminComponent } from './views/edit-admin/edit-admin.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -83,7 +84,10 @@ export const routes: Routes = [
         path: 'editar-servicio/:id', component: EditarServicioComponent
       },
       {
-        path: 'create-user-admin', component: CreateUserAdminComponent
+        path: 'create-admin', component: CrearAdminComponent
+      },
+      {
+        path: 'edit-admin/:id', component: EditAdminComponent
       },
       {
         path: 'crear-empleado', component: CrearEmpleadoComponent

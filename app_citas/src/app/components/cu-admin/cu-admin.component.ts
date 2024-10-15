@@ -1,0 +1,398 @@
+import { Component, Input, OnInit, resolveForwardRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { DayConfig, ScheduleConfComponent } from '../schedule-conf/schedule-conf.component';
+import { EmpleadoUpdateCreate, HorarioEmpleado, Rol, UserService } from '../../services/user/user.service';
+import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
+import { FormsModule } from '@angular/forms';
+import { BehaviorSubject, debounceTime, filter } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { Dia, DiaService } from '../../services/dia/dia.service';
+import { ActivatedRoute } from '@angular/router';
+
+export interface CreateUpdateEmpleado {
+  id_empleado?: number;
+  id_usuario?: number;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  phone: string;
+  password: string;
+  current_password?: string;
+  confirm_password?: string;
+  cui: string;
+  nit?: string;
+  rol: number;
+  horario: DayConfig[];
+}
+
+@Component({
+  standalone: true,
+  imports: [CommonModule, RouterModule, ScheduleConfComponent, FormsModule],
+  selector: 'app-cu-admin',
+  templateUrl: './cu-admin.component.html',
+  styleUrls: ['./cu-admin.component.css']
+})
+export class CuAdminComponent implements OnInit {
+  @Input() confWorkSchedule = false;
+  @Input() isCliente = false;
+  @Input() modificar = false;
+
+  activeButtonSave = false;
+  roles: Rol[] = [];
+  dataDias: Dia[] = []
+
+  empleado: CreateUpdateEmpleado = {
+    nombres: '',
+    apellidos: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirm_password: '',
+    cui: '',
+    rol: 0,
+    horario: []
+  }
+
+  empleadoOrignal: CreateUpdateEmpleado = {
+    nombres: '',
+    apellidos: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirm_password: '',
+    cui: '',
+    rol: 0,
+    horario: []
+  }
+
+  private empleadoDataSubject = new BehaviorSubject<CreateUpdateEmpleado>(this.empleado); // Para observar cambios
+
+  constructor(
+    private toastr: ToastrService,
+    private userService: UserService,
+    private diaService: DiaService,
+    private route: ActivatedRoute
+  ) { }
+
+  async ngOnInit() {
+    await this.getRolesGenericos();
+    await this.getDias();
+    if (this.modificar) {
+      await this.cargarDatosEmpleado();
+    }
+    this.empleadoDataSubject.pipe(
+      debounceTime(300) // Evitar múltiples comparaciones inmediatas
+    ).subscribe(newData => {
+      if (this.modificar) {
+        this.activeButtonSave = !this.compararObjetos(newData, this.empleadoOrignal);
+        if (this.activeButtonSave) {
+          this.toastr.info('Hay cambios pendientes por guardar');
+        }
+      } else {
+        this.activeButtonSave = true;
+      }
+    });
+    if (!this.modificar) {
+      const horario = await this.calcularHorario([]);
+      this.empleado.horario = horario;
+    }
+  }
+
+  // Comparación profunda entre dos objetos
+  compararObjetos(obj1: CreateUpdateEmpleado, obj2: CreateUpdateEmpleado): boolean {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+  }
+
+  calcularHorario(horarios: any): DayConfig[] {
+    let horarioHas: DayConfig[] = horarios.map((horario: any) => {
+      return {
+        id: horario.dia.id,
+        day: horario.dia.nombre,
+        init: horario.entrada,
+        end: horario.salida,
+        active: true
+      } as DayConfig
+    })
+    //En el listado de dias buscamos por medio de id si ya esta agregado si no esta agregado
+    //se agrega con active en false y init y end en 00:00
+    this.dataDias.forEach((dia) => {
+      let index = horarioHas.findIndex((diaHas) => {
+        return diaHas.id === dia.id
+      })
+      if (index === -1) {
+        horarioHas.push({
+          id: dia.id,
+          day: dia.nombre,
+          init: '08:00',
+          end: '18:00',
+          active: false
+        } as DayConfig)
+      }
+    })
+    return horarioHas;
+  }
+
+  onNombresChange(newNombre: string) {
+    this.empleado.nombres = newNombre;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onApellidosChange(newApellido: string) {
+    this.empleado.apellidos = newApellido;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onEmailChange(newEmail: string) {
+    this.empleado.email = newEmail;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onPhoneChange(newPhone: string) {
+    this.empleado.phone = newPhone;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onCuiChange(newCui: string) {
+    this.empleado.cui = newCui;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onNitChange(newNit: string) {
+    this.empleado.nit = newNit;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onRolChange(newRol: number) {
+    this.empleado.rol = newRol;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onPasswordChange(newPassword: string) {
+    this.empleado.password = newPassword;
+    this.empleadoDataSubject.next(this.empleado);
+    this.compararPassword();
+  }
+
+  onConfirmPasswordChange(newPassword: string) {
+    this.empleado.confirm_password = newPassword;
+    this.empleadoDataSubject.next(this.empleado);
+    this.compararPassword();
+  }
+
+  onHorarioChange(newHorario: DayConfig[]) {
+    this.empleado.horario = newHorario;
+    this.empleadoDataSubject.next(this.empleado);
+  }
+
+  compararPassword(): boolean {
+    //Verificamos si las password estan vacias
+    if ((this.empleado.password ?? '').length <= 0) {
+      this.toastr.error('Debe de asignar una contraseña')
+      return false;
+    }
+    if (this.empleado.password !== this.empleado.confirm_password) {
+      this.toastr.error('Las contraseñas no coinciden');
+      return false;
+    }
+    return true;
+  }
+
+  accionBoton() {
+    if (this.modificar) {
+      this.modificarEmpleado()
+    } else {
+      this.crearEmpleado()
+    }
+  }
+
+
+  crearEmpleado() {
+    if (this.compararPassword()) {
+      let rolSeleccionado = null;
+      for (const rol of this.roles) {
+        if (Number(this.empleado.rol) == Number(rol.id)) {
+          rolSeleccionado = rol;
+          break;
+        }
+      }
+      if (rolSeleccionado != null && rolSeleccionado.id != 0) {
+        const payloadEmpleado: EmpleadoUpdateCreate = {
+          usuario: {
+            id: this.empleado.id_usuario,
+            nombres: this.empleado.nombres,
+            apellidos: this.empleado.apellidos,
+            cui: this.empleado.cui,
+            email: this.empleado.email,
+            nit: this.empleado.nit,
+            phone: this.empleado.phone,
+            password: this.empleado.password,
+          },
+          rol: rolSeleccionado,
+          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+        }
+        this.userService.crearEmpleado(payloadEmpleado).subscribe({
+          next: async (response: ApiResponse) => {
+            this.toastr.success('Empleado creado con exito', 'Empleado Creado');
+            this.empleado = {
+              nombres: '',
+              apellidos: '',
+              email: '',
+              phone: '',
+              password: '',
+              confirm_password: '',
+              cui: '',
+              rol: 0,
+              horario: []
+            }
+            const horario = await this.calcularHorario([]);
+            this.empleado.horario = horario;
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al crear el empleado');
+          }
+        });
+      } else {
+        this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
+      }
+    }
+  }
+
+  obtenerHorarioEmpleado(horario: DayConfig[]): HorarioEmpleado[] {
+    //Filtramos solo los dias activos
+    const diasActivos = horario.filter(confDay => confDay.active)
+    //por cada dia antivo buscamos el dia asociado
+    let horarioFinal: HorarioEmpleado[] = []
+    for (const dia of diasActivos) {
+      const diaEcontrado = this.dataDias.find(diaData => diaData.nombre == dia.day)
+      if (diaEcontrado) {
+        horarioFinal.push(
+          {
+            dia: diaEcontrado,
+            entrada: dia.init,
+            salida: dia.end
+          }
+        )
+      }
+    }
+    return horarioFinal;
+  }
+
+  modificarEmpleado() {
+    if (this.activeButtonSave) {
+      let rolSeleccionado = null;
+      for (const rol of this.roles) {
+        if (Number(this.empleado.rol) == Number(rol.id)) {
+          rolSeleccionado = rol;
+          break;
+        }
+      }
+      if (rolSeleccionado != null && rolSeleccionado.id != 0) {
+        const payloadEmpleado: EmpleadoUpdateCreate = {
+          usuario: {
+            id: this.empleado.id_usuario,
+            nombres: this.empleado.nombres,
+            apellidos: this.empleado.apellidos,
+            cui: this.empleado.cui,
+            email: this.empleado.email,
+            nit: this.empleado.nit,
+            phone: this.empleado.phone
+          },
+          rol: rolSeleccionado,
+          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+        }
+        console.log("Actualizar Empleado: ", payloadEmpleado);
+      } else {
+        this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
+      }
+    }
+  }
+
+  getRolesGenericos(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.userService.getRolesGenericos().subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          const roles: Rol[] = data.map((rol: any) => {
+            return {
+              id: rol.id,
+              nombre: rol.nombre
+            }
+          });
+          this.roles = roles;
+          resolve(); // Resolvemos la promesa cuando se obtienen los roles
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.message, 'Error al obtener los roles');
+          reject(error);
+        }
+      })
+    });
+  }
+
+  getDias(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.diaService.getDias().subscribe({
+        next: (response: ApiResponse) => {
+          const dias = response.data ?? [];
+          dias.forEach((dia: any) => {
+            this.dataDias.push({
+              id: dia.id,
+              nombre: dia.nombre,
+            } as Dia);
+          });
+          resolve(); // Resolvemos la promesa cuando se obtienen los días
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.message, 'Error al obtener los días');
+          reject(error);
+        }
+      });
+    });
+  }
+
+  cargarDatosEmpleado() {
+    const id_empleado = this.route.snapshot.paramMap.get('id');
+    this.userService.getEmpleado(Number(id_empleado)).subscribe({
+      next: (response: ApiResponse) => {
+        const data = response.data;
+        this.empleado.id_empleado = data.id;
+        this.empleado.id_usuario = data.usuario.id;
+        this.empleado.nombres = data.usuario.nombres;
+        this.empleado.apellidos = data.usuario.apellidos;
+        this.empleado.email = data.usuario.email;
+        this.empleado.phone = data.usuario.phone;
+        this.empleado.nit = data.usuario.nit;
+        this.empleado.cui = data.usuario.cui;
+        const rolesObtenidos = data.usuario.roles.map((rol: any) => rol.rol.id);
+        this.empleado.rol = this.filtrarRolesPermitidos(rolesObtenidos);
+        this.empleado.horario = [...this.calcularHorario(data.horarios)];
+        //Ahora una copia de los datos originales
+        this.empleadoOrignal.id_empleado = data.id;
+        this.empleadoOrignal.id_usuario = data.usuario.id;
+        this.empleadoOrignal.nombres = data.usuario.nombres;
+        this.empleadoOrignal.apellidos = data.usuario.apellidos;
+        this.empleadoOrignal.email = data.usuario.email;
+        this.empleadoOrignal.phone = data.usuario.phone;
+        this.empleadoOrignal.nit = data.usuario.nit;
+        this.empleadoOrignal.cui = data.usuario.cui;
+        this.empleadoOrignal.rol = this.filtrarRolesPermitidos([...rolesObtenidos]);
+        this.empleadoOrignal.horario = [...this.calcularHorario(data.horarios)];
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error al obtener el empleado');
+      }
+    });
+  }
+
+  private filtrarRolesPermitidos(roles: any[]): any {
+    let rolesPermitidos: any[] = [];
+    let rolesApp = this.roles.map((rol: Rol) => rol.id);
+    roles.forEach((rol: any) => {
+      if (rolesApp.includes(rol)) {
+        rolesPermitidos.push(rol);
+      }
+    });
+    return rolesPermitidos[0] ?? 0;
+  }
+}
