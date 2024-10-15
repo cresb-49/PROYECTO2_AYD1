@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, resolveForwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DayConfig, ScheduleConfComponent } from '../schedule-conf/schedule-conf.component';
-import { Rol, UserService } from '../../services/user/user.service';
+import { EmpleadoUpdateCreate, HorarioEmpleado, Rol, UserService } from '../../services/user/user.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, debounceTime } from 'rxjs';
+import { BehaviorSubject, debounceTime, filter } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Dia, DiaService } from '../../services/dia/dia.service';
 import { ActivatedRoute } from '@angular/router';
@@ -186,6 +186,11 @@ export class CreateUserComponent implements OnInit {
   }
 
   compararPassword(): boolean {
+    //Verificamos si las password estan vacias
+    if ((this.empleado.password ?? '').length <= 0) {
+      this.toastr.error('Debe de asignar una contraseña')
+      return false;
+    }
     if (this.empleado.password !== this.empleado.confirm_password) {
       this.toastr.error('Las contraseñas no coinciden');
       return false;
@@ -204,13 +209,102 @@ export class CreateUserComponent implements OnInit {
 
   crearEmpleado() {
     if (this.compararPassword()) {
-      console.log("Crear Empleado: ", this.empleado);
+      let rolSeleccionado = null;
+      for (const rol of this.roles) {
+        if (Number(this.empleado.rol) == Number(rol.id)) {
+          rolSeleccionado = rol;
+          break;
+        }
+      }
+      if (rolSeleccionado != null && rolSeleccionado.id != 0) {
+        const payloadEmpleado: EmpleadoUpdateCreate = {
+          usuario: {
+            id: this.empleado.id_usuario,
+            nombres: this.empleado.nombres,
+            apellidos: this.empleado.apellidos,
+            cui: this.empleado.cui,
+            email: this.empleado.email,
+            nit: this.empleado.nit,
+            phone: this.empleado.phone,
+            password: this.empleado.password,
+          },
+          rol: rolSeleccionado,
+          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+        }
+        this.userService.crearEmpleado(payloadEmpleado).subscribe({
+          next: async (response: ApiResponse) => {
+            this.toastr.success('Empleado creado con exito', 'Empleado Creado');
+            this.empleado = {
+              nombres: '',
+              apellidos: '',
+              email: '',
+              phone: '',
+              password: '',
+              confirm_password: '',
+              cui: '',
+              rol: 0,
+              horario: []
+            }
+            const horario = await this.calcularHorario([]);
+            this.empleado.horario = horario;
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al crear el empleado');
+          }
+        });
+      } else {
+        this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
+      }
     }
+  }
+
+  obtenerHorarioEmpleado(horario: DayConfig[]): HorarioEmpleado[] {
+    //Filtramos solo los dias activos
+    const diasActivos = horario.filter(confDay => confDay.active)
+    //por cada dia antivo buscamos el dia asociado
+    let horarioFinal: HorarioEmpleado[] = []
+    for (const dia of diasActivos) {
+      const diaEcontrado = this.dataDias.find(diaData => diaData.nombre == dia.day)
+      if (diaEcontrado) {
+        horarioFinal.push(
+          {
+            dia: diaEcontrado,
+            entrada: dia.init,
+            salida: dia.end
+          }
+        )
+      }
+    }
+    return horarioFinal;
   }
 
   modificarEmpleado() {
     if (this.activeButtonSave) {
-      console.log("Actualizar Empleado: ", this.empleado);
+      let rolSeleccionado = null;
+      for (const rol of this.roles) {
+        if (Number(this.empleado.rol) == Number(rol.id)) {
+          rolSeleccionado = rol;
+          break;
+        }
+      }
+      if (rolSeleccionado != null && rolSeleccionado.id != 0) {
+        const payloadEmpleado: EmpleadoUpdateCreate = {
+          usuario: {
+            id: this.empleado.id_usuario,
+            nombres: this.empleado.nombres,
+            apellidos: this.empleado.apellidos,
+            cui: this.empleado.cui,
+            email: this.empleado.email,
+            nit: this.empleado.nit,
+            phone: this.empleado.phone
+          },
+          rol: rolSeleccionado,
+          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+        }
+        console.log("Actualizar Empleado: ", payloadEmpleado);
+      } else {
+        this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
+      }
     }
   }
 
@@ -268,6 +362,7 @@ export class CreateUserComponent implements OnInit {
         this.empleado.apellidos = data.usuario.apellidos;
         this.empleado.email = data.usuario.email;
         this.empleado.phone = data.usuario.phone;
+        this.empleado.nit = data.usuario.nit;
         this.empleado.cui = data.usuario.cui;
         const rolesObtenidos = data.usuario.roles.map((rol: any) => rol.rol.id);
         this.empleado.rol = this.filtrarRolesPermitidos(rolesObtenidos);
@@ -279,6 +374,7 @@ export class CreateUserComponent implements OnInit {
         this.empleadoOrignal.apellidos = data.usuario.apellidos;
         this.empleadoOrignal.email = data.usuario.email;
         this.empleadoOrignal.phone = data.usuario.phone;
+        this.empleadoOrignal.nit = data.usuario.nit;
         this.empleadoOrignal.cui = data.usuario.cui;
         this.empleadoOrignal.rol = this.filtrarRolesPermitidos([...rolesObtenidos]);
         this.empleadoOrignal.horario = [...this.calcularHorario(data.horarios)];

@@ -484,6 +484,14 @@ public class UsuarioService extends usac.api.services.Service {
         return usuarioGuardadoFinal;
     }
 
+    public Empleado actualizarEmpleado(NuevoEmpleadoRequest actualizacionEmpleado) throws Exception{
+        // Validamos el modelo de usuario
+        this.validarModelo(actualizacionEmpleado);
+        this.validarModelo(actualizacionEmpleado.getUsuario());
+        this.validarId(actualizacionEmpleado.getRol(), "Id del rol invalido");
+        return new Empleado();
+    }
+
     /**
      * Guarda un usuario asignandole un rol
      *

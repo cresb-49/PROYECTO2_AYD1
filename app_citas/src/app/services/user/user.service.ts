@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiResponse, ErrorApiResponse, HttpService } from '../http/http.service';
 import { ToastrService } from 'ngx-toastr';
+import { Dia } from '../dia/dia.service';
 export interface signUpCliente {
   nombres: string;
   apellidos: string;
@@ -20,6 +21,29 @@ export interface UpdateInfoUser {
   phone: string;
   nit: string;
   cui: string;
+}
+
+export interface UpdateCreateInfoEmpleado {
+  id?: number;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  phone: string;
+  nit?: string;
+  cui: string;
+  password?: string;
+}
+
+export interface HorarioEmpleado {
+  dia: Dia,
+  entrada: string,
+  salida: string
+}
+
+export interface EmpleadoUpdateCreate {
+  usuario: UpdateCreateInfoEmpleado,
+  rol: Rol,
+  horarios: HorarioEmpleado[]
 }
 
 export interface UpdateUserPassword {
@@ -130,10 +154,10 @@ export class UserService {
   }
 
   crearEmpleado(payload: any) {
-    return this.httpService.post<any>('empleado/private/empleado', payload, true);
+    return this.httpService.post<any>('usuario/private/crearEmpleado', payload, true);
   }
 
-  updateEmpleado(payload:any){
-    return this.httpService.patch<any>('empleado/private/empleado', payload, true);
+  updateEmpleado(payload: any) {
+    return this.httpService.patch<any>('usuario/private/actualizarEmpleado', payload, true);
   }
 }
