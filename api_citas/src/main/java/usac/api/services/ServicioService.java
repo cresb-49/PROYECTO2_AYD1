@@ -5,13 +5,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import usac.api.models.Rol;
 import usac.api.models.Servicio;
+import usac.api.repositories.RolRepository;
 import usac.api.repositories.ServicioRepository;
 
 @Service
 public class ServicioService extends usac.api.services.Service {
     @Autowired
     private ServicioRepository servicioRepository;
+    @Autowired
+    private RolRepository rolRepository;
 
     /**
      * Obtiene un servicio por su id
@@ -66,13 +70,38 @@ public class ServicioService extends usac.api.services.Service {
      * @throws Exception
      */
     public Servicio actualizarServicio(Servicio servicio) throws Exception {
-        throw new Exception("No implementado");
-        // if(servicio.getId() == null || servicio == null) {
-        //     throw new Exception("El servicio no tiene un id valido");
-        // }
-        // this.validarModelo(servicio);
-        // Servicio servicioActualizado = this.servicioRepository.save(servicio);
-        // return servicioActualizado;
+        if(servicio.getId() == null || servicio == null) {
+            throw new Exception("El servicio no tiene un id valido");
+        }
+        //Obtenemos el servicio actual
+        Servicio servicioActual = this.servicioRepository.findById(servicio.getId()).orElse(null);
+        if(servicioActual == null) {
+            throw new Exception("No se encontro el servicio");
+        }
+        //Verificamos si hay un rol asociado al servicio
+        if(servicio.getRol() == null) {
+            throw new Exception("El servicio debe tener un rol asociado");
+        }
+        //Verificamos si el rol asociado al servicio existe
+        if(servicio.getRol().getId() == null) {
+            throw new Exception("El rol asociado al servicio no tiene un id valido");
+        }
+        //Obtenemos el rol actual
+        Rol rolActual = this.rolRepository.findById(servicio.getRol().getId()).orElse(null);
+        if(rolActual == null) {
+            throw new Exception("No se encontro el rol asociado al servicio");
+        }
+        //Colocamos los nuevos valores
+        servicioActual.setNombre(servicio.getNombre());
+        servicioActual.setDuracion(servicio.getDuracion());
+        servicioActual.setImagen(servicio.getImagen());
+        servicioActual.setCosto(servicio.getCosto());
+        servicioActual.setDetalles(servicio.getDetalles());
+        servicioActual.setRol(rolActual);
+        //Verificamos el modelo
+        this.validarModelo(servicioActual);
+        Servicio servicioActualizado = this.servicioRepository.save(servicioActual);
+        return servicioActualizado;
     }
 
     /**

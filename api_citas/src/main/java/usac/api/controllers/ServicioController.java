@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,8 +35,9 @@ public class ServicioController {
     }
 
     @GetMapping("public/servicio/{id}")
-    public ResponseEntity<?> getServicioById(Long id) {
+    public ResponseEntity<?> getServicioById(@PathVariable Long id) {
         try {
+            System.out.println("id: " + id);    
             Object data = servicioService.getServicioById(id);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
@@ -43,7 +46,7 @@ public class ServicioController {
     }
 
     @GetMapping("public/servicios/nombre/{nombre}")
-    public ResponseEntity<?> getServiciosLikeNombre(String nombre) {
+    public ResponseEntity<?> getServiciosLikeNombre(@PathVariable String nombre) {
         try {
             Object data = servicioService.getServiciosLikeNombre(nombre);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
@@ -53,7 +56,7 @@ public class ServicioController {
     }
 
     @DeleteMapping("private/servicio/{id}")
-    public ResponseEntity<?> deleteServicio(Long id) {
+    public ResponseEntity<?> deleteServicio(@PathVariable Long id) {
         try {
             servicioService.eliminarServicio(id);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", null, null, null).sendResponse();
@@ -63,7 +66,7 @@ public class ServicioController {
     }
     
     @PatchMapping("private/servicio")
-    public ResponseEntity<?> updateServicio(Servicio servicio) {
+    public ResponseEntity<?> updateServicio(@RequestBody Servicio servicio) {
         try {
             servicioService.actualizarServicio(servicio);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", null, null, null).sendResponse();
@@ -73,7 +76,7 @@ public class ServicioController {
     }
 
     @PostMapping("private/servicio")
-    public ResponseEntity<?> createServicio(Servicio servicio) {
+    public ResponseEntity<?> createServicio(@RequestBody Servicio servicio) {
         try {
             servicioService.crearServicio(servicio);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", null, null, null).sendResponse();
