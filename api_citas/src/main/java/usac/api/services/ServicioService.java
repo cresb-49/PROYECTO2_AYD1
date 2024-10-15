@@ -2,6 +2,8 @@ package usac.api.services;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +57,7 @@ public class ServicioService extends usac.api.services.Service {
      * @param id
      * @throws Exception
      */
+    @Transactional(rollbackOn = Exception.class)
     public void eliminarServicio(Long id) throws Exception {
         Servicio servicio = this.servicioRepository.findById(id).orElse(null);
         if(servicio == null) {
@@ -69,6 +72,7 @@ public class ServicioService extends usac.api.services.Service {
      * @return
      * @throws Exception
      */
+    @Transactional(rollbackOn = Exception.class)
     public Servicio actualizarServicio(Servicio servicio) throws Exception {
         if(servicio.getId() == null || servicio == null) {
             throw new Exception("El servicio no tiene un id valido");
@@ -110,6 +114,7 @@ public class ServicioService extends usac.api.services.Service {
      * @return
      * @throws Exception
      */
+    @Transactional(rollbackOn = Exception.class)
     public Servicio crearServicio(Servicio servicio) throws Exception {
         if(servicio.getId() != null) {
             throw new Exception("El servicio ya tiene un id");
