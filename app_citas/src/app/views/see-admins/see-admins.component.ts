@@ -17,11 +17,11 @@ export interface UserInfo {
 @Component({
   standalone: true,
   imports: [CommonModule, FormsModule, TableComponent, PopUpModalComponent],
-  selector: 'app-see-users',
-  templateUrl: './see-users.component.html',
-  styleUrls: ['./see-users.component.css']
+  selector: 'app-see-admins',
+  templateUrl: './see-admins.component.html',
+  styleUrls: ['./see-admins.component.css']
 })
-export class SeeUsersComponent implements OnInit {
+export class SeeAdminsComponent implements OnInit {
   hideModal = true;
   tableHeaders: TableHeader[] = [
     { name: 'Nombre', key: 'nombres', main: true },
@@ -39,7 +39,7 @@ export class SeeUsersComponent implements OnInit {
   usuarios: UserInfo[] = [];
 
   actionsTable: TableAction[] = [
-    { name: 'Editar', icon: 'edit', route: '/edit-user', key: 'id' },
+    { name: 'Editar', icon: 'edit', route: '/edit-admin', key: 'id' },
     { name: 'Eliminar', icon: 'delete', action: (data: any) => this.openModal(data), return: true }
   ]
   constructor(
@@ -54,11 +54,10 @@ export class SeeUsersComponent implements OnInit {
   obtenerUsuarios() {
     this.userService.getUsers().subscribe({
       next: (response: ApiResponse) => {
-        console.log('Response:', response);
         const data = response.data;
         this.usuarios = [];
         for (let d of data) {
-          const isCliente = d.roles.find((rol: any) => rol.rol.nombre === UserRoles.CLIENTE)
+          const isCliente = d.roles.find((rol: any) => rol.rol.nombre === UserRoles.ADMIN)
           if (isCliente) {
             this.usuarios.push({
               id: d.id,

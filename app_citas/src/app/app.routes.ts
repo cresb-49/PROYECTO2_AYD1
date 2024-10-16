@@ -25,6 +25,7 @@ import { SeeServiciosComponent } from './views/see-servicios/see-servicios.compo
 import { CreateCourtComponent } from './views/create-court/create-court.component';
 import { CrearAdminComponent } from './views/crear-admin/crear-admin.component';
 import { EditAdminComponent } from './views/edit-admin/edit-admin.component';
+import { SeeAdminsComponent } from './views/see-admins/see-admins.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -82,6 +83,9 @@ export const routes: Routes = [
       },
       {
         path: 'editar-servicio/:id', component: EditarServicioComponent
+      },
+      {
+        path: 'admins', component: SeeAdminsComponent
       },
       {
         path: 'create-admin', component: CrearAdminComponent
