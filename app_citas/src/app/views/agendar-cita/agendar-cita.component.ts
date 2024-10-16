@@ -27,6 +27,8 @@ export class AgendarCitaComponent implements OnInit {
     id_rol: 0
   };
 
+  empleados: any[] = [];
+
   constructor(private authService: AuthService,
     private servicioService: ServicioService,
     private route: ActivatedRoute,
@@ -36,6 +38,7 @@ export class AgendarCitaComponent implements OnInit {
   async ngOnInit() {
     this.enableCita = this.authService.isLoggedIn();
     await this.cargarDatosServicio();
+    await this.empleadosServicio();
   }
 
   cargarDatosServicio(): Promise<void> {
@@ -54,6 +57,7 @@ export class AgendarCitaComponent implements OnInit {
             nombre: data.nombre,
             precio: data.costo
           }
+          resolve(data)
         },
         error: (error: ErrorApiResponse) => {
           this.toastr.error(error.error, 'Error al obtener el servicio')
@@ -63,7 +67,24 @@ export class AgendarCitaComponent implements OnInit {
     });
   }
 
-  agendar(){
-    
+  empleadosServicio(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.servicioService.getEmpleadosServicio(Number(id)).subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.empleados = data;
+          resolve(data);
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al obtener los empleados');
+          reject(error)
+        }
+      });
+    });
+  }
+
+  agendar() {
+
   }
 }

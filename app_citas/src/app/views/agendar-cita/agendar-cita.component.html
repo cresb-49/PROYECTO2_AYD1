@@ -39,11 +39,8 @@
             Empleado</label>
           <select id="countries"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-            <option selected>Aleatorio</option>
-            <option value="US">Empleado 1</option>
-            <option value="CA">Empleado 2</option>
-            <option value="FR">Empleado 3</option>
-            <option value="DE">Empleado 4</option>
+            <option value="0">Aleatorio</option>
+            <option *ngFor="let empleado of empleados" value="{{empleado.id}}">{{empleado.usuario.nombres}}</option>
           </select>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2">

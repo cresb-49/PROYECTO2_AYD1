@@ -49,4 +49,8 @@ export class ServicioService {
     return this.httpService.post<any>('servicio/private/servicio', payload, true);
   }
 
+  getEmpleadosServicio(id_servicio: number) {
+    return this.httpService.get<any>(`servicio/public/servicio/${id_servicio}/empleados`, null, true);
+  }
+
 }
