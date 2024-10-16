@@ -84,7 +84,7 @@ export class UserService {
   }
 
   getUser(id: number | string) {
-    return this.httpService.get<any>(`private/getUsuario/${id}`, null, true);
+    return this.httpService.get<any>(`usuario/private/getUsuario/${id}`, null, true);
   }
 
   getUsers(): any {
@@ -159,5 +159,13 @@ export class UserService {
 
   updateEmpleado(payload: any) {
     return this.httpService.patch<any>('usuario/private/actualizarEmpleado', payload, true);
+  }
+
+  crearAdmin(payload: any) {
+    return this.httpService.post<any>('usuario/private/crearAdministrador', payload, true);
+  }
+
+  updateAdmin(payload: any) {
+    return this.httpService.patch<any>('usuario/private/actualizarAdministrador', payload, true);
   }
 }

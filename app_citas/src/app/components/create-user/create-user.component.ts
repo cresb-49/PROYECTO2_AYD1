@@ -2,7 +2,7 @@ import { Component, Input, OnInit, resolveForwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DayConfig, ScheduleConfComponent } from '../schedule-conf/schedule-conf.component';
-import { EmpleadoUpdateCreate, HorarioEmpleado, Rol, UserService } from '../../services/user/user.service';
+import { EmpleadoUpdateCreate, HorarioEmpleado, Rol, UpdateUserPassword, UserService } from '../../services/user/user.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, debounceTime, filter } from 'rxjs';
@@ -26,6 +26,12 @@ export interface CreateUpdateEmpleado {
   horario: DayConfig[];
 }
 
+export interface UpdatePassword {
+  password: string;
+  current_password: string;
+  confirm_password: string;
+}
+
 @Component({
   standalone: true,
   imports: [CommonModule, RouterModule, ScheduleConfComponent, FormsModule],
@@ -39,8 +45,16 @@ export class CreateUserComponent implements OnInit {
   @Input() modificar = false;
 
   activeButtonSave = false;
+  activeChangePassword = false;
+
   roles: Rol[] = [];
   dataDias: Dia[] = []
+
+  changePassword: UpdatePassword = {
+    password: '',
+    confirm_password: '',
+    current_password: ''
+  }
 
   empleado: CreateUpdateEmpleado = {
     nombres: '',
@@ -67,6 +81,7 @@ export class CreateUserComponent implements OnInit {
   }
 
   private empleadoDataSubject = new BehaviorSubject<CreateUpdateEmpleado>(this.empleado); // Para observar cambios
+  private changePassworSubject = new BehaviorSubject<UpdatePassword>(this.changePassword)
 
   constructor(
     private toastr: ToastrService,
@@ -96,6 +111,34 @@ export class CreateUserComponent implements OnInit {
     if (!this.modificar) {
       const horario = await this.calcularHorario([]);
       this.empleado.horario = horario;
+    }
+    this.changePassworSubject.pipe(
+      debounceTime(300)
+    ).subscribe(newData => {
+      this.activeChangePassword = this.verificarChangePassword(newData);
+    })
+  }
+
+  verificarChangePassword(data: UpdatePassword): boolean {
+    //Si todos los cambpos estan vacios se retorna false, pero no se emite notificacion
+    //Si esta definido el campo current_password, pero password y confirm estan vacion no se emite nada
+    // Si password y confirm no son iguales se emite una alerta
+    if (data.current_password.length <= 0 && data.password.length <= 0 && data.confirm_password.length <= 0) {
+      return false;
+    }
+    if (data.current_password.length > 0 && data.password.length <= 0 && data.confirm_password.length <= 0) {
+      return false;
+    }
+    if (data.password !== data.confirm_password) {
+      this.toastr.error('Las contraseñas no coinciden');
+      return false;
+    } else {
+      if (data.current_password.length <= 0) {
+        this.toastr.error('Debe de ingresar la contraseña actual');
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 
@@ -183,6 +226,21 @@ export class CreateUserComponent implements OnInit {
   onHorarioChange(newHorario: DayConfig[]) {
     this.empleado.horario = newHorario;
     this.empleadoDataSubject.next(this.empleado);
+  }
+
+  onUpdatePasswordChange(pass: string) {
+    this.changePassword.password = pass;
+    this.changePassworSubject.next(this.changePassword);
+  }
+
+  onUpdateConfirmPasswordChange(pass: string) {
+    this.changePassword.confirm_password = pass;
+    this.changePassworSubject.next(this.changePassword);
+  }
+
+  onUpdateCurrentPasswordChange(pass: string) {
+    this.changePassword.current_password = pass;
+    this.changePassworSubject.next(this.changePassword);
   }
 
   compararPassword(): boolean {
@@ -394,5 +452,29 @@ export class CreateUserComponent implements OnInit {
       }
     });
     return rolesPermitidos[0] ?? 0;
+  }
+
+  changePasswordAction() {
+    if (this.activeChangePassword) {
+      const payload: UpdateUserPassword = {
+        id: Number(this.empleado.id_usuario),
+        password: this.changePassword.current_password,
+        newPassword: this.changePassword.password
+      };
+      this.userService.changeUserPassword(payload).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastr.success('Contraseña cambiada correctamente');
+          this.changePassword = {
+            password: '',
+            confirm_password: '',
+            current_password: ''
+          }
+          this.changePassworSubject.next(this.changePassword);
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al cambiar la contraseña');
+        }
+      });
+    }
   }
 }
