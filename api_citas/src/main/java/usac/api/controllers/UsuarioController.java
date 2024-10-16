@@ -31,6 +31,7 @@ import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UpdateEmpleadoRequest;
 import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.models.request.UsuarioRolAsignacionRequest;
 import usac.api.services.UsuarioService;
@@ -229,7 +230,7 @@ public class UsuarioController {
         @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
     @PatchMapping("/private/actualizarEmpleado")
-    public ResponseEntity<?> actualizarEmpleado(@RequestBody NuevoEmpleadoRequest actualizar){
+    public ResponseEntity<?> actualizarEmpleado(@RequestBody UpdateEmpleadoRequest actualizar){
         try {
             Empleado respuesta = usuarioService.actualizarEmpleado(actualizar);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
