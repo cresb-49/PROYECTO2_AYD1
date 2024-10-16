@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
+import { DayConfig, ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth/auth.service';
 import { ManageServicio } from '../../components/cu-servicio/cu-servicio.component';
@@ -28,6 +28,7 @@ export class AgendarCitaComponent implements OnInit {
   };
 
   empleados: any[] = [];
+  horario: DayConfig[] = [];
 
   constructor(private authService: AuthService,
     private servicioService: ServicioService,
@@ -74,6 +75,7 @@ export class AgendarCitaComponent implements OnInit {
         next: (response: ApiResponse) => {
           const data = response.data;
           this.empleados = data;
+          this.procesadoHorarios(this.procesarHoarioEmpleado(data));
           resolve(data);
         },
         error: (error: ErrorApiResponse) => {
@@ -86,5 +88,57 @@ export class AgendarCitaComponent implements OnInit {
 
   agendar() {
 
+  }
+
+  procesarHoarioEmpleado(data: any[]): DayConfig[][] {
+    let horariosEmpleados = data.map(single_data => {
+      const result = ((single_data.horarios ?? []) as Array<any>).map(horario => {
+        const dayConf: DayConfig = {
+          id: horario.dia.id,
+          day: horario.dia.nombre,
+          init: horario.entrada,
+          end: horario.salida,
+          active: true,
+        }
+        return dayConf
+      })
+      return result
+    })
+    return horariosEmpleados;
+  }
+
+  procesadoHorarios(horariosEmpleados: DayConfig[][]) {
+    let diasServicio: Map<number, DayConfig> = new Map;
+    console.log(horariosEmpleados);
+    (horariosEmpleados ?? []).forEach(horarioEmpleado => {
+      (horarioEmpleado ?? []).forEach(dayconf => {
+        //Buscamos en el diasServicio si esta el id
+        let result = diasServicio.get(dayconf.id);
+        if (result) {
+          //Comparamos la hora init y la hora end
+          //Si la hora init es menor a la que ya esta asignanos se asigna ese valor
+          //Si la hora end es mayor a la que ya esta asignada se asigna ese valor
+          //Abos valores estan en string pero en formado HH:mm de 24 horas
+          //Comparamos la hora init y la hora end
+          //Convertimos a formato Date los valores de init y end para comparar correctamente
+          const initResult = new Date(`1970-01-01T${result.init}:00`);
+          const endResult = new Date(`1970-01-01T${result.end}:00`);
+          const initNew = new Date(`1970-01-01T${dayconf.init}:00`);
+          const endNew = new Date(`1970-01-01T${dayconf.end}:00`);
+          // Si la hora init del nuevo es menor, la asignamos
+          if (initNew < initResult) {
+            result.init = dayconf.init;
+          }
+          // Si la hora end del nuevo es mayor, la asignamos
+          if (endNew > endResult) {
+            result.end = dayconf.end;
+          }
+        } else {
+          //Si no se encuentra agregamos una copia de los datos
+          diasServicio.set(dayconf.id, { ...dayconf })
+        }
+      })
+    })
+    this.horario = Array.from(diasServicio.values());
   }
 }
