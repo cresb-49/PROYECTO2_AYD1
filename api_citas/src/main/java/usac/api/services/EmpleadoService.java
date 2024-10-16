@@ -7,9 +7,12 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import usac.api.models.Dia;
 import usac.api.models.Empleado;
+import usac.api.models.HorarioEmpleado;
 import usac.api.models.Usuario;
 import usac.api.repositories.EmpleadoRepository;
+import usac.api.repositories.HorarioEmpleadoRepository;
 import usac.api.repositories.UsuarioRepository;
 
 @Service
@@ -18,6 +21,8 @@ public class EmpleadoService extends usac.api.services.Service {
     private EmpleadoRepository empleadoRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private HorarioEmpleadoRepository horarioEmpleadoRepository;
 
     @Transactional(rollbackOn = Exception.class)
     public Empleado createEmpleado(Empleado empleado) throws Exception {
@@ -53,9 +58,10 @@ public class EmpleadoService extends usac.api.services.Service {
 
     public Empleado getEmpleadoById(Long id) {
         Empleado empleado = this.empleadoRepository.findById(id).orElse(null);
-        if(empleado == null) {
-            return null;
-        }
         return empleado;
+    }
+
+    public HorarioEmpleado obtenerHorarioDiaEmpleado(Dia dia, Empleado empleado) {
+        return horarioEmpleadoRepository.findByDiaAndEmpleado(dia, empleado);
     }
 }
