@@ -14,8 +14,13 @@ export interface UpdateRole {
   permisos: Permiso[];
 }
 
+export interface CreateRole {
+  rol: Rol;
+  permisos: Permiso[];
+}
+
 export interface Rol {
-  id: number;
+  id?: number;
   nombre: string;
 }
 
@@ -32,6 +37,10 @@ export class RolService {
 
   getRolById(id: number) {
     return this.httpService.get<any>(`rol/private/no_restricted/getRolById/${id}`, null, true);
+  }
+
+  createRol(payload: CreateRole) {
+    return this.httpService.post<any>('rol/private/restricted/crearRol', payload, true);
   }
 
   updateRol(payload: Rol) {

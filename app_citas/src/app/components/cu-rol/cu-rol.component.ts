@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { Permiso, Rol, RolService, UpdateRole } from '../../services/rol/rol.service';
+import { CreateRole, Permiso, Rol, RolService, UpdateRole } from '../../services/rol/rol.service';
 import { ActivatedRoute } from '@angular/router';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 
@@ -115,10 +115,28 @@ export class CuRolComponent implements OnInit {
   }
 
   crearRole() {
-    this.toastr.success('Rol creado exitosamente');
-    console.log('Rol a guardar:', this.role);
-
-    // Lógica para guardar el rol
+    // Creamos el payload para crear el rol
+    const payload: CreateRole = {
+      rol: {
+        nombre: this.role.name
+      },
+      permisos: this.castPermisos(this.role.permissions),
+    }
+    // Llamamos al servicio para crear el rol
+    this.rolService.createRol(payload).subscribe({
+      next: async (response: ApiResponse) => {
+        this.toastr.success('Rol creado exitosamente');
+        //Limpiamos los campos
+        await this.getPermisos();
+        this.role = {
+          name: '',
+          permissions: Array.from(this.permisos.values())
+        }
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error al crear el rol');
+      }
+    });
   }
 
   modificarRole() {
