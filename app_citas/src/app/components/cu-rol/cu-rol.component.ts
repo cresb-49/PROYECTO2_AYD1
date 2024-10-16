@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { RolService } from '../../services/rol/rol.service';
+import { Permiso, Rol, RolService, UpdateRole } from '../../services/rol/rol.service';
 import { ActivatedRoute } from '@angular/router';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 
@@ -61,7 +61,7 @@ export class CuRolComponent implements OnInit {
     });
     if (this.modificar) {
       this.cargarDatosRole();
-    }else{
+    } else {
       this.role.permissions = this.calcularPermisos([]);
       this.activeButtonSave = true;
     }
@@ -122,9 +122,52 @@ export class CuRolComponent implements OnInit {
   }
 
   modificarRole() {
-    this.toastr.success('Rol actualizado exitosamente');
-    console.log('Rol a modificar:', this.role);
-    // Lógica para actualizar el rol
+    if (this.modificar && this.activeButtonSave) {
+      // Creamos el payload de la actualizacion del rol
+      const payload1: UpdateRole = {
+        idRol: Number(this.role.id),
+        permisos: this.castPermisos(this.role.permissions),
+      }
+      const payload2: Rol = {
+        id: Number(this.role.id),
+        nombre: this.role.name
+      }
+      // Llamamos al servicio para actualizar el rol y luego los permisos
+      this.rolService.updateRol(payload2).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastr.success('Rol actualizado exitosamente');
+          this.roleOriginal.name = this.role.name;
+          this.roleDataSubject.next(this.role);
+          this.rolService.updatePermisosRole(payload1).subscribe({
+            next: (response: ApiResponse) => {
+              this.toastr.success('Permisos actualizados exitosamente');
+              this.roleOriginal = JSON.parse(JSON.stringify(this.role));
+              this.roleDataSubject.next(this.role);
+            },
+            error: (error: ErrorApiResponse) => {
+              this.toastr.error(error.error, 'Error al actualizar los permisos');
+            }
+          });
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al actualizar el rol');
+        }
+      });
+    }
+  }
+
+  castPermisos(permisos: RolePermission[]): Permiso[] {
+    let permisosCast: Permiso[] = [];
+    //Recorremos los permisos y solo agregamos los que esten asignados
+    permisos.forEach((permiso) => {
+      if (permiso.assigned) {
+        permisosCast.push({
+          id: permiso.id,
+          nombre: permiso.name,
+        });
+      }
+    });
+    return permisosCast;
   }
 
   cargarDatosRole() {
