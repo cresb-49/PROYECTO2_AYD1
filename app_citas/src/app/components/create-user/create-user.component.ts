@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, resolveForwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DayConfig, ScheduleConfComponent } from '../schedule-conf/schedule-conf.component';
-import { Rol, UserService } from '../../services/user/user.service';
+import { EmpleadoUpdateCreate, HorarioEmpleado, Rol, UpdateUserPassword, UserService } from '../../services/user/user.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, debounceTime } from 'rxjs';
+import { BehaviorSubject, debounceTime, filter } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Dia, DiaService } from '../../services/dia/dia.service';
 import { ActivatedRoute } from '@angular/router';
@@ -26,6 +26,12 @@ export interface CreateUpdateEmpleado {
   horario: DayConfig[];
 }
 
+export interface UpdatePassword {
+  password: string;
+  current_password: string;
+  confirm_password: string;
+}
+
 @Component({
   standalone: true,
   imports: [CommonModule, RouterModule, ScheduleConfComponent, FormsModule],
@@ -39,8 +45,16 @@ export class CreateUserComponent implements OnInit {
   @Input() modificar = false;
 
   activeButtonSave = false;
+  activeChangePassword = false;
+
   roles: Rol[] = [];
   dataDias: Dia[] = []
+
+  changePassword: UpdatePassword = {
+    password: '',
+    confirm_password: '',
+    current_password: ''
+  }
 
   empleado: CreateUpdateEmpleado = {
     nombres: '',
@@ -67,6 +81,7 @@ export class CreateUserComponent implements OnInit {
   }
 
   private empleadoDataSubject = new BehaviorSubject<CreateUpdateEmpleado>(this.empleado); // Para observar cambios
+  private changePassworSubject = new BehaviorSubject<UpdatePassword>(this.changePassword)
 
   constructor(
     private toastr: ToastrService,
@@ -97,6 +112,34 @@ export class CreateUserComponent implements OnInit {
       const horario = await this.calcularHorario([]);
       this.empleado.horario = horario;
     }
+    this.changePassworSubject.pipe(
+      debounceTime(300)
+    ).subscribe(newData => {
+      this.activeChangePassword = this.verificarChangePassword(newData);
+    })
+  }
+
+  verificarChangePassword(data: UpdatePassword): boolean {
+    //Si todos los cambpos estan vacios se retorna false, pero no se emite notificacion
+    //Si esta definido el campo current_password, pero password y confirm estan vacion no se emite nada
+    // Si password y confirm no son iguales se emite una alerta
+    if (data.current_password.length <= 0 && data.password.length <= 0 && data.confirm_password.length <= 0) {
+      return false;
+    }
+    if (data.current_password.length > 0 && data.password.length <= 0 && data.confirm_password.length <= 0) {
+      return false;
+    }
+    if (data.password !== data.confirm_password) {
+      this.toastr.error('Las contraseñas no coinciden');
+      return false;
+    } else {
+      if (data.current_password.length <= 0) {
+        this.toastr.error('Debe de ingresar la contraseña actual');
+        return false;
+      } else {
+        return true;
+      }
+    }
   }
 
   // Comparación profunda entre dos objetos
@@ -124,8 +167,8 @@ export class CreateUserComponent implements OnInit {
         horarioHas.push({
           id: dia.id,
           day: dia.nombre,
-          init: '00:00',
-          end: '00:00',
+          init: '08:00',
+          end: '18:00',
           active: false
         } as DayConfig)
       }
@@ -185,7 +228,27 @@ export class CreateUserComponent implements OnInit {
     this.empleadoDataSubject.next(this.empleado);
   }
 
+  onUpdatePasswordChange(pass: string) {
+    this.changePassword.password = pass;
+    this.changePassworSubject.next(this.changePassword);
+  }
+
+  onUpdateConfirmPasswordChange(pass: string) {
+    this.changePassword.confirm_password = pass;
+    this.changePassworSubject.next(this.changePassword);
+  }
+
+  onUpdateCurrentPasswordChange(pass: string) {
+    this.changePassword.current_password = pass;
+    this.changePassworSubject.next(this.changePassword);
+  }
+
   compararPassword(): boolean {
+    //Verificamos si las password estan vacias
+    if ((this.empleado.password ?? '').length <= 0) {
+      this.toastr.error('Debe de asignar una contraseña')
+      return false;
+    }
     if (this.empleado.password !== this.empleado.confirm_password) {
       this.toastr.error('Las contraseñas no coinciden');
       return false;
@@ -193,15 +256,122 @@ export class CreateUserComponent implements OnInit {
     return true;
   }
 
+  accionBoton() {
+    if (this.modificar) {
+      this.modificarEmpleado()
+    } else {
+      this.crearEmpleado()
+    }
+  }
+
+
   crearEmpleado() {
     if (this.compararPassword()) {
-      console.log("Crear Empleado: ", this.empleado);
+      let rolSeleccionado = null;
+      for (const rol of this.roles) {
+        if (Number(this.empleado.rol) == Number(rol.id)) {
+          rolSeleccionado = rol;
+          break;
+        }
+      }
+      if (rolSeleccionado != null && rolSeleccionado.id != 0) {
+        const payloadEmpleado: EmpleadoUpdateCreate = {
+          usuario: {
+            id: this.empleado.id_usuario,
+            nombres: this.empleado.nombres,
+            apellidos: this.empleado.apellidos,
+            cui: this.empleado.cui,
+            email: this.empleado.email,
+            nit: this.empleado.nit,
+            phone: this.empleado.phone,
+            password: this.empleado.password,
+          },
+          rol: rolSeleccionado,
+          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+        }
+        this.userService.crearEmpleado(payloadEmpleado).subscribe({
+          next: async (response: ApiResponse) => {
+            this.toastr.success('Empleado creado con exito', 'Empleado Creado');
+            this.empleado = {
+              nombres: '',
+              apellidos: '',
+              email: '',
+              phone: '',
+              password: '',
+              confirm_password: '',
+              cui: '',
+              rol: 0,
+              horario: []
+            }
+            const horario = await this.calcularHorario([]);
+            this.empleado.horario = horario;
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al crear el empleado');
+          }
+        });
+      } else {
+        this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
+      }
     }
+  }
+
+  obtenerHorarioEmpleado(horario: DayConfig[]): HorarioEmpleado[] {
+    //Filtramos solo los dias activos
+    const diasActivos = horario.filter(confDay => confDay.active)
+    //por cada dia antivo buscamos el dia asociado
+    let horarioFinal: HorarioEmpleado[] = []
+    for (const dia of diasActivos) {
+      const diaEcontrado = this.dataDias.find(diaData => diaData.nombre == dia.day)
+      if (diaEcontrado) {
+        horarioFinal.push(
+          {
+            dia: diaEcontrado,
+            entrada: dia.init,
+            salida: dia.end
+          }
+        )
+      }
+    }
+    return horarioFinal;
   }
 
   modificarEmpleado() {
     if (this.activeButtonSave) {
-      console.log("Actualizar Empleado: ", this.empleado);
+      let rolSeleccionado = null;
+      for (const rol of this.roles) {
+        if (Number(this.empleado.rol) == Number(rol.id)) {
+          rolSeleccionado = rol;
+          break;
+        }
+      }
+      if (rolSeleccionado != null && rolSeleccionado.id != 0) {
+        const payloadEmpleado: EmpleadoUpdateCreate = {
+          id: Number(this.empleado.id_empleado),
+          usuario: {
+            id: this.empleado.id_usuario,
+            nombres: this.empleado.nombres,
+            apellidos: this.empleado.apellidos,
+            cui: this.empleado.cui,
+            email: this.empleado.email,
+            nit: this.empleado.nit,
+            phone: this.empleado.phone
+          },
+          rol: rolSeleccionado,
+          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+        }
+        this.userService.updateEmpleado(payloadEmpleado).subscribe({
+          next: async (response: ApiResponse) => {
+            this.toastr.success('Empleado modificado con exito', 'Empleado Modificado');
+            await this.cargarDatosEmpleado();
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al crear el empleado');
+          }
+        });
+      } else {
+        this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
+      }
     }
   }
 
@@ -253,13 +423,13 @@ export class CreateUserComponent implements OnInit {
     this.userService.getEmpleado(Number(id_empleado)).subscribe({
       next: (response: ApiResponse) => {
         const data = response.data;
-        console.log("Empleado: ", data);
         this.empleado.id_empleado = data.id;
         this.empleado.id_usuario = data.usuario.id;
         this.empleado.nombres = data.usuario.nombres;
         this.empleado.apellidos = data.usuario.apellidos;
         this.empleado.email = data.usuario.email;
         this.empleado.phone = data.usuario.phone;
+        this.empleado.nit = data.usuario.nit;
         this.empleado.cui = data.usuario.cui;
         const rolesObtenidos = data.usuario.roles.map((rol: any) => rol.rol.id);
         this.empleado.rol = this.filtrarRolesPermitidos(rolesObtenidos);
@@ -271,10 +441,11 @@ export class CreateUserComponent implements OnInit {
         this.empleadoOrignal.apellidos = data.usuario.apellidos;
         this.empleadoOrignal.email = data.usuario.email;
         this.empleadoOrignal.phone = data.usuario.phone;
+        this.empleadoOrignal.nit = data.usuario.nit;
         this.empleadoOrignal.cui = data.usuario.cui;
         this.empleadoOrignal.rol = this.filtrarRolesPermitidos([...rolesObtenidos]);
         this.empleadoOrignal.horario = [...this.calcularHorario(data.horarios)];
-
+        this.empleadoDataSubject.next(this.empleado);
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.error, 'Error al obtener el empleado');
@@ -291,5 +462,29 @@ export class CreateUserComponent implements OnInit {
       }
     });
     return rolesPermitidos[0] ?? 0;
+  }
+
+  changePasswordAction() {
+    if (this.activeChangePassword) {
+      const payload: UpdateUserPassword = {
+        id: Number(this.empleado.id_usuario),
+        password: this.changePassword.current_password,
+        newPassword: this.changePassword.password
+      };
+      this.userService.changeUserPassword(payload).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastr.success('Contraseña cambiada correctamente');
+          this.changePassword = {
+            password: '',
+            confirm_password: '',
+            current_password: ''
+          }
+          this.changePassworSubject.next(this.changePassword);
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al cambiar la contraseña');
+        }
+      });
+    }
   }
 }

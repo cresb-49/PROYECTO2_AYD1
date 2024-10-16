@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DayConfig, ScheduleConfComponent } from '../../components/schedule-conf/schedule-conf.component';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth/auth.service';
-import { Cancha, CanchaPayloadUpdate, CanchaService, Horario } from '../../services/cancha/cancha.service';
+import { Cancha, CanchaPayloadUpdateCreate, CanchaService, Horario } from '../../services/cancha/cancha.service';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
@@ -72,7 +72,7 @@ export class EditCourtComponent implements OnInit {
         cierre: day.end
       } as Horario
     });
-    const payload: CanchaPayloadUpdate = {
+    const payload: CanchaPayloadUpdateCreate = {
       cancha: {
         id: this.cancha.id,
         costoHora: this.cancha.costoHora,
@@ -102,6 +102,11 @@ export class EditCourtComponent implements OnInit {
     this.canchaSubject.next(this.cancha);
   }
 
+  onDetallesChange(detalle: string) {
+    this.cancha.descripcion = detalle;
+    this.canchaSubject.next(this.cancha);
+  }
+
   // Comparación profunda entre dos objetos
   compararObjetos(obj1: Cancha, obj2: Cancha): boolean {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
@@ -122,7 +127,6 @@ export class EditCourtComponent implements OnInit {
         this.canchaOriginal.costoHora = data.costoHora;
         this.canchaOriginal.descripcion = data.descripcion;
         this.canchaOriginal.horarios = [...this.calcularHorario(data.horarios)];
-        console.log(this.cancha);
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.error, 'Error al obtener la cancha');
@@ -150,8 +154,8 @@ export class EditCourtComponent implements OnInit {
         negocioHas.push({
           id: dia.id,
           day: dia.nombre,
-          init: '00:00',
-          end: '00:00',
+          init: '08:00',
+          end: '18:00',
           active: false
         } as DayConfig)
       }

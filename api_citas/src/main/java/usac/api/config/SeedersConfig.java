@@ -34,6 +34,7 @@ import usac.api.models.request.RolPermisoUpdateRequest;
 import usac.api.repositories.DiaRepository;
 import usac.api.repositories.PermisoRepository;
 import usac.api.repositories.RolRepository;
+import usac.api.services.B64Service;
 import usac.api.services.CanchaService;
 import usac.api.services.DiaService;
 import usac.api.services.EmpleadoService;
@@ -68,6 +69,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private CanchaService canchaService;
     @Autowired
     private ServicioService servicioService;
+    @Autowired
+    private B64Service b64Service;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -413,13 +416,15 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             if (inputStream == null) {
                 throw new IOException("No se pudo encontrar el archivo logo.svg en el directorio /resources/images");
             }
-
             // Leer todos los bytes del archivo
             byte[] bytes = inputStream.readAllBytes();
-
             // Convertir a Base64
-            return Base64.getEncoder().encodeToString(bytes);
-
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            if(this.b64Service.hasExtension(base64)){
+                return base64;
+            }else{
+                return this.b64Service.addExtension(base64);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Error al cargar y convertir la imagen a Base64", e);
         }

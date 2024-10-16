@@ -11,7 +11,7 @@ export interface Servicio {
   imagen: string;
   costo: number;
   detalles: string;
-  rol:Rol;
+  rol: Rol;
 }
 
 @Injectable({
@@ -33,7 +33,7 @@ export class ServicioService {
     return this.httpService.get<any>(`servicio/servicios/nombre/${name}`)
   }
 
-  getServicio(id: number) {
+  getServicio(id: number | string | null) {
     return this.httpService.get<any>(`servicio/public/servicio/${id}`)
   }
 

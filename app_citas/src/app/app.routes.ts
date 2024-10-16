@@ -15,7 +15,6 @@ import { ReservarCanchaComponent } from './views/reservar-cancha/reservar-cancha
 import { AgendarCitaComponent } from './views/agendar-cita/agendar-cita.component';
 import { CrearNegocioComponent } from './views/crear-negocio/crear-negocio.component';
 import { CrearServicioComponent } from './views/crear-servicio/crear-servicio.component';
-import { CreateUserAdminComponent } from './views/create-user-admin/create-user-admin.component';
 import { CrearEmpleadoComponent } from './views/crear-empleado/crear-empleado.component';
 import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 import { MyInformationComponent } from './views/my-information/my-information.component';
@@ -23,6 +22,10 @@ import { RecoveryPasswordComponent } from './views/recovery-password/recovery-pa
 import { SeeUsersComponent } from './views/see-users/see-users.component';
 import { EditarServicioComponent } from './views/editar-servicio/editar-servicio.component';
 import { SeeServiciosComponent } from './views/see-servicios/see-servicios.component';
+import { CreateCourtComponent } from './views/create-court/create-court.component';
+import { CrearAdminComponent } from './views/crear-admin/crear-admin.component';
+import { EditAdminComponent } from './views/edit-admin/edit-admin.component';
+import { SeeAdminsComponent } from './views/see-admins/see-admins.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -52,6 +55,9 @@ export const routes: Routes = [
         path: 'edit-cancha/:id', component: EditCourtComponent
       },
       {
+        path: 'crear-cancha', component: CreateCourtComponent
+      },
+      {
         path: 'edit-empleado/:id', component: EditEmployeeComponent
       },
       {
@@ -76,10 +82,16 @@ export const routes: Routes = [
         path: 'crear-servicio', component: CrearServicioComponent
       },
       {
-        path: 'editar-servicio', component: EditarServicioComponent
+        path: 'editar-servicio/:id', component: EditarServicioComponent
       },
       {
-        path: 'create-user-admin', component: CreateUserAdminComponent
+        path: 'admins', component: SeeAdminsComponent
+      },
+      {
+        path: 'create-admin', component: CrearAdminComponent
+      },
+      {
+        path: 'edit-admin/:id', component: EditAdminComponent
       },
       {
         path: 'crear-empleado', component: CrearEmpleadoComponent

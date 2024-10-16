@@ -12,7 +12,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Cascade;
@@ -23,7 +22,6 @@ import org.hibernate.annotations.Where;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.persistence.FetchType;
 
 /**
  *
@@ -86,4 +84,8 @@ public class Rol extends Auditor {
         this.ususarios = ususarios;
     }
 
+    @Override
+    public String toString() {
+        return "Rol [nombre=" + nombre + "]";
+    }
 }

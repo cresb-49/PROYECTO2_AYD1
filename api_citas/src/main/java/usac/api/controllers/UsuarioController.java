@@ -26,10 +26,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import usac.api.models.Empleado;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UpdateEmpleadoRequest;
 import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.models.request.UsuarioRolAsignacionRequest;
 import usac.api.services.UsuarioService;
@@ -215,6 +217,22 @@ public class UsuarioController {
     public ResponseEntity<?> crearEmpleado(@RequestBody NuevoEmpleadoRequest crear) {
         try {
             Usuario respuesta = usuarioService.crearEmpleado(crear);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Actualiza el empleado en el sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario admin exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @PatchMapping("/private/actualizarEmpleado")
+    public ResponseEntity<?> actualizarEmpleado(@RequestBody UpdateEmpleadoRequest actualizar){
+        try {
+            Empleado respuesta = usuarioService.actualizarEmpleado(actualizar);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();

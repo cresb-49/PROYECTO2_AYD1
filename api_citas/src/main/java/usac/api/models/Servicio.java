@@ -125,5 +125,10 @@ public class Servicio extends Auditor {
     public void setRol(Rol rol) {
         this.rol = rol;
     }
-   
+
+    @Override
+    public String toString() {
+        return "Servicio [nombre=" + nombre + ", duracion=" + duracion + ", costo=" + costo
+                + ", detalles=" + detalles + ", rol=" + rol + "]";
+    }    
 }

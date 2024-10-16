@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, debounceTime } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { ServicioService } from '../../services/servicio/servicio.service';
+import { Servicio, ServicioService } from '../../services/servicio/servicio.service';
 import { Rol, UserService } from '../../services/user/user.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
+import { ActivatedRoute } from '@angular/router';
 
 export interface ManageServicio {
   id?: number;
@@ -52,39 +53,36 @@ export class CuServicioComponent implements OnInit {
   constructor(
     private userService: UserService,
     private toastr: ToastrService,
-    private servicioService: ServicioService
+    private servicioService: ServicioService,
+    private route: ActivatedRoute,
   ) { }
 
   //Observadores de los cambios en los datos del servicio
   onNombreChange(event: any) {
-    this.servicioData.nombre = event.target.value;
     this.servicioDataSubject.next(this.servicioData);
   }
 
   onDetallesChange(event: any) {
-    this.servicioData.detalles = event.target.value;
     this.servicioDataSubject.next(this.servicioData);
   }
 
   onPrecioChange(event: any) {
-    this.servicioData.precio = event.target.value;
     this.servicioDataSubject.next(this.servicioData);
   }
 
   onDuracionChange(event: any) {
-    this.servicioData.duracion = event.target.value;
     this.servicioDataSubject.next(this.servicioData);
   }
 
   onRolChange(event: any) {
-    this.servicioData.id_rol = event.target.value;
+    this.servicioData.id_rol = Number(event ?? 0)
     this.servicioDataSubject.next(this.servicioData);
   }
 
   async ngOnInit() {
     await this.getRolesGenericos();
     if (this.modificar) {
-      this.cargarDatosServicio();
+      await this.cargarDatosServicio();
     }
     this.servicioDataSubject.pipe(
       debounceTime(300)
@@ -109,25 +107,100 @@ export class CuServicioComponent implements OnInit {
   }
 
   crearServicio() {
-    // this.servicioService.crearServicio(this.servicioData).subscribe({
-    //   next: (response: ApiResponse) => {
-    //     this.toastr.success('Servicio creado');
-    //   },
-    //   error: (error: ErrorApiResponse) => {
-    //     this.toastr.error(error.message, 'Error al crear servicio');
-    //   }
-    // });
+    let rolSeleccionado = null;
+    for (const rol of this.roles) {
+      if (rol.id === this.servicioData.id_rol) {
+        rolSeleccionado = rol;
+        break
+      }
+    }
+    if (rolSeleccionado != null) {
+      if (rolSeleccionado.id === 0) {
+        this.toastr.error('Debe de seleccionar un rol para el servicio', 'Error al crear el Servicio');
+      } else {
+        const createServicio: Servicio = {
+          id: this.servicioData.id,
+          costo: this.servicioData.precio,
+          detalles: this.servicioData.detalles,
+          duracion: this.servicioData.duracion,
+          imagen: this.servicioData.imagen,
+          nombre: this.servicioData.nombre,
+          rol: rolSeleccionado
+        };
+        this.servicioService.createServicio(createServicio).subscribe({
+          next: (response: ApiResponse) => {
+            this.toastr.success('Servicio actualizado con exito', "Exito!!!");
+            this.imageSrc = 'no-image-found.png';
+            this.servicioData = {
+              imagen: this.imageSrc,
+              nombre: '',
+              detalles: '',
+              precio: 1,
+              duracion: 0.25,
+              id_rol: 0
+            };
+            this.servicioDataSubject.next(this.servicioData);
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al crear el Servicio');
+          }
+        })
+      }
+    } else {
+      this.toastr.error('Debe de seleccionar un rol para el servicio', 'Error al crear el Servicio');
+    }
   }
 
   actualizarServicio() {
-    // this.servicioService.actualizarServicio(this.servicioData).subscribe({
-    //   next: (response: ApiResponse) => {
-    //     this.toastr.success('Servicio actualizado');
-    //   },
-    //   error: (error: ErrorApiResponse) => {
-    //     this.toastr.error(error.message, 'Error al actualizar servicio');
-    //   }
-    // });
+    //Generamos el payload de carga de los datos
+    //Obtenemos el rol de los roles seleccionados
+    let rolSeleccionado = null;
+    for (const rol of this.roles) {
+      if (rol.id === this.servicioData.id_rol) {
+        rolSeleccionado = rol;
+        break
+      }
+    }
+    //Verificamos que seleccionamos un rol
+    if (rolSeleccionado != null) {
+      const updateService: Servicio = {
+        id: this.servicioData.id,
+        costo: this.servicioData.precio,
+        detalles: this.servicioData.detalles,
+        duracion: this.servicioData.duracion,
+        imagen: this.servicioData.imagen,
+        nombre: this.servicioData.nombre,
+        rol: rolSeleccionado
+      };
+
+      this.servicioService.updateServicio(updateService).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastr.success('Servicio actualizado con exito', "Exito!!!");
+          this.servicioData = {
+            id: updateService.id,
+            precio: updateService.costo,
+            detalles: updateService.detalles,
+            duracion: updateService.duracion,
+            id_rol: updateService.rol.id,
+            imagen: updateService.imagen,
+            nombre: updateService.nombre
+          }
+          this.servicioOriginalData = {
+            id: updateService.id,
+            precio: updateService.costo,
+            detalles: updateService.detalles,
+            duracion: updateService.duracion,
+            id_rol: updateService.rol.id,
+            imagen: updateService.imagen,
+            nombre: updateService.nombre
+          };
+          this.servicioDataSubject.next(this.servicioData);
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al actualizar el Servicio');
+        }
+      });
+    }
   }
 
   compararObjetos(obj1: ManageServicio, obj2: ManageServicio): boolean {
@@ -148,8 +221,41 @@ export class CuServicioComponent implements OnInit {
     }
   }
 
-  cargarDatosServicio() {
-
+  cargarDatosServicio(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      //Obtenemos el paramento id de la url
+      const id = this.route.snapshot.paramMap.get('id');
+      this.servicioService.getServicio(id).subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.servicioData = {
+            id: data.id,
+            detalles: data.detalles,
+            duracion: data.duracion,
+            id_rol: data.rol.id,
+            imagen: data.imagen,
+            nombre: data.nombre,
+            precio: data.costo
+          }
+          this.imageSrc = data.imagen;
+          this.servicioOriginalData = {
+            id: data.id,
+            detalles: data.detalles,
+            duracion: data.duracion,
+            id_rol: data.rol.id,
+            imagen: data.imagen,
+            nombre: data.nombre,
+            precio: data.costo
+          }
+          this.servicioDataSubject.next(this.servicioData);
+          resolve();
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al obtener el servicio')
+          reject(error);
+        }
+      })
+    });
   }
 
   getRolesGenericos(): Promise<void> {

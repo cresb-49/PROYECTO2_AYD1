@@ -14,5 +14,5 @@ import { CuServicioComponent } from '../../components/cu-servicio/cu-servicio.co
 export class CrearServicioComponent implements OnInit {
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 }

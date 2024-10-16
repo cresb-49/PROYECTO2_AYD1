@@ -22,8 +22,10 @@ import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UpdateEmpleadoRequest;
 import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.models.request.UsuarioRolAsignacionRequest;
+import usac.api.repositories.EmpleadoRepository;
 import usac.api.repositories.RolRepository;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
@@ -50,19 +52,24 @@ public class UsuarioService extends usac.api.services.Service {
     @Autowired
     private EmpleadoService empleadoService;
     @Autowired
+    private EmpleadoRepository empleadoRepository;
+    @Autowired
     private RolRepository rolRepository;
+    @Autowired
+    private DiaService diaService;
 
     /**
      * Envía un correo electrónico de recuperación de contraseña a un usuario
      * con un código de recuperación único.
      *
      * @param correo El correo electrónico del usuario que ha solicitado la
-     * recuperación de su contraseña.
+     *               recuperación de su contraseña.
      * @return Un mensaje indicando si el correo de recuperación fue enviado con
-     * éxito.
+     *         éxito.
      * @throws Exception Si el correo está en blanco, el correo electrónico del
-     * usuario no es encontrado, el usuario está desactivado, o si ocurre un
-     * error durante el envío del correo de recuperación.
+     *                   usuario no es encontrado, el usuario está desactivado, o si
+     *                   ocurre un
+     *                   error durante el envío del correo de recuperación.
      */
     @Transactional(rollbackOn = Exception.class)
     public String enviarMailDeRecuperacion(String correo) throws Exception {
@@ -96,8 +103,7 @@ public class UsuarioService extends usac.api.services.Service {
             // Usamos el servicio de correo para enviar el correo en segundo plano
             mailService.enviarCorreoDeRecuperacion(
                     actualizacion.getEmail(),
-                    actualizacion.getTokenRecuperacion()
-            );
+                    actualizacion.getTokenRecuperacion());
 
             // Retornamos un mensaje de confirmación
             return "Te hemos enviado un correo electrónico con las instrucciones para recuperar tu cuenta. Por favor revisa tu bandeja de entrada.";
@@ -112,12 +118,13 @@ public class UsuarioService extends usac.api.services.Service {
      * su estado y generando un token JWT si la autenticación es exitosa.
      *
      * @param log El objeto Usuario que contiene las credenciales de inicio de
-     * sesión.
+     *            sesión.
      * @return Un objeto LoginDTO que contiene el usuario autenticado y el token
-     * JWT generado.
+     *         JWT generado.
      * @throws Exception Si el correo electrónico o la contraseña son
-     * incorrectos, el usuario está desactivado, o si ocurre un error de
-     * autenticación.
+     *                   incorrectos, el usuario está desactivado, o si ocurre un
+     *                   error de
+     *                   autenticación.
      */
     public LoginDTO iniciarSesion(Usuario log) throws Exception {
         try {
@@ -156,11 +163,12 @@ public class UsuarioService extends usac.api.services.Service {
      * contraseña antes de guardarla.
      *
      * @param usuPassChange El objeto Usuario que contiene el ID y la nueva
-     * contraseña a establecer.
+     *                      contraseña a establecer.
      * @return Un mensaje indicando si el cambio de contraseña fue exitoso.
      * @throws Exception Si el ID del usuario es inválido, si el usuario no es
-     * encontrado, si el usuario está desactivado, o si ocurre un error durante
-     * el proceso de actualización de la contraseña.
+     *                   encontrado, si el usuario está desactivado, o si ocurre un
+     *                   error durante
+     *                   el proceso de actualización de la contraseña.
      */
     @Transactional(rollbackOn = Exception.class)
     public String cambiarPassword(UserChangePasswordRequest usuPassChange) throws Exception {
@@ -174,7 +182,8 @@ public class UsuarioService extends usac.api.services.Service {
             throw new Exception("No hemos encontrado el usuario.");
         }
 
-        // Verificamos que el usuario no esté desactivado y que tenga los permisos necesarios
+        // Verificamos que el usuario no esté desactivado y que tenga los permisos
+        // necesarios
         this.isDesactivated(usuario);
         this.verificarUsuarioJwt(usuario);
 
@@ -183,13 +192,15 @@ public class UsuarioService extends usac.api.services.Service {
             throw new Exception("Contraseña actual incorrecta.");
         }
 
-        // Encriptamos la nueva contraseña y actualizamos el campo en el modelo de usuario
+        // Encriptamos la nueva contraseña y actualizamos el campo en el modelo de
+        // usuario
         usuario.setPassword(this.encriptador.encriptar(usuPassChange.getNewPassword()));
 
         // Guardamos el usuario con la nueva contraseña
         Usuario update = this.usuarioRepository.save(usuario);
 
-        // Verificamos si el cambio fue exitoso comparando el ID del usuario original y el actualizado
+        // Verificamos si el cambio fue exitoso comparando el ID del usuario original y
+        // el actualizado
         if (update != null && update.getId().longValue() == usuario.getId().longValue()) {
             return "Se cambió tu contraseña con éxito.";
         }
@@ -203,11 +214,12 @@ public class UsuarioService extends usac.api.services.Service {
      * recuperación válido.
      *
      * @param cambioPassword El objeto PasswordChangeRequest que contiene el
-     * código de recuperación y la nueva contraseña.
+     *                       código de recuperación y la nueva contraseña.
      * @return Un mensaje indicando si el cambio de contraseña fue exitoso.
      * @throws Exception Si el código de recuperación es inválido, el usuario
-     * está desactivado, o si ocurre algún error durante el proceso de
-     * actualización de la contraseña.
+     *                   está desactivado, o si ocurre algún error durante el
+     *                   proceso de
+     *                   actualización de la contraseña.
      */
     @Transactional(rollbackOn = Exception.class)
     public String recuperarPassword(PasswordChangeRequest cambioPassword) throws Exception {
@@ -247,8 +259,9 @@ public class UsuarioService extends usac.api.services.Service {
      * @param usuario El objeto Usuario con los nuevos datos a actualizar.
      * @return El objeto Usuario actualizado.
      * @throws Exception Si el ID es inválido, el usuario no es encontrado, ya
-     * existe otro usuario con el mismo correo electrónico, o si ocurre un error
-     * durante la actualización.
+     *                   existe otro usuario con el mismo correo electrónico, o si
+     *                   ocurre un error
+     *                   durante la actualización.
      */
     @Transactional(rollbackOn = Exception.class)
     public Usuario updateUsuario(Usuario usuario) throws Exception {
@@ -402,7 +415,7 @@ public class UsuarioService extends usac.api.services.Service {
         // traer rol AYUDANTE
         Rol rol = this.rolService.getRolByNombre("CLIENTE");
 
-        //preparamos el rol
+        // preparamos el rol
         List<RolUsuario> rolesUsuario = new ArrayList<>();
         rolesUsuario.add(new RolUsuario(crear, rol));
 
@@ -423,16 +436,16 @@ public class UsuarioService extends usac.api.services.Service {
      * asignando el rol correspondiente.
      *
      * @param crear El objeto Usuario que contiene los datos del nuevo
-     * administrador a crear.
+     *              administrador a crear.
      * @return El objeto Usuario creado con el rol de Administrador.
      * @throws Exception Si los datos del usuario no son válidos o si ocurre un
-     * error durante la creación.
+     *                   error durante la creación.
      */
     public Usuario crearAdministrador(Usuario crear) throws Exception {
         // Validamos el modelo de usuario
         this.validarModelo(crear);
         // Guardamos el usuario con el rol de Administrador
-//        Usuario usuarioGuardado = this.guardarUsuario(crear, null);
+        // Usuario usuarioGuardado = this.guardarUsuario(crear, null);
         // Obtenemos el rol 'ADMIN' para asignarlo al nuevo usuario
         Rol rol = this.rolService.getRolByNombre("ADMIN");
 
@@ -450,7 +463,7 @@ public class UsuarioService extends usac.api.services.Service {
      * @param nuevoEmpleadoRequest
      * @return El objeto Usuario creado con el rol de Empleado.
      * @throws Exception Si los datos del usuario no son válidos o si ocurre un
-     * error durante la creación.
+     *                   error durante la creación.
      */
     public Usuario crearEmpleado(NuevoEmpleadoRequest nuevoEmpleadoRequest) throws Exception {
         // Validamos el modelo de usuario
@@ -472,16 +485,87 @@ public class UsuarioService extends usac.api.services.Service {
         Empleado empleado = new Empleado(usuarioGuardadoFinal);
         // Guardamos el empleado
         this.empleadoService.createEmpleado(empleado);
-        //Horarios del empleado
+        // Horarios del empleado
         ArrayList<HorarioEmpleado> horariosEmpleadoCreado = new ArrayList<>();
         for (HorarioEmpleado horario : nuevoEmpleadoRequest.getHorarios()) {
-            horariosEmpleadoCreado.add(new HorarioEmpleado(horario.getDia(), empleado, horario.getEntrada(), horario.getSalida()));
+            horariosEmpleadoCreado
+                    .add(new HorarioEmpleado(horario.getDia(), empleado, horario.getEntrada(), horario.getSalida()));
         }
         empleado.setHorarios(horariosEmpleadoCreado);
         // Guardamos el empleado
         this.empleadoService.createEmpleado(empleado);
         // Retornamos el usuario guardado
         return usuarioGuardadoFinal;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public Empleado actualizarEmpleado(UpdateEmpleadoRequest actualizacionEmpleado) throws Exception {
+        // Validamos el modelo de actualizacion del empleado
+        this.validarModelo(actualizacionEmpleado);
+        // Obtenemos el empleado
+        Empleado empeladoEncontrado = this.empleadoService.getEmpleadoById(actualizacionEmpleado.getId());
+        // Verificamos que existe el empelado asociado
+        if (empeladoEncontrado == null) {
+            throw new Exception("Empleado no encontrado");
+        }
+        // Obtenemos el usuario asociado al empleado
+        Usuario usuarioEncontrado = this.usuarioRepository.findById(empeladoEncontrado.getUsuario().getId())
+                .orElse(null);
+        // Verificamos que existe el usuario asociado
+        if (usuarioEncontrado == null) {
+            throw new Exception("Usuario no encontrado");
+        }
+        // Verificamos que el usuario asociado al empleado no este desactivado
+        this.isDesactivated(usuarioEncontrado);
+        // Verificamos el rol del usuario asociado al empleado
+        Rol rolEncontrado = this.rolService.getRolById(actualizacionEmpleado.getRol().getId());
+        // Verificamos que existe el rol asociado
+        if (rolEncontrado == null) {
+            throw new Exception("Rol no encontrado");
+        }
+        // Actualizamos la informacion del usuario
+        Usuario userActualizado = this.updateUsuario(actualizacionEmpleado.getUsuario());
+        empeladoEncontrado.setUsuario(userActualizado);
+        // Realizamos la actualizacion del rol del empleado, reemplazamos el rol que es
+        // diferente de empleado
+        // Obtenemos el rol Empleado
+        Rol rolEmpleado = this.rolService.getRolByNombre("EMPLEADO");
+        // Creamos un UsuarioRolAsignacionRequest
+        UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
+        asignacionRequest.setUsuarioId(usuarioEncontrado.getId());
+        asignacionRequest.setRoles(new ArrayList<Rol>());
+        asignacionRequest.getRoles().add(rolEmpleado);
+        asignacionRequest.getRoles().add(rolEncontrado);
+        // Actualizamos los roles del usuario
+        this.updateRoles(asignacionRequest);
+        // Actualizamos los horarios del empleado
+        // Eliminamos los horarios anteriores
+        empeladoEncontrado.getHorarios().clear();
+        // Creamos los nuevos horarios
+        for (HorarioEmpleado horario : actualizacionEmpleado.getHorarios()) {
+            HorarioEmpleado horarioEncontrado = this.empleadoService.obtenerHorarioDiaEmpleado(
+                    diaService.getDiaByNombre(horario.getDia().getNombre()), empeladoEncontrado);
+            // Si el horario ya existe, se actualiza
+            if (horarioEncontrado != null) {
+                horarioEncontrado.setEntrada(horario.getEntrada());
+                horarioEncontrado.setSalida(horario.getSalida());
+                empeladoEncontrado.getHorarios().add(horarioEncontrado);
+                // Si el horario encontrado esta eliminado, se activa
+                if (horarioEncontrado.getDeletedAt() != null) {
+                    horarioEncontrado.setDeletedAt(null);
+                }
+            } else {
+                // Si el horario no existe, se crea
+                empeladoEncontrado.getHorarios()
+                        .add(new HorarioEmpleado(diaService.getDiaByNombre(horario.getDia().getNombre()),
+                                empeladoEncontrado, horario.getEntrada(), horario.getSalida()));
+            }
+        }
+        Empleado empleadoActualizado = empleadoRepository.save(empeladoEncontrado);
+        if (empleadoActualizado != null && empleadoActualizado.getId() > 0) {
+            return empleadoActualizado;
+        }
+        throw new Exception("No se pudo actualizar el empleado");
     }
 
     /**
@@ -530,10 +614,10 @@ public class UsuarioService extends usac.api.services.Service {
      * Además, el rol "CLIENTE" no puede ser asignado de ninguna forma.
      *
      * @param asignacionRequest El objeto que contiene el ID del usuario y la
-     * lista de nuevos roles a asignar.
+     *                          lista de nuevos roles a asignar.
      * @return El objeto Usuario con los roles actualizados.
      * @throws Exception Si el usuario no se encuentra o si tiene el rol
-     * "CLIENTE" o algún rol no existe.
+     *                   "CLIENTE" o algún rol no existe.
      */
     @Transactional(rollbackOn = Exception.class)
     public Usuario updateRoles(UsuarioRolAsignacionRequest asignacionRequest) throws Exception {
@@ -552,7 +636,7 @@ public class UsuarioService extends usac.api.services.Service {
         // Buscar el rol base del usuario (ADMIN, CLIENTE o EMPLEADO)
         RolUsuario asignacionBase = usuario.getRoles().stream()
                 .filter(rol -> rol.getRol().getNombre().equals("ADMIN") || rol.getRol().getNombre().equals("CLIENTE")
-                || rol.getRol().getNombre().equals("EMPLEADO"))
+                        || rol.getRol().getNombre().equals("EMPLEADO"))
                 .findFirst().orElseThrow(() -> new Exception("El usuario no tiene un rol base asignado"));
 
         // Guardar el rol base existente
@@ -585,7 +669,7 @@ public class UsuarioService extends usac.api.services.Service {
 
                         return rol;
                     } catch (Exception e) {
-                        throw new RuntimeException(e.getMessage());  // Lanzar RuntimeException para no romper el flujo
+                        throw new RuntimeException(e.getMessage()); // Lanzar RuntimeException para no romper el flujo
                     }
                 })
                 .collect(Collectors.toList());
@@ -611,7 +695,8 @@ public class UsuarioService extends usac.api.services.Service {
         // Limpiar los roles actuales del usuario para evitar duplicados
         usuario.getRoles().clear();
 
-        // Asignar nuevamente el rol base (que ahora es EMPLEADO si era ADMIN) al usuario
+        // Asignar nuevamente el rol base (que ahora es EMPLEADO si era ADMIN) al
+        // usuario
         usuario.getRoles().add(new RolUsuario(usuario, rolBase));
 
         // Iterar sobre los nuevos roles proporcionados y asignarlos
