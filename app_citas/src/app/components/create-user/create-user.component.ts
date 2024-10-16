@@ -347,6 +347,7 @@ export class CreateUserComponent implements OnInit {
       }
       if (rolSeleccionado != null && rolSeleccionado.id != 0) {
         const payloadEmpleado: EmpleadoUpdateCreate = {
+          id: Number(this.empleado.id_empleado),
           usuario: {
             id: this.empleado.id_usuario,
             nombres: this.empleado.nombres,
@@ -359,7 +360,26 @@ export class CreateUserComponent implements OnInit {
           rol: rolSeleccionado,
           horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
         }
-        console.log("Actualizar Empleado: ", payloadEmpleado);
+        this.userService.updateEmpleado(payloadEmpleado).subscribe({
+          next: async (response: ApiResponse) => {
+            this.toastr.success('Empleado modificado con exito', 'Empleado Modificado');
+            this.empleadoOrignal = {
+              nombres: this.empleado.nombres,
+              apellidos: this.empleado.apellidos,
+              email: this.empleado.email,
+              phone: this.empleado.phone,
+              password: this.empleado.password,
+              confirm_password: this.empleado.confirm_password,
+              cui: this.empleado.cui,
+              rol: this.empleado.rol,
+              horario: [...this.empleado.horario]
+            };
+            this.empleadoDataSubject.next(this.empleado);
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al crear el empleado');
+          }
+        });
       } else {
         this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
       }

@@ -41,6 +41,7 @@ export interface HorarioEmpleado {
 }
 
 export interface EmpleadoUpdateCreate {
+  id?: number;
   usuario: UpdateCreateInfoEmpleado,
   rol: Rol,
   horarios: HorarioEmpleado[]
