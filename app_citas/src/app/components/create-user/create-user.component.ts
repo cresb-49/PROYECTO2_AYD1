@@ -363,18 +363,7 @@ export class CreateUserComponent implements OnInit {
         this.userService.updateEmpleado(payloadEmpleado).subscribe({
           next: async (response: ApiResponse) => {
             this.toastr.success('Empleado modificado con exito', 'Empleado Modificado');
-            this.empleadoOrignal = {
-              nombres: this.empleado.nombres,
-              apellidos: this.empleado.apellidos,
-              email: this.empleado.email,
-              phone: this.empleado.phone,
-              password: this.empleado.password,
-              confirm_password: this.empleado.confirm_password,
-              cui: this.empleado.cui,
-              rol: this.empleado.rol,
-              horario: [...this.empleado.horario]
-            };
-            this.empleadoDataSubject.next(this.empleado);
+            await this.cargarDatosEmpleado();
           },
           error: (error: ErrorApiResponse) => {
             this.toastr.error(error.error, 'Error al crear el empleado');
@@ -456,6 +445,7 @@ export class CreateUserComponent implements OnInit {
         this.empleadoOrignal.cui = data.usuario.cui;
         this.empleadoOrignal.rol = this.filtrarRolesPermitidos([...rolesObtenidos]);
         this.empleadoOrignal.horario = [...this.calcularHorario(data.horarios)];
+        this.empleadoDataSubject.next(this.empleado);
       },
       error: (error: ErrorApiResponse) => {
         this.toastr.error(error.error, 'Error al obtener el empleado');
