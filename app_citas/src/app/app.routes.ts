@@ -115,6 +115,9 @@ export const routes: Routes = [
       },
       {
         path: 'editar-rol/:id', component: EditarRolComponent
+      },
+      {
+        path: 'info-servicio/:id', component: AgendarCitaComponent
       }
     ]
   },
