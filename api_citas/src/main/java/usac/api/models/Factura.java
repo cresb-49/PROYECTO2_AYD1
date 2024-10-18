@@ -6,13 +6,18 @@ package usac.api.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -46,6 +51,11 @@ public class Factura extends Auditor {
     @Column(name = "precio", nullable = false)
     @Min(value = 1, message = "El total debe ser de al menos 1.")
     private Double total;
+
+    @OneToOne(mappedBy = "factura", fetch = FetchType.EAGER)
+    @Cascade(CascadeType.ALL)
+    @JoinColumn(name = "reserva", nullable = false, unique = true)
+    private Reserva reserva;
 
     public Factura(String nombre, String nit, String detalle, Double total) {
         this.nombre = nombre;
@@ -87,6 +97,14 @@ public class Factura extends Auditor {
 
     public void setTotal(Double total) {
         this.total = total;
-    } 
-}
+    }
 
+    public Reserva getReserva() {
+        return reserva;
+    }
+
+    public void setReserva(Reserva reserva) {
+        this.reserva = reserva;
+    }
+
+}

@@ -11,6 +11,7 @@ import java.util.List;
 
 @Service
 public class HorarioCanchaService extends usac.api.services.Service {
+
     @Autowired
     private HorarioCanchaRepository horarioCanchaRepository;
 

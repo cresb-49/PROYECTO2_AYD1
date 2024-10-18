@@ -1,5 +1,6 @@
 package usac.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -41,6 +42,12 @@ public class Cancha extends Auditor {
     @Where(clause = "deleted_at IS NULL")
     private List<HorarioCancha> horarios;
 
+    @OneToMany(mappedBy = "cancha", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Schema(hidden = true)
+    private List<ReservaCancha> reservas;
+
     public Cancha() {
     }
 
@@ -72,4 +79,13 @@ public class Cancha extends Auditor {
     public void setHorarios(List<HorarioCancha> horarios) {
         this.horarios = horarios;
     }
+
+    public List<ReservaCancha> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<ReservaCancha> reservas) {
+        this.reservas = reservas;
+    }
+
 }

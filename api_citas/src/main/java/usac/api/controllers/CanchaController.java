@@ -17,15 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 import usac.api.models.Cancha;
 import usac.api.models.HorarioCancha;
 import usac.api.models.request.CanchaRequest;
+import usac.api.models.request.ReservacionCanchaRequest;
 import usac.api.services.CanchaService;
+import usac.api.services.ReservaService;
 import usac.api.tools.transformers.ApiBaseTransformer;
-
 
 @RestController
 @RequestMapping("/api/cancha")
 public class CanchaController {
+
     @Autowired
     private CanchaService canchaService;
+    @Autowired
+    private ReservaService reservaService;
 
     @GetMapping("/public/canchas")
     public ResponseEntity<?> getCanchas() {
@@ -76,6 +80,16 @@ public class CanchaController {
             Cancha cancha = canchaRequest.getCancha();
             List<HorarioCancha> horarios = canchaRequest.getHorarios();
             Cancha data = canchaService.actualizarCancha(cancha, horarios);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @PatchMapping("/cliente/reservarCancha")
+    public ResponseEntity<?> reservarCancha(@RequestBody ReservacionCanchaRequest reservacionCanchaRequest) {
+        try {
+            String data = reservaService.reservaCancha(reservacionCanchaRequest);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();

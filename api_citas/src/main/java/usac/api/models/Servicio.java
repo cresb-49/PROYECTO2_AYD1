@@ -4,10 +4,15 @@
  */
 package usac.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -16,6 +21,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -33,7 +40,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE servicio SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class Servicio extends Auditor {
-    
+
     @Column(length = 250, nullable = false)
     @NotBlank(message = "El nombre del servicio no puede estar vacío.")
     @NotNull(message = "El nombre del servicio no puede ser nulo")
@@ -43,7 +50,7 @@ public class Servicio extends Auditor {
     @Column(name = "duracion", nullable = false)
     @DecimalMin(value = "0.1", message = "La duracion del servicio debe ser mayor o igual a 0.1 horas")
     private Double duracion;
-    
+
     @Column(nullable = false)
     @Lob
     @NotBlank(message = "La imagen del servicio no puede estar vacío.")
@@ -59,12 +66,18 @@ public class Servicio extends Auditor {
     @NotBlank(message = "Los detalles del servicio no pueden estar vacío.")
     @NotNull(message = "Los detalles del servicio no pueden ser nulo")
     private String detalles;
-    
+
     @OneToOne
     @NotNull(message = "El rol con el que se relaciona el servicio no puede ser nulo.")
     @JoinColumn(name = "rol", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Rol rol;
+
+    @OneToMany(mappedBy = "servicio", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private List<ReservaServicio> reservas;
 
     public Servicio() {
     }
@@ -76,7 +89,7 @@ public class Servicio extends Auditor {
         this.costo = costo;
         this.detalles = detalles;
         this.rol = rol;
-    }   
+    }
 
     public String getNombre() {
         return nombre;
@@ -126,9 +139,17 @@ public class Servicio extends Auditor {
         this.rol = rol;
     }
 
+    public List<ReservaServicio> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<ReservaServicio> reservas) {
+        this.reservas = reservas;
+    }
+
     @Override
     public String toString() {
         return "Servicio [nombre=" + nombre + ", duracion=" + duracion + ", costo=" + costo
                 + ", detalles=" + detalles + ", rol=" + rol + "]";
-    }    
+    }
 }

@@ -86,7 +86,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
     public Dia insertarDia(Dia dia) throws Exception {
         try {
-            Optional<Dia> opDia = this.diaRepository.findOneByNombre(dia.getNombre());
+            Optional<Dia> opDia = this.diaRepository.findOneByNombreIgnoreCase(dia.getNombre());
             if (opDia.isPresent()) {
                 return opDia.get();
             }
@@ -157,10 +157,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             // Creacion de los dias de la semana
             Dia lunes = this.insertarDia(new Dia("Lunes"));
             Dia martes = this.insertarDia(new Dia("Martes"));
-            Dia miercoles = this.insertarDia(new Dia("Miercoles"));
+            Dia miercoles = this.insertarDia(new Dia("Miércoles"));
             Dia jueves = this.insertarDia(new Dia("Jueves"));
             Dia viernes = this.insertarDia(new Dia("Viernes"));
-            Dia sabado = this.insertarDia(new Dia("Sabado"));
+            Dia sabado = this.insertarDia(new Dia("Sábado"));
             Dia domingo = this.insertarDia(new Dia("Domingo"));
 
             // siders roles
@@ -172,7 +172,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             Rol customRol3 = this.insertarRol(new Rol("Custom3"));
             Rol customRol4 = this.insertarRol(new Rol("Custom4"));
             Rol customRol5 = this.insertarRol(new Rol("Custom5"));
-
 
             // Seeder de usuarios del sistema
             Usuario admin = new Usuario("456123789", "3322114455669",
@@ -347,11 +346,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             String imagenEjemplo = cargarImagenComoBase64("imagen_ejemplo.jpg");
             // Creacion de los servicios de la tienda
             try {
-                this.servicioService.crearServicio(new Servicio("Servicio 1", 1.0,imagenEjemplo,100.0, "Descripcion del servicio 1",customRol));
-                this.servicioService.crearServicio(new Servicio("Servicio 2", 2.0,imagenEjemplo,200.0, "Descripcion del servicio 2",customRol2));
-                this.servicioService.crearServicio(new Servicio("Servicio 3", 3.0,imagenEjemplo,300.0, "Descripcion del servicio 3",customRol3));
-                this.servicioService.crearServicio(new Servicio("Servicio 4", 4.0,imagenEjemplo,400.0, "Descripcion del servicio 4",customRol4));
-                this.servicioService.crearServicio(new Servicio("Servicio 5", 5.0,imagenEjemplo,500.0, "Descripcion del servicio 5",customRol5));                
+                this.servicioService.crearServicio(new Servicio("Servicio 1", 1.0, imagenEjemplo, 100.0, "Descripcion del servicio 1", customRol));
+                this.servicioService.crearServicio(new Servicio("Servicio 2", 2.0, imagenEjemplo, 200.0, "Descripcion del servicio 2", customRol2));
+                this.servicioService.crearServicio(new Servicio("Servicio 3", 3.0, imagenEjemplo, 300.0, "Descripcion del servicio 3", customRol3));
+                this.servicioService.crearServicio(new Servicio("Servicio 4", 4.0, imagenEjemplo, 400.0, "Descripcion del servicio 4", customRol4));
+                this.servicioService.crearServicio(new Servicio("Servicio 5", 5.0, imagenEjemplo, 500.0, "Descripcion del servicio 5", customRol5));
             } catch (Exception e) {
             }
 
@@ -412,7 +411,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
     public String cargarImagenComoBase64(String imagen) {
         // Cargar el archivo desde resources
-        try (InputStream inputStream = getClass().getResourceAsStream("/images/"+imagen)) {
+        try (InputStream inputStream = getClass().getResourceAsStream("/images/" + imagen)) {
             if (inputStream == null) {
                 throw new IOException("No se pudo encontrar el archivo logo.svg en el directorio /resources/images");
             }
@@ -420,9 +419,9 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             byte[] bytes = inputStream.readAllBytes();
             // Convertir a Base64
             String base64 = Base64.getEncoder().encodeToString(bytes);
-            if(this.b64Service.hasExtension(base64)){
+            if (this.b64Service.hasExtension(base64)) {
                 return base64;
-            }else{
+            } else {
                 return this.b64Service.addExtension(base64);
             }
         } catch (IOException e) {
