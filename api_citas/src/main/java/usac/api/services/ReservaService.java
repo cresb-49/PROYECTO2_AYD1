@@ -16,6 +16,7 @@ import usac.api.models.Reserva;
 import usac.api.models.ReservaCancha;
 import usac.api.models.Usuario;
 import usac.api.models.request.ReservacionCanchaRequest;
+import usac.api.reportes.imprimibles.ComprobanteReservaImprimible;
 import usac.api.repositories.ReservaCanchaRepository;
 import usac.api.tools.ManejadorTiempo;
 
@@ -26,6 +27,8 @@ import usac.api.tools.ManejadorTiempo;
 @org.springframework.stereotype.Service
 public class ReservaService extends Service {
 
+    @Autowired
+    private ComprobanteReservaImprimible reservaImprimible;
     @Autowired
     private ReservaCanchaRepository reservaCanchaRepository;
     @Autowired
@@ -40,7 +43,7 @@ public class ReservaService extends Service {
     private UsuarioService usuarioService;
 
     @Transactional(rollbackOn = Exception.class)
-    public String reservaCancha(ReservacionCanchaRequest reservacionCanchaRequest) throws Exception {
+    public byte[] reservaCancha(ReservacionCanchaRequest reservacionCanchaRequest) throws Exception {
         this.validarModelo(reservacionCanchaRequest);
         Cancha cancha = this.canchaService.getCanchaById(reservacionCanchaRequest.getCanchaId());
         //obtenemos el dia de la reserva
@@ -106,10 +109,7 @@ public class ReservaService extends Service {
         // Guardar la reserva de la cancha
         ReservaCancha reservaCancha = new ReservaCancha(reserva, cancha);
         reservaCanchaRepository.save(reservaCancha);
-
         //ahora debemos generar la constacia a partir de la reserva generada
-        
-        
-        return null;
+        return this.reservaImprimible.init(reserva);
     }
 }

@@ -89,7 +89,7 @@ public class CanchaController {
     @PatchMapping("/cliente/reservarCancha")
     public ResponseEntity<?> reservarCancha(@RequestBody ReservacionCanchaRequest reservacionCanchaRequest) {
         try {
-            String data = reservaService.reservaCancha(reservacionCanchaRequest);
+            byte[] data = reservaService.reservaCancha(reservacionCanchaRequest);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
