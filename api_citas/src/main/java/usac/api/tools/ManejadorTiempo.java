@@ -5,8 +5,12 @@
 package usac.api.tools;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import org.springframework.stereotype.Component;
@@ -64,6 +68,21 @@ public class ManejadorTiempo {
         Duration duracion = Duration.between(inicio, fin);
         // Devuelve la cantidad de horas en esa duración
         return duracion.toHours();
+    }
+
+    /**
+     * Convierte un Local date ha un formato de fecha recional en dd/MM/yyyy
+     *
+     * @param fechaLocal fecha a convertir
+     * @return
+     */
+    public String parsearFechaYHoraAFormatoRegional(LocalDate fechaLocal) {
+        if (fechaLocal == null) { // si la fecha es nula retornamos vacío
+            return "-";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaFormateada = fechaLocal.format(formatter);
+        return fechaFormateada;
     }
 
 }

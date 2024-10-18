@@ -4,12 +4,19 @@
  */
 package usac.api.reportes;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import usac.api.reportes.imprimibles.ConstructorReporteImprimible;
+import usac.api.tools.ManejadorTiempo;
 
 /**
  *
  * @author luid
  */
+@Component
 public class Reporte extends ConstructorReporteImprimible {
+
+    @Autowired
+    protected ManejadorTiempo manejadorTiempo;
 
 }

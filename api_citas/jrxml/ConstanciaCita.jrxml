@@ -1,0 +1,125 @@
+<!-- Created with Jaspersoft Studio version 7.0.1.final using JasperReports Library version 7.0.1-573496633c2b4074e32f433154b543003f7d2498  -->
+<jasperReport name="ConstanciaCita" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="92c0f03b-c839-422d-be36-a4014c536cd0">
+	<parameter name="nombre" class="java.lang.String"/>
+	<parameter name="apellidos" class="java.lang.String"/>
+	<parameter name="adelanto" class="java.lang.String"/>
+	<parameter name="fechaHora" class="java.lang.String"/>
+	<parameter name="idReserva" class="java.lang.String"/>
+	<parameter name="nombreServicio" class="java.lang.String"/>
+	<parameter name="empleadoNombre" class="java.lang.String"/>
+	<parameter name="nombre_tienda" class="java.lang.String"/>
+	<parameter name="direccion_tienda" class="java.lang.String"/>
+	<parameter name="estadoCita" class="java.lang.String"/>
+	<parameter name="imagen_tienda" class="net.sf.jasperreports.repo.InputStreamResource"/>
+	<query language="sql"><![CDATA[]]></query>
+	<background splitType="Stretch"/>
+	<pageHeader height="80" splitType="Stretch">
+		<element kind="rectangle" uuid="f5459e0c-127a-4740-89bb-c582167fa8d9" x="80" y="0" width="475" height="80" backcolor="#8CD19D">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<pen lineColor="rgba(0, 0, 0, 0.0)"/>
+		</element>
+		<element kind="staticText" uuid="bc3e1613-8815-4e95-a232-dd422aab8bee" x="80" y="40" width="465" height="40" forecolor="#FFFFFF" markup="none" fontSize="25.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<text><![CDATA[Constancia de cita]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+		</element>
+		<element kind="image" uuid="f4769d4e-d231-483c-9667-bb239ffe7cf5" x="10" y="10" width="60" height="60" onErrorType="Icon" hImageAlign="Center" vImageAlign="Middle">
+			<expression><![CDATA[$P{imagen_tienda}]]></expression>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+		</element>
+		<element kind="textField" uuid="30dbd6d1-fa21-4d6c-a788-5e52762621d1" x="338" y="10" width="204" height="20" forecolor="#FFFFFF" fontSize="12.0" hTextAlign="Right">
+			<expression><![CDATA[$P{nombre_tienda}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</pageHeader>
+	<detail>
+		<band height="409" splitType="Stretch">
+			<element kind="rectangle" uuid="73b3a225-b4ba-4fbd-ab7c-c15d371d598f" x="0" y="20" width="555" height="110" backcolor="#FFFFFF" radius="10">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<pen lineColor="#B0B0B0"/>
+			</element>
+			<element kind="staticText" uuid="00e59dc4-6921-4c1f-ad74-dcf947fb8cd7" x="30" y="30" width="150" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Nombres del cliente]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="staticText" uuid="dca20e6a-46b3-42f7-8c16-5ed658b17382" x="30" y="90" width="70" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Adelanto abonado]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="staticText" uuid="16c0f88c-fb82-4be7-beda-975b3da8e9b6" x="79" y="160" width="100" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+				<text><![CDATA[Id de reserva:]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="staticText" uuid="4c158949-00ee-4290-8450-4fbd814d0647" x="29" y="210" width="150" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+				<text><![CDATA[Nombre del servicio:]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="staticText" uuid="05be856e-3d40-41d0-aaa2-df2ef0ff4bd7" x="29" y="260" width="150" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+				<text><![CDATA[Empleado encargado:]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="staticText" uuid="f7d0809c-b92b-41a7-9b80-3346bcc755de" x="59" y="310" width="120" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+				<text><![CDATA[Estado de la cita:]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="staticText" uuid="8b7c5c94-9575-4453-8e48-63a46285f286" x="280" y="30" width="150" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Apellidos del cliente]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="textField" uuid="a895a79c-fdbf-46fe-a5be-d2f2ae4a4e91" x="30" y="54" width="240" height="30" markup="none" fontSize="12.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$P{nombre}]]></expression>
+			</element>
+			<element kind="textField" uuid="94c1e891-4ab6-4b5d-a4c5-2878db582b0b" x="280" y="54" width="262" height="30" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<expression><![CDATA[$P{apellidos}]]></expression>
+			</element>
+			<element kind="textField" uuid="b25872d9-7808-4d58-8986-76f52a3f9e95" x="110" y="90" width="310" height="24" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<expression><![CDATA[$P{adelanto}]]></expression>
+			</element>
+			<element kind="staticText" uuid="5d012f60-8844-42f4-9f91-5433fb56bdb1" x="19" y="360" width="160" height="24" forecolor="#000000" markup="none" fontSize="14.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+				<text><![CDATA[Fecha y hora de la cita:]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="textField" uuid="d37d251a-0b13-4b12-b60d-9b2c899a13f2" x="189" y="360" width="366" height="24" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<expression><![CDATA[$P{fechaHora}]]></expression>
+			</element>
+			<element kind="textField" uuid="ec0ffc50-c028-4e51-ace5-6f4d28a5f4f8" x="189" y="310" width="366" height="24" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<expression><![CDATA[$P{empleadoNombre}]]></expression>
+			</element>
+			<element kind="textField" uuid="8b1b8e14-5161-43e1-a628-d9f0523d4d8a" x="189" y="210" width="366" height="24" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<expression><![CDATA[$P{nombreServicio}]]></expression>
+			</element>
+			<element kind="textField" uuid="fefac1f1-a1f7-4322-875c-c598c085c605" x="189" y="160" width="366" height="24" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<expression><![CDATA[$P{idReserva}]]></expression>
+			</element>
+			<element kind="textField" uuid="db85142e-36c9-4c35-b79f-372dcf017ffa" x="189" y="260" width="366" height="24" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<expression><![CDATA[$P{estadoCita}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<pageFooter height="51" splitType="Stretch">
+		<element kind="textField" uuid="cde73579-e1d1-4564-a6d5-af757db5bf3a" x="306" y="10" width="250" height="30" markup="html" textAdjust="ScaleFont" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA[" <b>Direccion:</b> "+ $P{direccion_tienda}]]></expression>
+		</element>
+	</pageFooter>
+</jasperReport>

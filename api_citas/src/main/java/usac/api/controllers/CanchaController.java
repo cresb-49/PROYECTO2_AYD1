@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import usac.api.models.Cancha;
 import usac.api.models.HorarioCancha;
+import usac.api.models.dto.ArchivoDTO;
 import usac.api.models.request.CanchaRequest;
 import usac.api.models.request.ReservacionCanchaRequest;
 import usac.api.services.CanchaService;
@@ -89,8 +90,9 @@ public class CanchaController {
     @PatchMapping("/cliente/reservarCancha")
     public ResponseEntity<?> reservarCancha(@RequestBody ReservacionCanchaRequest reservacionCanchaRequest) {
         try {
-            byte[] data = reservaService.reservaCancha(reservacionCanchaRequest);
-            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
+            ArchivoDTO data = reservaService.reservaCancha(reservacionCanchaRequest);
+            // Devolvemos el PDF en la respuesta HTTP
+            return new ResponseEntity<>(data.getArchivo(), data.getHeaders(), HttpStatus.OK);
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }

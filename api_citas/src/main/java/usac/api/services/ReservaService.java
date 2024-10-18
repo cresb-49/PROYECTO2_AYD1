@@ -7,14 +7,16 @@ package usac.api.services;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import usac.api.enums.FileHttpMetaData;
 import usac.api.models.Cancha;
 import usac.api.models.Dia;
 import usac.api.models.HorarioCancha;
 import usac.api.models.Reserva;
 import usac.api.models.ReservaCancha;
 import usac.api.models.Usuario;
+import usac.api.models.dto.ArchivoDTO;
 import usac.api.models.request.ReservacionCanchaRequest;
 import usac.api.reportes.imprimibles.ComprobanteReservaImprimible;
 import usac.api.repositories.ReservaCanchaRepository;
@@ -43,7 +45,7 @@ public class ReservaService extends Service {
     private UsuarioService usuarioService;
 
     @Transactional(rollbackOn = Exception.class)
-    public byte[] reservaCancha(ReservacionCanchaRequest reservacionCanchaRequest) throws Exception {
+    public ArchivoDTO reservaCancha(ReservacionCanchaRequest reservacionCanchaRequest) throws Exception {
         this.validarModelo(reservacionCanchaRequest);
         Cancha cancha = this.canchaService.getCanchaById(reservacionCanchaRequest.getCanchaId());
         //obtenemos el dia de la reserva
@@ -110,6 +112,14 @@ public class ReservaService extends Service {
         ReservaCancha reservaCancha = new ReservaCancha(reserva, cancha);
         reservaCanchaRepository.save(reservaCancha);
         //ahora debemos generar la constacia a partir de la reserva generada
-        return this.reservaImprimible.init(reserva);
+        byte[] reporte = this.reservaImprimible.init(reserva);
+        //preparar los headers para la respuesta http
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType(FileHttpMetaData.PDF.getContentType()));
+        headers.setContentDispositionFormData(FileHttpMetaData.PDF.getContentDispoition(), "Constancia_Reserva.pdf");
+
+        return new ArchivoDTO(
+                headers,
+                reporte);
     }
 }
