@@ -1,5 +1,10 @@
 package usac.api.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +92,28 @@ public class CanchaController {
         }
     }
 
-    @PatchMapping("/cliente/reservarCancha")
+    /**
+     * Endpoint que permite a los clientes realizar una reserva de cancha.
+     *
+     * @param reservacionCanchaRequest Detalles de la reserva solicitada como la
+     * fecha, horas de inicio y fin, y la cancha a reservar.
+     * @return Devuelve un archivo PDF que contiene la constancia de la reserva
+     * si se realiza correctamente.
+     */
+    @Operation(summary = "Reservar una cancha",
+            description = "Permite a los clientes reservar una cancha "
+            + "verificando los horarios y la disponibilidad."
+            + " Devuelve un archivo PDF con la constancia de la reserva.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Reserva exitosa,"
+                + " se devuelve la constancia en formato PDF.",
+                content = @Content(mediaType = "application/pdf",
+                        schema = @Schema(type = "string", format = "binary"))),
+        @ApiResponse(responseCode = "400", description = "Error en la solicitud"
+                + " o la cancha ya está ocupada.",
+                content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/cliente/reservarCancha")
     public ResponseEntity<?> reservarCancha(@RequestBody ReservacionCanchaRequest reservacionCanchaRequest) {
         try {
             ArchivoDTO data = reservaService.reservaCancha(reservacionCanchaRequest);

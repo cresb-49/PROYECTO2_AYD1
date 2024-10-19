@@ -48,6 +48,9 @@ public class ReservaServicio extends Auditor {
         this.servicio = servicio;
     }
 
+    public ReservaServicio() {
+    }
+
     public Reserva getReserva() {
         return reserva;
     }

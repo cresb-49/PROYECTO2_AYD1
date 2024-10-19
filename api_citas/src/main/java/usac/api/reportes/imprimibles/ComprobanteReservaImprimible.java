@@ -24,7 +24,7 @@ public class ComprobanteReservaImprimible extends Reporte {
         //si pasaron las comporbaciones mandamos a traer los parametros
         Map<String, Object> parametrosReporte = this.construirComprobante();
         //mandamos ha abrir el reporte
-        return this.exportarReporte("ConstanciaCita", parametrosReporte,
+        return this.exportarReporte("ConstanciaReserva", parametrosReporte,
                 "pdf");
     }
 

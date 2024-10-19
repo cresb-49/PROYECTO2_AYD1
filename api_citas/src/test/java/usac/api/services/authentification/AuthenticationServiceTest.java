@@ -60,7 +60,7 @@ public class AuthenticationServiceTest {
 
         // Crear una lista de usuarios y agregar algunos usuarios
         List<RolUsuario> roles = new ArrayList<>();
-        roles.add(new RolUsuario(rolAdmin, usuario));
+        roles.add(new RolUsuario(usuario, rolAdmin));
 
         usuario.setRoles(roles);
 

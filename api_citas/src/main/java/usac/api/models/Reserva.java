@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -45,8 +46,8 @@ public class Reserva extends Auditor {
     private LocalDate fechaReservacion;
 
     // Relación opcional uno a uno con Factura
-    @OneToOne(optional = false)
-    @JoinColumn(name = "factura", nullable = false, unique = true)
+    @OneToOne(optional = true)
+    @JoinColumn(name = "factura", nullable = true, unique = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Schema(hidden = true)
@@ -65,13 +66,13 @@ public class Reserva extends Auditor {
     private Double totalACobrar;
 
     // Relación opcional uno a uno con Reserva
-    @OneToOne(optional = true, mappedBy = "reserva")// La relación con Reserva es opcional
-    @JoinColumn(name = "reserva_cancha")
+    @OneToOne(optional = true, fetch = FetchType.EAGER)// La relación con Reserva es opcional
+    @JoinColumn(name = "reserva_cancha", referencedColumnName = "id", nullable = true)
     private ReservaCancha reservaCancha;
 
     // Relación opcional uno a uno con Cita
-    @OneToOne(optional = true, mappedBy = "reserva") // La relación con Cita es opcional
-    @JoinColumn(name = "reserva_servicio")
+    @OneToOne(optional = true, fetch = FetchType.EAGER) // La relación con Cita es opcional
+    @JoinColumn(name = "reserva_servicio", referencedColumnName = "id", nullable = true)
     private ReservaServicio reservaServicio;
 
     public Reserva(Usuario reservador, LocalTime horaInicio, LocalTime horaFin, LocalDate fechaReservacion, Factura factura, Boolean realizada,

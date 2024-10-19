@@ -137,7 +137,7 @@ public class UsuarioServiceTest {
         rolEmpleado.setNombre("EMPLEADO");
 
         // Asignar rol base ADMIN al usuario
-        RolUsuario rolUsuarioAdmin = new RolUsuario(rolAdmin, usuarioMock);
+        RolUsuario rolUsuarioAdmin = new RolUsuario( usuarioMock,rolAdmin);
         usuarioMock.getRoles().add(rolUsuarioAdmin);
 
         // Mock de solicitud de asignación de roles
@@ -213,7 +213,7 @@ public class UsuarioServiceTest {
         rolAdmin.setId(1L);
         rolAdmin.setNombre("ADMIN");
         // Asignar rol base ADMIN al usuario
-        RolUsuario rolUsuarioAdmin = new RolUsuario(rolAdmin, usuarioMock);
+        RolUsuario rolUsuarioAdmin = new RolUsuario( usuarioMock,rolAdmin);
         usuarioMock.getRoles().add(rolUsuarioAdmin);
 
         // Crear rol cliente
@@ -268,7 +268,7 @@ public class UsuarioServiceTest {
         rolEmpleado.setNombre("EMPLEADO");
 
         // Asignar rol base ADMIN al usuario
-        RolUsuario rolUsuarioAdmin = new RolUsuario(rolAdmin, usuarioMock);
+        RolUsuario rolUsuarioAdmin = new RolUsuario(usuarioMock,rolAdmin);
         usuarioMock.getRoles().add(rolUsuarioAdmin);
 
         // Mock de solicitud de asignación de roles con el rol "ADMIN"

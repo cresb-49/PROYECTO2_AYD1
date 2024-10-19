@@ -52,7 +52,7 @@ public class Factura extends Auditor {
     @Min(value = 1, message = "El total debe ser de al menos 1.")
     private Double total;
 
-    @OneToOne(mappedBy = "factura", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "factura")
     @Cascade(CascadeType.ALL)
     @JoinColumn(name = "reserva", nullable = false, unique = true)
     private Reserva reserva;

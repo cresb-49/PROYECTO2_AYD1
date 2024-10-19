@@ -4,9 +4,11 @@
  */
 package usac.api.services;
 
+import java.time.LocalTime;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import usac.api.enums.FileHttpMetaData;
@@ -20,6 +22,7 @@ import usac.api.models.dto.ArchivoDTO;
 import usac.api.models.request.ReservacionCanchaRequest;
 import usac.api.reportes.imprimibles.ComprobanteReservaImprimible;
 import usac.api.repositories.ReservaCanchaRepository;
+import usac.api.repositories.ReservaRepository;
 import usac.api.tools.ManejadorTiempo;
 
 /**
@@ -42,30 +45,40 @@ public class ReservaService extends Service {
     @Autowired
     private CanchaService canchaService;
     @Autowired
+    private ReservaRepository reservaRepository;
+    @Autowired
     private UsuarioService usuarioService;
 
     @Transactional(rollbackOn = Exception.class)
     public ArchivoDTO reservaCancha(ReservacionCanchaRequest reservacionCanchaRequest) throws Exception {
         this.validarModelo(reservacionCanchaRequest);
+
         Cancha cancha = this.canchaService.getCanchaById(reservacionCanchaRequest.getCanchaId());
-        //obtenemos el dia de la reserva
+
+        // Obtenemos el día de la reserva
         String diaReserva = this.manejadorFechas.localDateANombreDia(reservacionCanchaRequest.getFechaReservacion());
-        //mandamos a buscar el dia segun el nombre que nos arroje la funcion
+
+        // Buscamos el día según el nombre
         Dia dia = this.diaService.getDiaByNombre(diaReserva);
-        //mandamos a traer el horario de la cancha en el dia de la reserva
+
+        // Traemos el horario de la cancha en el día de la reserva
         HorarioCancha obtenerHorarioPorDiaYCancha = this.horarioCanchaService.obtenerHorarioPorDiaYCancha(dia, cancha);
-        // Verificamos si las horas de la reserva están dentro de los horarios de apertura y cierre de la cancha
+
+        if (!this.manejadorFechas.esPrimeraHoraAntes(
+                reservacionCanchaRequest.getHoraInicio(),
+                reservacionCanchaRequest.getHoraFin())) {
+            throw new Exception(
+                    "La hora de inicio no puede ser mayor a la hora de fin.");
+        }
+
+        // Verificamos si las horas de la reserva están dentro del horario de apertura y cierre de la cancha
         if (!this.manejadorFechas.isHorarioEnLimites(obtenerHorarioPorDiaYCancha.getApertura(),
                 obtenerHorarioPorDiaYCancha.getCierre(), reservacionCanchaRequest.getHoraInicio(),
                 reservacionCanchaRequest.getHoraFin())) {
-
-            // Formateamos un mensaje de excepción con los horarios de apertura y cierre
-            String mensajeError = String.format("La reserva no puede realizarse fuera de los horarios permitidos. "
+            throw new Exception(String.format("La reserva no puede realizarse fuera de los horarios permitidos. "
                     + "El horario de la cancha es de %s a %s.",
                     obtenerHorarioPorDiaYCancha.getApertura().toString(),
-                    obtenerHorarioPorDiaYCancha.getCierre().toString());
-
-            throw new Exception(mensajeError);
+                    obtenerHorarioPorDiaYCancha.getCierre().toString()));
         }
 
         // Verificar si la cancha está ocupada en el horario solicitado
@@ -78,48 +91,63 @@ public class ReservaService extends Service {
         if (!reservasSolapadas.isEmpty()) {
             throw new Exception("La cancha ya está ocupada en el horario solicitado.");
         }
-        //obtener el usuario por medio del jwt
+
+        // Obtener el usuario a partir del JWT
         Usuario reservador = this.usuarioService.getUsuarioUseJwt();
 
-        //mandamos a traer el porcentaje de adelanto de la aplicacion
+        // Calcular adelanto (ejemplo: 10%)
         Double porcentajeAdelanto = 10.00;
 
-        //obtenemos las horas tottales de la reservacion
+        // Calcular horas totales de la reservación
         Long horas = this.manejadorFechas.calcularDiferenciaEnHoras(
                 reservacionCanchaRequest.getHoraInicio(),
                 reservacionCanchaRequest.getHoraFin());
 
-        //traer el precio por hora de la cancha 
+        // Traer el precio por hora de la cancha y calcular el total a pagar
         Double precioHoraCancha = cancha.getCostoHora();
-
-        //cacular el recio total y sacar el adelanto
         Double totalAPagar = horas * precioHoraCancha;
         Double adelanto = totalAPagar * (porcentajeAdelanto / 100);
 
-        //si esta disponible entonces hacemos la reservacion creando la constancia de reserva, y cobramos el porcentaje de anticipo
+        // Crear la entidad `Reserva`
         Reserva reserva = new Reserva(
                 reservador,
                 reservacionCanchaRequest.getHoraInicio(),
                 reservacionCanchaRequest.getHoraFin(),
                 reservacionCanchaRequest.getFechaReservacion(),
-                null,
+                null, // Aquí puedes asignar una factura si la tienes
                 false,
                 adelanto,
                 totalAPagar
         );
 
-        // Guardar la reserva de la cancha
-        ReservaCancha reservaCancha = new ReservaCancha(reserva, cancha);
-        reservaCanchaRepository.save(reservaCancha);
-        //ahora debemos generar la constacia a partir de la reserva generada
-        byte[] reporte = this.reservaImprimible.init(reserva);
-        //preparar los headers para la respuesta http
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType(FileHttpMetaData.PDF.getContentType()));
-        headers.setContentDispositionFormData(FileHttpMetaData.PDF.getContentDispoition(), "Constancia_Reserva.pdf");
+        // Guardar primero la entidad `Reserva`
+        Reserva saveReserva = reservaRepository.save(reserva);
 
+        // Crear la entidad `ReservaCancha`
+        ReservaCancha reservaCancha = new ReservaCancha(saveReserva, cancha);
+
+        // Establecer la relación bidireccional
+        saveReserva.setReservaCancha(reservaCancha);
+
+        // Guardar ambas entidades
+        reservaCanchaRepository.save(reservaCancha);
+        reservaRepository.save(saveReserva); // Guardar de nuevo para actualizar la relación
+
+        // Generar la constancia a partir de la reserva generada
+        byte[] reporte = this.reservaImprimible.init(saveReserva);
+
+        // Preparar los headers para la respuesta HTTP
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.parseMediaType(FileHttpMetaData.PDF.getContentType())); // Ajustar el valor de Content-Type
+        headers.setContentDisposition(ContentDisposition.builder(FileHttpMetaData.PDF.getContentDispoition()) // Corregir el contentDisposition
+                .filename(FileHttpMetaData.PDF.getFileName())
+                .build());
+        // Retornar el archivo generado
         return new ArchivoDTO(
                 headers,
-                reporte);
+                reporte
+        );
     }
+
 }

@@ -57,6 +57,19 @@ public class ManejadorTiempo {
     }
 
     /**
+     * Compara dos objetos LocalTime para verificar si la primera hora es
+     * anterior a la segunda.
+     *
+     * @param hora1 La primera hora a comparar (LocalTime).
+     * @param hora2 La segunda hora a comparar (LocalTime).
+     * @return true si la primera hora es anterior a la segunda, false en caso
+     * contrario.
+     */
+    public boolean esPrimeraHoraAntes(LocalTime hora1, LocalTime hora2) {
+        return hora1.isBefore(hora2);
+    }
+
+    /**
      * Calcula la diferencia en horas entre dos LocalTime.
      *
      * @param inicio El tiempo de inicio.

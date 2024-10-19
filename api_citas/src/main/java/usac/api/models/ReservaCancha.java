@@ -40,6 +40,9 @@ public class ReservaCancha extends Auditor {
         this.cancha = cancha;
     }
 
+    public ReservaCancha() {
+    }
+
     public Cancha getCancha() {
         return cancha;
     }

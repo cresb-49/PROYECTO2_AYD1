@@ -80,7 +80,7 @@ public class ValidadorPermisosTest {
         permisosRol.add(rolPermiso);
         rol.setPermisosRol(permisosRol);
         List<RolUsuario> roles = new ArrayList<>();
-        roles.add(new RolUsuario(rol, usuario));
+        roles.add(new RolUsuario(usuario, rol));
         usuario.setRoles(roles);
 
         // Simular que el usuario es un ayudante
@@ -103,7 +103,7 @@ public class ValidadorPermisosTest {
         Rol rol = new Rol();
         rol.setPermisosRol(permisosRol);
         List<RolUsuario> roles = new ArrayList<>();
-        roles.add(new RolUsuario(rol, usuario));
+        roles.add(new RolUsuario(usuario, rol));
 
         usuario.setRoles(roles);
 
@@ -128,7 +128,7 @@ public class ValidadorPermisosTest {
         usuario.setEmail("usuario@usuario");
         Rol rol = new Rol();
         List<RolUsuario> roles = new ArrayList<>();
-        roles.add(new RolUsuario(rol, usuario));
+        roles.add(new RolUsuario(usuario, rol));
         usuario.setRoles(roles);
 
         // Simular que el usuario no es un ayudante
