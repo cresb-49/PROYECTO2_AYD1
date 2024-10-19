@@ -30,22 +30,22 @@ import usac.api.models.RolUsuario;
  * permisos de acceso a rutas protegidas por rol de usuario.
  */
 public class ValidadorPermisosTest {
-    
+
     @Mock
     private HttpServletRequest request;
-    
+
     @Mock
     private UsuarioService usuarioService;
-    
+
     @Mock
     private Authentication authentication;
-    
+
     @Mock
     private SecurityContext securityContext;
-    
+
     @InjectMocks
     private ValidadorPermiso validadorPermiso;
-    
+
     private List<RolPermiso> permisosRol;
 
     /**
@@ -73,14 +73,14 @@ public class ValidadorPermisosTest {
         // Crear un nuevo usuario y asignarle rol y permisos
         Usuario usuario = new Usuario();
         Rol rol = new Rol();
-        
+
         Permiso permiso = new Permiso();
         permiso.setRuta("/api/test");
         RolPermiso rolPermiso = new RolPermiso(null, permiso);
         permisosRol.add(rolPermiso);
         rol.setPermisosRol(permisosRol);
         List<RolUsuario> roles = new ArrayList<>();
-        roles.add(new RolUsuario(usuario, rol));
+        roles.add(new RolUsuario(rol, usuario));
         usuario.setRoles(roles);
 
         // Simular que el usuario es un ayudante
@@ -103,8 +103,8 @@ public class ValidadorPermisosTest {
         Rol rol = new Rol();
         rol.setPermisosRol(permisosRol);
         List<RolUsuario> roles = new ArrayList<>();
-        roles.add(new RolUsuario(usuario, rol));
-        
+        roles.add(new RolUsuario(rol, usuario));
+
         usuario.setRoles(roles);
 
         // Simular que el usuario es un ayudante
@@ -128,7 +128,7 @@ public class ValidadorPermisosTest {
         usuario.setEmail("usuario@usuario");
         Rol rol = new Rol();
         List<RolUsuario> roles = new ArrayList<>();
-        roles.add(new RolUsuario(usuario, rol));
+        roles.add(new RolUsuario(rol, usuario));
         usuario.setRoles(roles);
 
         // Simular que el usuario no es un ayudante
@@ -146,7 +146,7 @@ public class ValidadorPermisosTest {
     void testGetUsuarioPorJwt() throws Exception {
         // Crear un nuevo usuario
         Usuario usuario = new Usuario();
-        
+
         when(authentication.getName()).thenReturn("test@example.com");
         when(usuarioService.getByEmail(anyString())).thenReturn(usuario);
 
