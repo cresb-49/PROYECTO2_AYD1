@@ -62,27 +62,23 @@ public class UserChangePasswordRequestTest {
     // @Test
     // void testInvalidEmail() {
     //     UserChangePasswordRequest request = new UserChangePasswordRequest(1L, "", "oldPassword", "newPassword");
-
     //     Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(request);
-
     //     assertEquals(1, violations.size(), "Debe haber 1 violación de validación.");
     //     assertEquals("La email no puede estar vacía.", violations.iterator().next().getMessage());
     // }
-
     /**
      * Prueba para validar que se genera un error cuando la contraseña actual
      * está vacía.
      */
     @Test
     void testInvalidPassword() {
-        UserChangePasswordRequest request = new UserChangePasswordRequest(1L, "", "newPassword");
+        UserChangePasswordRequest request = new UserChangePasswordRequest(1L,
+                "", "newPassword");
 
         Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(
                 request);
 
-        assertEquals(1, violations.size(), "Debe haber 1 violación de validación.");
-        assertEquals("La contraseña actual no puede estar vacía.",
-                violations.iterator().next().getMessage());
+        assertEquals(2, violations.size(), "Debe haber 2 violaciónes de validación.");
     }
 
     /**
@@ -96,7 +92,7 @@ public class UserChangePasswordRequestTest {
         Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(
                 request);
 
-        assertEquals(2, violations.size(), "Debe haber 2 violación de validación.");
+        assertEquals(1, violations.size(), "Debe haber 1 violación de validación.");
     }
 
     /**

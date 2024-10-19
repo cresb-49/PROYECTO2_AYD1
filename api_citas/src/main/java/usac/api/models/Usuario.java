@@ -9,7 +9,6 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -83,6 +82,11 @@ public class Usuario extends Auditor {
     @Cascade(CascadeType.ALL)
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private List<RolUsuario> roles;
+
+    @OneToMany(mappedBy = "reservador", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private List<Reserva> reservas;
 
     public Usuario(String nit, String cui, String phone, String email, String nombres, String apellidos,
             String password) {
@@ -168,6 +172,14 @@ public class Usuario extends Auditor {
 
     public void setRoles(List<RolUsuario> roles) {
         this.roles = roles;
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
     }
 
 }

@@ -14,10 +14,13 @@ import usac.api.repositories.CanchaRepository;
 
 @Service
 public class CanchaService extends usac.api.services.Service {
+
     @Autowired
     private CanchaRepository canchaRepository;
+
     @Autowired
     private HorarioCanchaService horarioCanchaService;
+
     @Autowired
     private DiaService diaService;
 
@@ -51,6 +54,7 @@ public class CanchaService extends usac.api.services.Service {
 
     /**
      * Método para actualizar una cancha
+     *
      * @param cancha
      * @param horarios
      * @return
@@ -102,20 +106,20 @@ public class CanchaService extends usac.api.services.Service {
 
     /**
      * Método para obtener una cancha por su id
+     *
      * @param id
      * @return
      * @throws Exception
      */
     public Cancha getCanchaById(Long id) throws Exception {
-        Cancha cancha = canchaRepository.findById(id).orElse(null);
-        if (cancha == null) {
-            throw new Exception("No se encontró la cancha");
-        }
+        Cancha cancha = canchaRepository.findById(id).orElseThrow(
+                () -> new Exception("No se encontró la cancha"));
         return cancha;
     }
 
     /**
      * Método para eliminar una cancha por su id
+     *
      * @param id
      * @throws Exception
      */

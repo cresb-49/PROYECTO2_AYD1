@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaReserva" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7872f32f-a04e-479a-bd88-20211fa5a784">
+	<parameter name="empleadoNombre" class="java.lang.String"/>
+	<parameter name="nombreServicio" class="java.lang.String"/>
+	<parameter name="fechaHora" class="java.lang.String"/>
+	<parameter name="estadoCita" class="java.lang.String"/>
+	<parameter name="idReserva" class="java.lang.Long"/>
+	<parameter name="nombre" class="java.lang.String"/>
+	<parameter name="adelanto" class="java.lang.String"/>
+	<parameter name="apellidos" class="java.lang.String"/>
+	<parameter name="nombre_tienda" class="java.lang.String"/>
+	<parameter name="direccion_tienda" class="java.lang.String"/>
+	<parameter name="imagen_tienda" class="java.io.InputStream"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="80" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="80" backcolor="#FFBF3D" uuid="6ba2d07b-93cd-4a3b-9ff2-9cbb6f659b2e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<image hAlign="Center" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="20" y="0" width="70" height="80" uuid="fe100217-126a-404c-97a4-5947171bf8e2"/>
+				<imageExpression><![CDATA[$P{imagen_tienda}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="157" y="40" width="388" height="40" forecolor="#FFFFFF" uuid="8ce90400-1a41-49fe-929e-44c95f1f9518"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="25" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Constancia de Reservación]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="157" y="0" width="388" height="30" forecolor="#FFFFFF" uuid="953cd63b-7894-49d7-8101-2a00f3125ecd"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nombre_tienda}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="318" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="290" y="80" width="250" height="150" uuid="e5646e32-0f66-441f-8305-bf997cb3033e"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="10">
+				<reportElement x="10" y="20" width="250" height="290" uuid="ca88fbd8-0dbd-4f18-ab06-a4900972f35f"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</rectangle>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="309" y="130" width="210" height="30" uuid="9be0ac8d-cde0-42b9-9d9c-578fd789d289"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Nombre del cliente: </b>"+$P{nombre} + " " +$P{apellidos}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="310" y="180" width="210" height="30" uuid="c16ad613-77ae-4ab9-b1af-8654db626339"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Adelanto: </b>"+ $P{adelanto}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="30" y="70" width="210" height="30" uuid="8356c327-5d28-437c-ba88-dbabc4cf23ea"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Id de la reserva: </b>"+ $P{idReserva}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="30" y="120" width="210" height="30" uuid="f6ae8f1f-f287-46a3-99a2-d172c4a8d6ba"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Servicio: </b>"+ $P{nombreServicio}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="30" y="170" width="210" height="30" uuid="248f80c6-9f48-4c70-ae6a-b53523b76be6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Lo atendera: </b>"+ $P{empleadoNombre}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="30" y="220" width="210" height="30" uuid="58b52f13-b1ce-4476-aa59-06e0b2197805"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Fecha y hora de la reserva: </b>"+$P{fechaHora}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="30" y="270" width="210" height="30" uuid="826726fc-02df-4136-abe4-70494f2bcf46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Estado reserva: </b>"+$P{estadoCita}]]></textFieldExpression>
+			</textField>
+			<rectangle radius="10">
+				<reportElement x="10" y="20" width="250" height="40" backcolor="rgba(205, 82, 59, 0.49019608)" uuid="c5b91476-25fb-4eaf-9b1d-067a98a855ab"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="10">
+				<reportElement x="290" y="80" width="250" height="40" backcolor="rgba(28, 200, 235, 0.49411765)" uuid="a371d33e-bce9-449d-9301-510d2f504795"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="11" y="25" width="249" height="30" forecolor="#FFFFFF" uuid="c9c6bf99-8f21-491a-a3d4-3536f11b067c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reservación]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="85" width="249" height="30" forecolor="#FFFFFF" uuid="eb651e57-59b6-4d72-ba99-d76846fb4835"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Información Personal]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="48" splitType="Stretch">
+			<textField textAdjust="ScaleFont">
+				<reportElement x="271" y="10" width="274" height="30" uuid="e9c93b4e-ef60-4325-a5c4-b4032d8154d4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Direccion: </b>"+$P{direccion_tienda}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

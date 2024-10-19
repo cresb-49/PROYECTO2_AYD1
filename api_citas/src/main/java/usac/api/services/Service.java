@@ -29,6 +29,11 @@ public class Service {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    public String getGmailUsuarioPorJwt() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+
     /**
      * Si se falla la validacion se lanza Exception con los motivos
      *
