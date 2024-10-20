@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import usac.api.models.Empleado;
 import usac.api.models.Servicio;
 import usac.api.models.dto.ArchivoDTO;
 import usac.api.models.request.ReservacionServicioRequest;
@@ -139,6 +143,23 @@ public class ServicioController {
         } catch (Exception ex) {
             // Devuelve una respuesta con un mensaje de error si ocurre algún problema
             return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    /*
+     * Retorna los empleados asociados a un servicio
+     * @param id id del servicio
+     * @return empleados asociados al servicio
+     */
+    @GetMapping("public/servicio/{id}/empleados")
+    public ResponseEntity<?> empleadosAsociadosAlServicio(@PathVariable Long id) {
+        try {
+            System.out.println("Consulta " + id);
+            List<Empleado> data = servicioService.empleadosAsociadosAlServicio(id);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+
         }
     }
 }

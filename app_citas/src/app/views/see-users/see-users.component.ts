@@ -39,7 +39,7 @@ export class SeeUsersComponent implements OnInit {
   usuarios: UserInfo[] = [];
 
   actionsTable: TableAction[] = [
-    { name: 'Editar', icon: 'edit', route: '/edit-user', key: 'id' },
+    { name: 'Editar', icon: 'edit', route: '/editar-cliente', key: 'id' },
     { name: 'Eliminar', icon: 'delete', action: (data: any) => this.openModal(data), return: true }
   ]
   constructor(

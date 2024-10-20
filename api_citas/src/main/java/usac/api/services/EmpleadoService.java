@@ -31,9 +31,9 @@ public class EmpleadoService extends usac.api.services.Service {
 
     @Transactional(rollbackOn = Exception.class)
     public Empleado createEmpleado(Empleado empleado) throws Exception {
-        //Validamos el modelo
+        // Validamos el modelo
         this.validarModelo(empleado);
-        //Creamos el empleado
+        // Creamos el empleado
         Empleado empleadoCreado = empleadoRepository.save(empleado);
         if (empleadoCreado != null && empleadoCreado.getId() != null) {
             return empleadoCreado;
@@ -98,5 +98,9 @@ public class EmpleadoService extends usac.api.services.Service {
 
     public HorarioEmpleado obtenerHorarioDiaEmpleado(Dia dia, Empleado empleado) {
         return horarioEmpleadoRepository.findByDiaAndEmpleado(dia, empleado);
+    }
+
+    public List<Empleado> getEmpleadosByRolId(Long rolId) {
+        return empleadoRepository.findEmpleadosByRolId(rolId);
     }
 }
