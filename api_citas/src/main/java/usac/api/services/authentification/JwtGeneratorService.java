@@ -22,9 +22,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class JwtGeneratorService {
+    // Clave secreta para firmar el JWT
 
-    //4040notfoundSecretKey!@# en base 64
     private static final String JWT_SECRET_KEY = "llave_secreta";
+
     //nueve horas de validez
     private static long JWT_TOKEN_TIME_VALIDITY = 1000 * 60 * 60 * (long) 48;
 
@@ -61,10 +62,9 @@ public class JwtGeneratorService {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_TIME_VALIDITY))
                 .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KEY).compact();
-
     }
 
-    public boolean validateTOken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
         return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }

@@ -22,7 +22,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.persistence.FetchType;
 
 /**
  * @author carlo
@@ -82,5 +81,4 @@ public class Empleado extends Auditor {
     public void setCitas(List<ReservaServicio> citas) {
         this.citas = citas;
     }
-
 }

@@ -10,7 +10,7 @@ import usac.api.models.Usuario;
 
 public class UpdateEmpleadoRequest {
 
-    @NotNull(message= "El id del empleado no puede ser nulo")
+    @NotNull(message = "El id del empleado no puede ser nulo")
     private Long id;
 
     @NotNull(message = "El usuario no puede ser nulo")
