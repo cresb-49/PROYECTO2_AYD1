@@ -280,7 +280,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             // Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a
             // base64
             String logo = cargarImagenComoBase64("logo.svg");
-            Negocio negocio = new Negocio(logo, "TiendaAyD", false, "2da calle XXX-XXX-XX Quetgo");
+            Negocio negocio = new Negocio(logo, "TiendaAyD", false,
+                    "2da calle XXX-XXX-XX Quetgo", 5.0);
             try {
                 ArrayList<Dia> horario = new ArrayList<>();
                 horario.add(lunes);
