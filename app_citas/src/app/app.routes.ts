@@ -26,6 +26,11 @@ import { CreateCourtComponent } from './views/create-court/create-court.componen
 import { CrearAdminComponent } from './views/crear-admin/crear-admin.component';
 import { EditAdminComponent } from './views/edit-admin/edit-admin.component';
 import { SeeAdminsComponent } from './views/see-admins/see-admins.component';
+import { CrearClienteComponent } from './views/crear-cliente/crear-cliente.component';
+import { EditClienteComponent } from './views/edit-cliente/edit-cliente.component';
+import { SeeRolesComponent } from './views/see-roles/see-roles.component';
+import { CrearRolComponent } from './views/crear-rol/crear-rol.component';
+import { EditarRolComponent } from './views/editar-rol/editar-rol.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -95,6 +100,24 @@ export const routes: Routes = [
       },
       {
         path: 'crear-empleado', component: CrearEmpleadoComponent
+      },
+      {
+        path: 'crear-cliente', component: CrearClienteComponent
+      },
+      {
+        path: 'editar-cliente/:id', component: EditClienteComponent
+      },
+      {
+        path: 'roles', component: SeeRolesComponent
+      },
+      {
+        path: 'crear-rol', component: CrearRolComponent
+      },
+      {
+        path: 'editar-rol/:id', component: EditarRolComponent
+      },
+      {
+        path: 'info-servicio/:id', component: AgendarCitaComponent
       }
     ]
   },

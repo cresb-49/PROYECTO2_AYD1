@@ -4,6 +4,8 @@
  */
 package usac.api.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import usac.api.models.Permiso;
 import usac.api.repositories.PermisoRepository;
@@ -26,10 +28,19 @@ public class PermisoService extends Service {
      * @throws Exception
      */
     public Permiso getPermisoById(Permiso permisoId) throws Exception {
-        this.validarId(permisoId, "Id del permiso invalido.");//validar id
+        this.validarId(permisoId, "Id del permiso invalido.");// validar id
         Permiso permiso = this.permisoRepository.findById(permisoId.getId()).orElse(null);
         this.validarNull(permiso);
         return permiso;
+    }
+
+    /**
+     * Obtiene todos los permisos del sistema
+     * 
+     * @return
+     */
+    public List<Permiso> getAllPermisos() {
+        return this.permisoRepository.findAll();
     }
 
 }

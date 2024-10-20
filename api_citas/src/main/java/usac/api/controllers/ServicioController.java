@@ -1,8 +1,11 @@
 package usac.api.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -12,11 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import usac.api.models.Empleado;
 import usac.api.models.Servicio;
 import usac.api.services.ServicioService;
 import usac.api.tools.transformers.ApiBaseTransformer;
-
-
 
 @RestController
 @RequestMapping("/api/servicio")
@@ -37,7 +39,7 @@ public class ServicioController {
     @GetMapping("public/servicio/{id}")
     public ResponseEntity<?> getServicioById(@PathVariable Long id) {
         try {
-            System.out.println("id: " + id);    
+            System.out.println("id: " + id);
             Object data = servicioService.getServicioById(id);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
@@ -64,7 +66,7 @@ public class ServicioController {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
     }
-    
+
     @PatchMapping("private/servicio")
     public ResponseEntity<?> updateServicio(@RequestBody Servicio servicio) {
         try {
@@ -81,6 +83,22 @@ public class ServicioController {
             System.out.println("servicio: " + servicio);
             Servicio servicioCreado = servicioService.crearServicio(servicio);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", servicioCreado, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    /**
+     * Retorna los empleados asociados a un servicio
+     * @param id id del servicio
+     * @return empleados asociados al servicio
+     */
+    @GetMapping("public/servicio/{id}/empleados")
+    public ResponseEntity<?> empleadosAsociadosAlServicio(@PathVariable Long id) {
+        try {
+            System.out.println("Consulta " + id);
+            List<Empleado> data = servicioService.empleadosAsociadosAlServicio(id);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }

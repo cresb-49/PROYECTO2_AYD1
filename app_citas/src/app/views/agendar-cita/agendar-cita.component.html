@@ -1,28 +1,22 @@
 <section class="px-20">
-
   <h4 class="text-2xl font-bold dark:text-white">Agendar Cita</h4>
-  <form class="w-full mt-4">
+  <div class="w-full mt-4">
     <!-- Primera sección del formulario -->
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
       <div class="relative z-0 w-full mb-2 group">
-        <label for="codigo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Negocio</label>
-        <input type="text" id="codigo-input" readonly
-          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-      </div>
-      <div class="relative z-0 w-full mb-2 group">
         <label for="codigo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Servicio</label>
-        <input type="text" id="codigo-input" readonly
+        <input type="text" id="codigo-input" readonly [(ngModel)]="servicioData.nombre"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="relative z-0 w-full mb-2 group">
         <label for="costo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo</label>
-        <input type="number" id="costo-input" readonly
+        <input type="number" id="costo-input" readonly [(ngModel)]="servicioData.precio"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="relative z-0 w-full mb-2 group">
         <label for="costo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tiempo del
-          Servicio</label>
-        <input type="number" id="costo-input" readonly
+          Servicio (horas)</label>
+        <input type="number" id="costo-input" readonly [(ngModel)]="servicioData.duracion"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
     </div>
@@ -31,7 +25,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
       <div class="relative z-0 w-full mb-4 group">
         <h4 class="text-2xl font-bold dark:text-white">Horarios Disponibles</h4>
-        <app-schedule-conf [isShowData]="true" [showNonActive]="false"></app-schedule-conf>
+        <app-schedule-conf [isShowData]="true" [data]="horario" [showNonActive]="false"></app-schedule-conf>
       </div>
       <div class="relative z-0 w-full mb-5 group">
         <h4 class="text-2xl font-bold dark:text-white mb-4">Agenda tu Cita</h4>
@@ -45,11 +39,8 @@
             Empleado</label>
           <select id="countries"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-            <option selected>Aleatorio</option>
-            <option value="US">Empleado 1</option>
-            <option value="CA">Empleado 2</option>
-            <option value="FR">Empleado 3</option>
-            <option value="DE">Empleado 4</option>
+            <option value="0">Aleatorio</option>
+            <option *ngFor="let empleado of empleados" value="{{empleado.id}}">{{empleado.usuario.nombres}}</option>
           </select>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2">
@@ -65,7 +56,7 @@
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
           </div>
         </div>
-        <button type="submit"
+        <button (click)="agendar()"
           class="mt-4 mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center  dark:focus:ring-blue-800"
           [ngClass]="{
         'cursor-not-allowed': !enableCita ,
@@ -77,10 +68,8 @@
         'dark:bg-blue-500': !enableCita
       }" [disabled]="!enableCita">
           Agendar
-
         </button>
       </div>
     </div>
-  </form>
-
+  </div>
 </section>
