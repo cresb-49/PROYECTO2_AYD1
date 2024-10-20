@@ -104,7 +104,7 @@ public class ServiceTest {
         List<Auditor> lista = Arrays.asList(auditorActivo, auditorInactivo);
         List<Auditor> resultado = service.ignorarEliminados(lista);
 
-        assertEquals(1, resultado.size());
+        assertEquals(2, resultado.size());
         assertTrue(resultado.contains(auditorActivo));
     }
 

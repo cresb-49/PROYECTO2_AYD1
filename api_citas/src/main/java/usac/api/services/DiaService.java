@@ -14,7 +14,7 @@ public class DiaService extends usac.api.services.Service {
     private DiaRepository diaRepository;
     
     public Dia getDiaByNombre(String nombre) throws Exception {
-        Dia dia = this.diaRepository.findOneByNombre(nombre).orElse(null);
+        Dia dia = this.diaRepository.findOneByNombreIgnoreCase(nombre).orElse(null);
         if (dia == null) {
             throw new Exception("Dia no encontrado.");
         }
