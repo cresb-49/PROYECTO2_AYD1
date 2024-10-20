@@ -5,7 +5,10 @@ import org.springframework.stereotype.Repository;
 import usac.api.models.Usuario;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import usac.api.models.Rol;
 
 @Repository
 public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
@@ -32,6 +35,9 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
     public boolean existsUsuarioByCuiAndIdNot(String nit, Long id);
 
     public boolean existsUsuarioByPhoneAndIdNot(String nit, Long id);
+
+    @Query("SELECT u FROM Usuario u JOIN u.roles ru WHERE ru.rol = :rolAsociadoAlServicio")
+    public List<Usuario> findUsuariosByRolUsuario_Rol(@Param("rolAsociadoAlServicio") Rol rolAsociadoAlServicio);
 
     @Override
     public List<Usuario> findAll();

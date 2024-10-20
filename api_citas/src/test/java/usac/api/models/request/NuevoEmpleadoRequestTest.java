@@ -25,7 +25,7 @@ class NuevoEmpleadoRequestTest {
         rol = new Rol("EMPLEADO");
 
         // Inicializar NuevoEmpleadoRequest con los objetos
-        nuevoEmpleadoRequest = new NuevoEmpleadoRequest(usuario,new ArrayList<>(), rol);
+        nuevoEmpleadoRequest = new NuevoEmpleadoRequest(usuario, new ArrayList<>(), rol);
     }
 
     @Test

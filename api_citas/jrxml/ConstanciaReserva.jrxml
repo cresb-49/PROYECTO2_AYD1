@@ -12,6 +12,8 @@
 	<parameter name="nombre_tienda" class="java.lang.String"/>
 	<parameter name="direccion_tienda" class="java.lang.String"/>
 	<parameter name="imagen_tienda" class="java.io.InputStream"/>
+	<parameter name="nit" class="java.lang.String"/>
+	<parameter name="cui" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -52,7 +54,7 @@
 	<detail>
 		<band height="318" splitType="Stretch">
 			<rectangle radius="10">
-				<reportElement x="290" y="80" width="250" height="150" uuid="e5646e32-0f66-441f-8305-bf997cb3033e"/>
+				<reportElement x="290" y="20" width="250" height="289" uuid="e5646e32-0f66-441f-8305-bf997cb3033e"/>
 				<graphicElement>
 					<pen lineWidth="1.0" lineColor="#CCCCCC"/>
 				</graphicElement>
@@ -64,14 +66,14 @@
 				</graphicElement>
 			</rectangle>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="309" y="130" width="210" height="30" uuid="9be0ac8d-cde0-42b9-9d9c-578fd789d289"/>
+				<reportElement x="310" y="70" width="210" height="30" uuid="9be0ac8d-cde0-42b9-9d9c-578fd789d289"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<b>Nombre del cliente: </b>"+$P{nombre} + " " +$P{apellidos}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="310" y="180" width="210" height="30" uuid="c16ad613-77ae-4ab9-b1af-8654db626339"/>
+				<reportElement x="310" y="220" width="210" height="30" uuid="c16ad613-77ae-4ab9-b1af-8654db626339"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 					<font size="12"/>
 				</textElement>
@@ -119,7 +121,7 @@
 				</graphicElement>
 			</rectangle>
 			<rectangle radius="10">
-				<reportElement x="290" y="80" width="250" height="40" backcolor="rgba(28, 200, 235, 0.49411765)" uuid="a371d33e-bce9-449d-9301-510d2f504795"/>
+				<reportElement x="290" y="20" width="250" height="40" backcolor="rgba(28, 200, 235, 0.49411765)" uuid="a371d33e-bce9-449d-9301-510d2f504795"/>
 				<graphicElement>
 					<pen lineWidth="0.0"/>
 				</graphicElement>
@@ -132,12 +134,26 @@
 				<text><![CDATA[Reservación]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="290" y="85" width="249" height="30" forecolor="#FFFFFF" uuid="eb651e57-59b6-4d72-ba99-d76846fb4835"/>
+				<reportElement x="290" y="25" width="249" height="30" forecolor="#FFFFFF" uuid="eb651e57-59b6-4d72-ba99-d76846fb4835"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="22" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Información Personal]]></text>
 			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="310" y="120" width="210" height="30" uuid="d8faac10-d06e-453d-9771-2e3861ee6d01"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>NIT: </b>"+$P{nit}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="309" y="170" width="210" height="30" uuid="868cc50e-55cd-4c74-89f4-612aa15500b0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b: CUI: </b>"+$P{cui}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<pageFooter>

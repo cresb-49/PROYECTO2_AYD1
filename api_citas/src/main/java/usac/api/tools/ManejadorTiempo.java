@@ -5,11 +5,8 @@
 package usac.api.tools;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -21,6 +18,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ManejadorTiempo {
+
+    /**
+     * Suma una cantidad de horas, representada por un double, a un LocalTime.
+     *
+     * @param horaInicio La hora de inicio en formato LocalTime.
+     * @param horasADurar La cantidad de horas que se desean sumar, representada
+     * como un double.
+     * @return LocalTime La hora final calculada después de sumar las horas
+     * proporcionadas.
+     */
+    public LocalTime sumarHoras(LocalTime horaInicio, Double horasADurar) {
+        // Convertir el valor de horasADurar a minutos (ya que LocalTime maneja minutos y segundos)
+        long minutosASumar = (long) (horasADurar * 60);
+
+        // Sumar los minutos al LocalTime proporcionado
+        return horaInicio.plus(Duration.ofMinutes(minutosASumar));
+    }
 
     /**
      * Convierte una fecha a su nombre de día de la semana en español.
