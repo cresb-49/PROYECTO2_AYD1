@@ -11,11 +11,11 @@ package usac.api.enums;
 public enum PermisoEnum {
     /*  ROLES */
     CREAR_ROLES("Crear roles",
-            "/api/rol/protected/crearRol"),
+            "/api/rol/private/restricted/crearRol"),
     ACTUALIZAR_ROLES("Actualizar roles",
-            "/api/rol/protected/actualizarRol"),
+            "/api/rol/private/restricted/actualizarRol"),
     ACTUALIZAR_PERMISOS_ROLES("Actualizar permisos en roles",
-            "/api/rol/protected/actualizarPermisosRol"),
+            "/api/rol/private/restricted/actualizarPermisosRol"),
     TERMINAR_RESERVAS("Marcar como 'Realizadas' las reservas",
             "/api/reserva/private/restricted/realizarReserva"),;
 
