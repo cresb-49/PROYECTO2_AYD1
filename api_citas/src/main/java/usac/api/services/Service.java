@@ -113,6 +113,18 @@ public class Service {
     }
 
     /**
+     * Verifica si el objeto tiene deletedAt = null
+     *
+     * @param <T> Tipo que extiende de Auditor
+     * @param entidad Objeto que extiende de Auditor
+     */
+    public <T extends Auditor> void isDeleted(T entidad) throws Exception {
+        if (entidad.getDesactivatedAt() != null) {
+            throw new Exception("Informacion eliminada previamente.");
+        }
+    }
+
+    /**
      * Valida el estado de un solo atributo de un modelo.
      *
      * @param objeto

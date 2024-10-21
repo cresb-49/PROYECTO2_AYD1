@@ -33,13 +33,19 @@ public interface ReservaServicioRepository extends CrudRepository<ReservaServici
             @Param("horaFin") LocalTime horaFin);
 
     @Query("SELECT COUNT(rs) FROM ReservaServicio rs WHERE rs.empleado.id"
-            + " = :empleadoId AND rs.reserva.fechaReservacion = :fecha")
+            + " = :empleadoId AND rs.reserva.fechaReservacion = :fecha AND"
+            + " rs.reserva.canceledAt IS NULL AND"
+            + " rs.reserva.desactivatedAt IS NULL AND"
+            + " rs.reserva.deletedAt IS NULL")
     public Long countReservasByEmpleadoAndFecha(@Param("empleadoId") Long empleadoId,
             @Param("fecha") LocalDate fecha);
 
     @Query("SELECT COUNT(r) FROM ReservaServicio r WHERE r.servicio.id = :servicioId"
             + " AND r.reserva.fechaReservacion = :fecha AND "
-            + "(r.reserva.horaInicio < :horaFin AND r.reserva.horaFin > :horaInicio)")
+            + "(r.reserva.horaInicio < :horaFin AND r.reserva.horaFin > :horaInicio) AND"
+            + " r.reserva.canceledAt IS NULL AND"
+            + " r.reserva.desactivatedAt IS NULL AND"
+            + " r.reserva.deletedAt IS NULL")
     public Integer countReservasActivasPorServicio(@Param("servicioId") Long servicioId, @Param("fecha") LocalDate fecha,
             @Param("horaInicio") LocalTime horaInicio, @Param("horaFin") LocalTime horaFin);
 
