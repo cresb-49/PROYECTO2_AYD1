@@ -21,7 +21,6 @@ public class ReservacionRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm") // Formato para hora
     private LocalTime horaInicio;
 
-    @NotNull(message = "La hora de fin de la reservacion no puede ser nula")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm") // Formato para hora
     private LocalTime horaFin;
 

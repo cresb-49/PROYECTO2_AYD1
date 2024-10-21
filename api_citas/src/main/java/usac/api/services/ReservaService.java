@@ -75,6 +75,10 @@ public class ReservaService extends Service {
         // Validar el modelo recibido
         this.validarModelo(reservacionCanchaRequest);
 
+        if (reservacionCanchaRequest.getHoraFin() == null) {
+            throw new Exception("La hora de fin de la reservacion no puede estar vacia.");
+        }
+
         // Obtener la cancha a partir de su ID
         Cancha cancha = this.canchaService.getCanchaById(reservacionCanchaRequest.getCanchaId());
 
@@ -107,6 +111,7 @@ public class ReservaService extends Service {
                 reservacionCanchaRequest.getHoraInicio(),
                 reservacionCanchaRequest.getHoraFin());
         Double precioHoraCancha = cancha.getCostoHora();
+
         double[] pagos = calcularPagos(porcentajeAdelanto, horas, precioHoraCancha);
 
         // Crear la entidad de reserva
@@ -143,10 +148,17 @@ public class ReservaService extends Service {
         // Obtener el servicio y su límite de empleados paralelos
         Integer maxEmpleadosParalelos = servicio.getEmpleadosParalelos();
 
+        // Calculamos la hora de fin al hacer la sumatoria de la hora de inicio y el tiempo estimado del servicio
+        LocalTime horaFin = this.manejadorFechas.sumarHoras(
+                reservacionServicioRequest.getHoraInicio(), servicio.getDuracion());
+        reservacionServicioRequest.setHoraFin(horaFin); // seteamos la hora de fin del servicio
+
         // Verificar cuántas reservas activas hay para este servicio
         Integer reservasActivas = reservaServicioRepository.countReservasActivasPorServicio(
-                reservacionServicioRequest.getServicioId(), reservacionServicioRequest.getFechaReservacion(),
-                reservacionServicioRequest.getHoraInicio(), reservacionServicioRequest.getHoraFin());
+                reservacionServicioRequest.getServicioId(),
+                reservacionServicioRequest.getFechaReservacion(),
+                reservacionServicioRequest.getHoraInicio(),
+                reservacionServicioRequest.getHoraFin());
 
         // Verificar si aún hay disponibilidad de empleados
         if (reservasActivas >= maxEmpleadosParalelos) {
@@ -174,11 +186,6 @@ public class ReservaService extends Service {
             throw new Exception("El empleado seleccionado no está autorizado "
                     + "para realizar este servicio.");
         }
-
-        // Calculamos la hora de fin al hacer la sumatoria de la hora de inicio y el tiempo estimado del servicio
-        LocalTime horaFin = this.manejadorFechas.sumarHoras(
-                reservacionServicioRequest.getHoraInicio(), servicio.getDuracion());
-        reservacionServicioRequest.setHoraFin(horaFin); // seteamos la hora de fin del servicio
 
         // Obtener el día de la semana de la reservación (e.g., Lunes, Martes)
         String diaReserva = this.manejadorFechas.localDateANombreDia(
@@ -292,12 +299,14 @@ public class ReservaService extends Service {
         Empleado empleadoAsignado = empleadosDisponibles.stream()
                 .filter(empleado -> {
                     // Verificar si el empleado trabaja ese día
-                    HorarioEmpleado horarioEmpleado = this.empleadoService.obtenerHorarioDiaEmpleado(dia, empleado);
+                    HorarioEmpleado horarioEmpleado = this.empleadoService.
+                            obtenerHorarioDiaEmpleado(dia, empleado);
                     if (horarioEmpleado != null) {
                         try {
                             // Verificar que el horario solicitado esté dentro de los horarios del empleado
                             this.verificarHoras(reservacionServicioRequest.getHoraInicio(),
                                     reservacionServicioRequest.getHoraFin(), horarioEmpleado);
+                            this.verificarDisponibilidadEmpleado(empleado, reservacionServicioRequest);
                             return true;
                         } catch (Exception e) {
                             // Si no está disponible en el horario, pasar al siguiente empleado
@@ -354,11 +363,14 @@ public class ReservaService extends Service {
      * empleado.
      */
     private void verificarHoras(LocalTime horaInicio, LocalTime horaFin, HorarioEmpleado horarioEmpleado) throws Exception {
+
         if (!this.manejadorFechas.esPrimeraHoraAntes(horaInicio, horaFin)) {
             throw new Exception("La hora de inicio no puede ser mayor a la hora de fin.");
         }
+
         if (!this.manejadorFechas.isHorarioEnLimites(horarioEmpleado.getEntrada(),
                 horarioEmpleado.getSalida(), horaInicio, horaFin)) {
+
             throw new Exception(String.format("La reserva no puede realizarse fuera de los horarios del empleado. El horario del empleado es de %s a %s.",
                     horarioEmpleado.getEntrada().toString(), horarioEmpleado.getSalida().toString()));
         }

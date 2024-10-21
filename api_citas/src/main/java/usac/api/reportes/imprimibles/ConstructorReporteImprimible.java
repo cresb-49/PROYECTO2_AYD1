@@ -4,6 +4,7 @@
  */
 package usac.api.reportes.imprimibles;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import net.sf.jasperreports.engine.JREmptyDataSource;
@@ -18,6 +19,7 @@ import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import usac.api.models.Negocio;
+import usac.api.services.B64Service;
 import usac.api.services.NegocioService;
 
 /**
@@ -43,8 +45,11 @@ public class ConstructorReporteImprimible {
         Negocio tiendaConfig = this.tiendaConfigService.obtenerNegocio();
         parametros.put("direccion_tienda", tiendaConfig.getDireccion());
         parametros.put("nombre_tienda", tiendaConfig.getNombre());
-   //     parametros.put("imagen_tienda",
-   //             new ByteArrayInputStream(tiendaConfig.getImagenTienda()));
+        parametros.put("imagen_tienda",
+                new ByteArrayInputStream(
+                        B64Service.base64ToByteArray(
+                                tiendaConfig.getLogo())
+                ));
         //cargamos el reporte
         JasperReport reporte
                 = (JasperReport) JRLoader.loadObject(
