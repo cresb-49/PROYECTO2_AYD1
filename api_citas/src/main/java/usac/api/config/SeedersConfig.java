@@ -250,6 +250,36 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "Empleado", "Prueba5",
                     "12345");
 
+            Usuario empleado6 = new Usuario("2462113", "2468014272468",
+                    "24680136",
+                    "empleadoprueba6@email.com",
+                    "Empleado", "Prueba6",
+                    "12345");
+
+            Usuario empleado7 = new Usuario("2469224", "2456781567246",
+                    "40930136",
+                    "empleadoprueba7@email.com",
+                    "Empleado", "Prueba7",
+                    "12345");
+
+            Usuario empleado8 = new Usuario("2468902", "2468013472434",
+                    "24032313",
+                    "empleadoprueba8@email.com",
+                    "Empleado", "Prueba8",
+                    "12345");
+
+            Usuario empleado9 = new Usuario("2468013", "2468013572488",
+                    "24623476",
+                    "empleadoprueba9@email.com",
+                    "Empleado", "Prueba9",
+                    "12345");
+
+            Usuario empleado10 = new Usuario("2468033", "2468013234468",
+                    "24422013",
+                    "empleadoprueba10@email.com",
+                    "Empleado", "Prueba10",
+                    "12345");
+
             ArrayList<HorarioEmpleado> horarios = new ArrayList<>();
             horarios.add(new HorarioEmpleado(lunes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
             horarios.add(new HorarioEmpleado(martes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
@@ -271,6 +301,12 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, horarios, customRol3));
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, horarios, customRol4));
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, horarios, customRol5));
+
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado6, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado7, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado8, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado9, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado10, horarios, customRol));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -347,11 +383,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             String imagenEjemplo = cargarImagenComoBase64("imagen_ejemplo.jpg");
             // Creacion de los servicios de la tienda
             try {
-                this.servicioService.crearServicio(new Servicio("Servicio 1", 1.0, imagenEjemplo, 100.0, "Descripcion del servicio 1", customRol));
-                this.servicioService.crearServicio(new Servicio("Servicio 2", 2.0, imagenEjemplo, 200.0, "Descripcion del servicio 2", customRol2));
-                this.servicioService.crearServicio(new Servicio("Servicio 3", 3.0, imagenEjemplo, 300.0, "Descripcion del servicio 3", customRol3));
-                this.servicioService.crearServicio(new Servicio("Servicio 4", 4.0, imagenEjemplo, 400.0, "Descripcion del servicio 4", customRol4));
-                this.servicioService.crearServicio(new Servicio("Servicio 5", 5.0, imagenEjemplo, 500.0, "Descripcion del servicio 5", customRol5));
+                this.servicioService.crearServicio(new Servicio("Servicio 1", 1.0, imagenEjemplo, 100.0, "Descripcion del servicio 1", customRol, 2));
+                this.servicioService.crearServicio(new Servicio("Servicio 2", 2.0, imagenEjemplo, 200.0, "Descripcion del servicio 2", customRol2, 6));
+                this.servicioService.crearServicio(new Servicio("Servicio 3", 3.0, imagenEjemplo, 300.0, "Descripcion del servicio 3", customRol3, 3));
+                this.servicioService.crearServicio(new Servicio("Servicio 4", 4.0, imagenEjemplo, 400.0, "Descripcion del servicio 4", customRol4, 5));
+                this.servicioService.crearServicio(new Servicio("Servicio 5", 5.0, imagenEjemplo, 500.0, "Descripcion del servicio 5", customRol5, 5));
             } catch (Exception e) {
             }
 

@@ -524,6 +524,10 @@ public class UsuarioService extends usac.api.services.Service {
         if (rolEncontrado == null) {
             throw new Exception("Rol no encontrado");
         }
+
+        //dememos mantener la persistencia de las reservas del usuario
+        actualizacionEmpleado.getUsuario().setReservas(usuarioEncontrado.getReservas());
+
         // Actualizamos la informacion del usuario
         Usuario userActualizado = this.updateUsuario(actualizacionEmpleado.getUsuario());
         empeladoEncontrado.setUsuario(userActualizado);

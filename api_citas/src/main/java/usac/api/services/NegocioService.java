@@ -16,6 +16,7 @@ import usac.api.repositories.NegocioRepository;
 
 @Service
 public class NegocioService extends usac.api.services.Service {
+
     @Autowired
     private NegocioRepository negocioRepository;
     @Autowired
@@ -23,8 +24,9 @@ public class NegocioService extends usac.api.services.Service {
     @Autowired
     private HorarioNegocioService horarioNegocioService;
 
-    public Negocio obtenerNegocio() {
-        return negocioRepository.findFirstByOrderByIdAsc().orElse(null);
+    public Negocio obtenerNegocio() throws Exception {
+        return negocioRepository.findFirstByOrderByIdAsc().orElseThrow(
+                () -> new Exception("No pudimos encontrar la configuracion del negocio."));
     }
 
     @Transactional(rollbackOn = Exception.class)

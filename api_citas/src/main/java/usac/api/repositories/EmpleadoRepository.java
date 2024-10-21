@@ -7,8 +7,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import usac.api.models.Empleado;
+import usac.api.models.Usuario;
 
 public interface EmpleadoRepository extends CrudRepository<Empleado, Long> {
+
     @Override
     public List<Empleado> findAll();
 
@@ -16,4 +18,6 @@ public interface EmpleadoRepository extends CrudRepository<Empleado, Long> {
     List<Empleado> findEmpleadosByRolId(@Param("rolId") Long rolId);
 
     public Long deleteEmpleadoById(Long id);
+
+    public List<Empleado> findByUsuarioIn(List<Usuario> usuarios);
 }

@@ -88,7 +88,7 @@ public class JwtGeneratorServiceTest {
         when(userDetails.getUsername()).thenReturn("testUser");
         String token = generateTestToken("testUser");
 
-        boolean isValid = jwtGeneratorService.validateTOken(token, userDetails);
+        boolean isValid = jwtGeneratorService.validateToken(token, userDetails);
         assertTrue(isValid);
     }
 
@@ -102,7 +102,7 @@ public class JwtGeneratorServiceTest {
 
         // Capturamos la excepción para que no detenga el test
         try {
-            boolean isValid = jwtGeneratorService.validateTOken(expiredToken, userDetails);
+            boolean isValid = jwtGeneratorService.validateToken(expiredToken, userDetails);
             // Como el token está expirado, esperamos que isValid sea false
             assertFalse(isValid);
         } catch (Exception e) {

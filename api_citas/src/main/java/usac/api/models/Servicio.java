@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
@@ -67,6 +66,13 @@ public class Servicio extends Auditor {
     @NotNull(message = "Los detalles del servicio no pueden ser nulo")
     private String detalles;
 
+    @Column(nullable = false)
+    @NotNull(message = "La cantidad de empleados que pueden trabajar al"
+            + " no puede ser nula.")
+    @Min(value = 1, message = "la cantidad de empleados que pueden trabajar al"
+            + " mismo tiempo debe tener como valor mínimo 1.")
+    private Integer empleadosParalelos;
+
     @OneToOne
     @NotNull(message = "El rol con el que se relaciona el servicio no puede ser nulo.")
     @JoinColumn(name = "rol", nullable = false)
@@ -82,13 +88,15 @@ public class Servicio extends Auditor {
     public Servicio() {
     }
 
-    public Servicio(String nombre, Double duracion, String imagen, Double costo, String detalles, Rol rol) {
+    public Servicio(String nombre, Double duracion, String imagen, Double costo,
+            String detalles, Rol rol, Integer empleadosParalelos) {
         this.nombre = nombre;
         this.duracion = duracion;
         this.imagen = imagen;
         this.costo = costo;
         this.detalles = detalles;
         this.rol = rol;
+        this.empleadosParalelos = empleadosParalelos;
     }
 
     public String getNombre() {
@@ -145,6 +153,14 @@ public class Servicio extends Auditor {
 
     public void setReservas(List<ReservaServicio> reservas) {
         this.reservas = reservas;
+    }
+
+    public Integer getEmpleadosParalelos() {
+        return empleadosParalelos;
+    }
+
+    public void setEmpleadosParalelos(Integer empleadosParalelos) {
+        this.empleadosParalelos = empleadosParalelos;
     }
 
     @Override
