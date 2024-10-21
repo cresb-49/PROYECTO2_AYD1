@@ -126,13 +126,14 @@ export class AuthService {
 
   private saveLocalStorage(payload: any = null): void {
     if (payload) {
+      const rolAndPermissions = this.getPayloadRoles(payload.usuario.roles);
       this.id = payload.usuario.id;
       this.token = payload.jwt;
       this.name = payload.usuario.nombres;
       this.lastname = payload.usuario.apellidos;
       this.email = payload.usuario.email;
-      this.roles = this.getPayloadRoles(payload.usuario.roles);
-      this.permissions = [];
+      this.roles = rolAndPermissions.roles;
+      this.permissions = rolAndPermissions.permissions;
     }
     this.setToLocalStorage('id', this.id.toString());
     this.setToLocalStorage('token', this.token);
@@ -144,9 +145,15 @@ export class AuthService {
     this.setToLocalStorage('permissions', JSON.stringify(this.permissions));
   }
 
-  private getPayloadRoles(roles: any[]): string[] {
-    // return roles.map((role: any) => role.rol.nombre);
-    return [];
+  private getPayloadRoles(roles: any[]): { roles: string[], permissions: string[] } {
+    let rolesUsuario = [];
+    for (const rol of roles) {
+      rolesUsuario.push(rol.rol.nombre);
+    }
+    return {
+      roles: rolesUsuario,
+      permissions: []
+    }
   }
 
   private clearLocalStorage(): void {

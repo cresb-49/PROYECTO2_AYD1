@@ -35,7 +35,7 @@ public class UserChangePasswordRequestTest {
      */
     @Test
     void testValidUserChangePasswordRequest() {
-        UserChangePasswordRequest request = new UserChangePasswordRequest(1L, "user@example.com", "oldPassword", "newPassword");
+        UserChangePasswordRequest request = new UserChangePasswordRequest(1L, "oldPassword", "newPassword");
 
         Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(request);
 
@@ -47,8 +47,7 @@ public class UserChangePasswordRequestTest {
      */
     @Test
     void testInvalidId() {
-        UserChangePasswordRequest request = new UserChangePasswordRequest(null,
-                "user@example.com", "oldPassword", "newPassword");
+        UserChangePasswordRequest request = new UserChangePasswordRequest(null, "oldPassword", "newPassword");
 
         Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(
                 request);
@@ -60,16 +59,13 @@ public class UserChangePasswordRequestTest {
     /**
      * Prueba para validar que se genera un error cuando el email está vacío.
      */
-    @Test
-    void testInvalidEmail() {
-        UserChangePasswordRequest request = new UserChangePasswordRequest(1L, "", "oldPassword", "newPassword");
-
-        Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(request);
-
-        assertEquals(1, violations.size(), "Debe haber 1 violación de validación.");
-        assertEquals("La email no puede estar vacía.", violations.iterator().next().getMessage());
-    }
-
+    // @Test
+    // void testInvalidEmail() {
+    //     UserChangePasswordRequest request = new UserChangePasswordRequest(1L, "", "oldPassword", "newPassword");
+    //     Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(request);
+    //     assertEquals(1, violations.size(), "Debe haber 1 violación de validación.");
+    //     assertEquals("La email no puede estar vacía.", violations.iterator().next().getMessage());
+    // }
     /**
      * Prueba para validar que se genera un error cuando la contraseña actual
      * está vacía.
@@ -77,14 +73,12 @@ public class UserChangePasswordRequestTest {
     @Test
     void testInvalidPassword() {
         UserChangePasswordRequest request = new UserChangePasswordRequest(1L,
-                "user@example.com", "", "newPassword");
+                "", "newPassword");
 
         Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(
                 request);
 
-        assertEquals(1, violations.size(), "Debe haber 1 violación de validación.");
-        assertEquals("La contraseña actual no puede estar vacía.",
-                violations.iterator().next().getMessage());
+        assertEquals(2, violations.size(), "Debe haber 2 violaciónes de validación.");
     }
 
     /**
@@ -93,13 +87,12 @@ public class UserChangePasswordRequestTest {
      */
     @Test
     void testInvalidNewPassword() {
-        UserChangePasswordRequest request = new UserChangePasswordRequest(1L,
-                "user@example.com", "oldPassword", "");
+        UserChangePasswordRequest request = new UserChangePasswordRequest(1L, "oldPassword", "");
 
         Set<ConstraintViolation<UserChangePasswordRequest>> violations = validator.validate(
                 request);
 
-        assertEquals(2, violations.size(), "Debe haber 2 violación de validación.");
+        assertEquals(1, violations.size(), "Debe haber 1 violación de validación.");
     }
 
     /**
@@ -109,12 +102,12 @@ public class UserChangePasswordRequestTest {
     void testSettersAndGetters() {
         UserChangePasswordRequest request = new UserChangePasswordRequest();
         request.setId(1L);
-        request.setEmail("user@example.com");
+        // request.setEmail("user@example.com");
         request.setPassword("oldPassword");
         request.setNewPassword("newPassword");
 
         assertEquals(1L, request.getId());
-        assertEquals("user@example.com", request.getEmail());
+        // assertEquals("user@example.com", request.getEmail());
         assertEquals("oldPassword", request.getPassword());
         assertEquals("newPassword", request.getNewPassword());
     }

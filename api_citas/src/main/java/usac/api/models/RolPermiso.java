@@ -21,8 +21,8 @@ import org.hibernate.annotations.Where;
  */
 @Entity
 @Table(name = "rol_permiso")
-@SQLDelete(sql = "UPDATE rol_permiso SET deleted_at = NULL WHERE id = ?")
-@Where(clause = "desactivated_at IS NULL")
+//@SQLDelete(sql = "UPDATE rol_permiso SET deleted_at = NULL WHERE id = ?")
+//@Where(clause = "desactivated_at IS NULL")
 public class RolPermiso extends Auditor {
 
     @ManyToOne//indicador de relacion muchos a uno

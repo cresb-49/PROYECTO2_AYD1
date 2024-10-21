@@ -15,12 +15,22 @@ import { ReservarCanchaComponent } from './views/reservar-cancha/reservar-cancha
 import { AgendarCitaComponent } from './views/agendar-cita/agendar-cita.component';
 import { CrearNegocioComponent } from './views/crear-negocio/crear-negocio.component';
 import { CrearServicioComponent } from './views/crear-servicio/crear-servicio.component';
-import { CreateUserAdminComponent } from './views/create-user-admin/create-user-admin.component';
 import { CrearEmpleadoComponent } from './views/crear-empleado/crear-empleado.component';
 import { MyCalendarComponent } from './views/my-calendar/my-calendar.component';
 import { MyInformationComponent } from './views/my-information/my-information.component';
 import { RecoveryPasswordComponent } from './views/recovery-password/recovery-password.component';
 import { SeeUsersComponent } from './views/see-users/see-users.component';
+import { EditarServicioComponent } from './views/editar-servicio/editar-servicio.component';
+import { SeeServiciosComponent } from './views/see-servicios/see-servicios.component';
+import { CreateCourtComponent } from './views/create-court/create-court.component';
+import { CrearAdminComponent } from './views/crear-admin/crear-admin.component';
+import { EditAdminComponent } from './views/edit-admin/edit-admin.component';
+import { SeeAdminsComponent } from './views/see-admins/see-admins.component';
+import { CrearClienteComponent } from './views/crear-cliente/crear-cliente.component';
+import { EditClienteComponent } from './views/edit-cliente/edit-cliente.component';
+import { SeeRolesComponent } from './views/see-roles/see-roles.component';
+import { CrearRolComponent } from './views/crear-rol/crear-rol.component';
+import { EditarRolComponent } from './views/editar-rol/editar-rol.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -50,6 +60,9 @@ export const routes: Routes = [
         path: 'edit-cancha/:id', component: EditCourtComponent
       },
       {
+        path: 'crear-cancha', component: CreateCourtComponent
+      },
+      {
         path: 'edit-empleado/:id', component: EditEmployeeComponent
       },
       {
@@ -68,13 +81,43 @@ export const routes: Routes = [
         path: 'usuarios', component: SeeUsersComponent
       },
       {
+        path: 'servicios', component: SeeServiciosComponent
+      },
+      {
         path: 'crear-servicio', component: CrearServicioComponent
       },
       {
-        path: 'create-user-admin', component: CreateUserAdminComponent
+        path: 'editar-servicio/:id', component: EditarServicioComponent
+      },
+      {
+        path: 'admins', component: SeeAdminsComponent
+      },
+      {
+        path: 'create-admin', component: CrearAdminComponent
+      },
+      {
+        path: 'edit-admin/:id', component: EditAdminComponent
       },
       {
         path: 'crear-empleado', component: CrearEmpleadoComponent
+      },
+      {
+        path: 'crear-cliente', component: CrearClienteComponent
+      },
+      {
+        path: 'editar-cliente/:id', component: EditClienteComponent
+      },
+      {
+        path: 'roles', component: SeeRolesComponent
+      },
+      {
+        path: 'crear-rol', component: CrearRolComponent
+      },
+      {
+        path: 'editar-rol/:id', component: EditarRolComponent
+      },
+      {
+        path: 'info-servicio/:id', component: AgendarCitaComponent
       }
     ]
   },

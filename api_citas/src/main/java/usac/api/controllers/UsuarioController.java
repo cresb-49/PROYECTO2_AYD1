@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,12 +26,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
+import usac.api.models.Empleado;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UpdateEmpleadoRequest;
 import usac.api.models.request.UserChangePasswordRequest;
+import usac.api.models.request.UsuarioRolAsignacionRequest;
 import usac.api.services.UsuarioService;
 import usac.api.tools.transformers.ApiBaseTransformer;
 
@@ -220,6 +223,22 @@ public class UsuarioController {
         }
     }
 
+    @Operation(description = "Actualiza el empleado en el sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario admin exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @PatchMapping("/private/actualizarEmpleado")
+    public ResponseEntity<?> actualizarEmpleado(@RequestBody UpdateEmpleadoRequest actualizar){
+        try {
+            Empleado respuesta = usuarioService.actualizarEmpleado(actualizar);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
     @Operation(description = "Deroga al servicio hacer la autenticacion de usuario.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Credenciales correctas", content = {
@@ -231,6 +250,43 @@ public class UsuarioController {
         try {
             LoginDTO respuesta = usuarioService.iniciarSesion(crear);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Actualiza los roles de un usuario. Si el usuario tiene el rol \"ADMIN\", se\n"
+            + "cambia a \"EMPLEADO\" y se asignan los nuevos roles (sin reasignar\n"
+            + "\"ADMIN\"). Si el usuario tiene el rol \"EMPLEADO\" y se le asigna el rol\n"
+            + "\"ADMIN\", solo se le asigna el rol \"ADMIN\". Si el usuario tiene el rol\n"
+            + "\"CLIENTE\", se lanzará un error y no se le asignarán más roles.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Actualizacion realizada con exito.", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @PatchMapping("/private/asignarRolAUsuario")
+    public ResponseEntity<?> asignarRolAUsuario(@RequestBody UsuarioRolAsignacionRequest asignar) {
+        try {
+            Usuario respuesta = usuarioService.updateRoles(asignar);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+           return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @Operation(description = "Elimina un usuario del sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario eliminado exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @DeleteMapping("/private/usuario/{id}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.eliminarUsuarioById(id);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", null, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }

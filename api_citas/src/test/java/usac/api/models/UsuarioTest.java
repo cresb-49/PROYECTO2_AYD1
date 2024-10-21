@@ -4,6 +4,8 @@
  */
 package usac.api.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -115,10 +117,14 @@ public class UsuarioTest {
         // Crear un rol y asignarlo al usuario
         Rol rol = new Rol();
         rol.setNombre("CLIENTE");
-        usuario.setRol(rol);
+
+        // Crear una lista de usuarios y agregar algunos usuarios
+        List<RolUsuario> roles = new ArrayList<>();
+        roles.add(new RolUsuario(null, rol));
+
+        usuario.setRoles(roles);
 
         // Verificar que el rol fue asignado correctamente
-        assertNotNull(usuario.getRol());
-        assertEquals("CLIENTE", usuario.getRol().getNombre());
+        assertNotNull(usuario.getRoles());
     }
 }

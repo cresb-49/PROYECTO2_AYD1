@@ -2,11 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiResponse, ErrorApiResponse, HttpService } from '../http/http.service';
 import { ToastrService } from 'ngx-toastr';
+import { Dia } from '../dia/dia.service';
 
-export interface Dia {
-  id: number;
-  nombre: string;
-}
 export interface Horario {
   dia: Dia;
   apertura: string;
@@ -54,7 +51,7 @@ export class NegocioService {
   }
 
   getNegocio() {
-    return this.httpService.get<any>('negocio/private/negocio', null, true) //TODO: debe ser privada
+    return this.httpService.get<any>('negocio/private/negocio', null, true)
   }
 
   updateNegocio(payload: PayloadNegocio) {

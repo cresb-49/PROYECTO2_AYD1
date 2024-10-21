@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiResponse, ErrorApiResponse, HttpService } from '../http/http.service';
 import { ToastrService } from 'ngx-toastr';
+import { Dia } from '../dia/dia.service';
 export interface signUpCliente {
   nombres: string;
   apellidos: string;
@@ -22,10 +23,39 @@ export interface UpdateInfoUser {
   cui: string;
 }
 
+export interface UpdateCreateInfoEmpleado {
+  id?: number;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  phone: string;
+  nit?: string;
+  cui: string;
+  password?: string;
+}
+
+export interface HorarioEmpleado {
+  dia: Dia,
+  entrada: string,
+  salida: string
+}
+
+export interface EmpleadoUpdateCreate {
+  id?: number;
+  usuario: UpdateCreateInfoEmpleado,
+  rol: Rol,
+  horarios: HorarioEmpleado[]
+}
+
 export interface UpdateUserPassword {
   id: number;
   password: string;
   newPassword: string;
+}
+
+export interface Rol {
+  id: number;
+  nombre: string;
 }
 
 export enum UserRoles {
@@ -55,7 +85,7 @@ export class UserService {
   }
 
   getUser(id: number | string) {
-    return this.httpService.get<any>(`private/getUsuario/${id}`, null, true);
+    return this.httpService.get<any>(`usuario/private/getUsuario/${id}`, null, true);
   }
 
   getUsers(): any {
@@ -102,5 +132,41 @@ export class UserService {
 
   changeUserPassword(payload: UpdateUserPassword) {
     return this.httpService.patch<any>('usuario/protected/cambiarPassword', payload, true);
+  }
+
+  getRolesGenericos() {
+    return this.httpService.get<any>('rol/private/restricted/getRolesGenericos', null, true);
+  }
+
+  getEmpleados() {
+    return this.httpService.get<any>('empleado/private/empleados', null, true);
+  }
+
+  getEmpleado(id: number) {
+    return this.httpService.get<any>(`empleado/private/empleado/${id}`, null, true);
+  }
+
+  elimiarUsuario(id: number) {
+    return this.httpService.delete<any>(`usuario/private/usuario/${id}`, true);
+  }
+
+  eliminarEmpleado(id: number) {
+    return this.httpService.delete<any>(`empleado/private/empleado/${id}`, true);
+  }
+
+  crearEmpleado(payload: any) {
+    return this.httpService.post<any>('usuario/private/crearEmpleado', payload, true);
+  }
+
+  updateEmpleado(payload: any) {
+    return this.httpService.patch<any>('usuario/private/actualizarEmpleado', payload, true);
+  }
+
+  crearAdmin(payload: any) {
+    return this.httpService.post<any>('usuario/private/crearAdministrador', payload, true);
+  }
+
+  updateAdmin(payload: any) {
+    return this.httpService.patch<any>('usuario/private/actualizarAdministrador', payload, true);
   }
 }

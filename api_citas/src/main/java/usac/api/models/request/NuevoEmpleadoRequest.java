@@ -4,8 +4,14 @@
  */
 package usac.api.models.request;
 
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.stereotype.Component;
-import usac.api.models.TipoEmpleado;
+
+import usac.api.models.HorarioEmpleado;
+import usac.api.models.Rol;
 import usac.api.models.Usuario;
 
 /**
@@ -15,15 +21,22 @@ import usac.api.models.Usuario;
 @Component
 public class NuevoEmpleadoRequest {
 
+    @NotNull(message = "El usuario no puede ser nulo")
     private Usuario usuario;
-    private TipoEmpleado tipoEmpleado;
+
+    @NotNull(message = "El rol no puede ser nulo")
+    private Rol rol;
+
+    @NotNull(message = "Los horarios del empleado no puede ser nulos.")
+    private List<HorarioEmpleado> horarios;
 
     public NuevoEmpleadoRequest() {
     }
 
-    public NuevoEmpleadoRequest(Usuario usuario, TipoEmpleado tipoEmpleado) {
+    public NuevoEmpleadoRequest(Usuario usuario, List<HorarioEmpleado> horarios, Rol rol) {
         this.usuario = usuario;
-        this.tipoEmpleado = tipoEmpleado;
+        this.rol = rol;
+        this.horarios = horarios;
     }
 
     public Usuario getUsuario() {
@@ -34,12 +47,20 @@ public class NuevoEmpleadoRequest {
         this.usuario = usuario;
     }
 
-    public TipoEmpleado getTipoEmpleado() {
-        return tipoEmpleado;
+    public Rol getRol() {
+        return rol;
     }
 
-    public void setTipoEmpleado(TipoEmpleado tipoEmpleado) {
-        this.tipoEmpleado = tipoEmpleado;
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
+    public List<HorarioEmpleado> getHorarios() {
+        return horarios;
+    }
+
+    public void setHorarios(List<HorarioEmpleado> horarios) {
+        this.horarios = horarios;
     }
 
 }

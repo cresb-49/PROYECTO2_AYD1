@@ -4,8 +4,11 @@
  */
 package usac.api.models;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,10 +16,13 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import javax.persistence.OneToMany;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  *
@@ -25,12 +31,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Table(name = "usuario")
 @DynamicUpdate
+@SQLDelete(sql = "UPDATE usuario SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@Where(clause = "desactivated_at IS NULL")
 public class Usuario extends Auditor {
-
-    @ManyToOne//indicador de relacion muchos a uno
-    @JoinColumn(name = "rol", nullable = false) //indicamos que el id del paciente se guardara con un solo field de tabla
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Rol rol;
 
     @NotBlank(message = "El nit del cliente no puede estar vacío.")
     @NotNull(message = "El nit del cliente no puede ser nulo")
@@ -75,8 +78,18 @@ public class Usuario extends Auditor {
     @Column(length = 250)
     private String tokenRecuperacion;
 
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER, orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private List<RolUsuario> roles;
+
+    @OneToMany(mappedBy = "reservador", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private List<Reserva> reservas;
+
     public Usuario(String nit, String cui, String phone, String email, String nombres, String apellidos,
-            String password, Rol rol) {
+            String password) {
         this.nit = nit;
         this.cui = cui;
         this.phone = phone;
@@ -84,7 +97,6 @@ public class Usuario extends Auditor {
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.password = password;
-        this.rol = rol;
     }
 
     public Usuario() {
@@ -154,12 +166,20 @@ public class Usuario extends Auditor {
         this.tokenRecuperacion = tokenRecuperacion;
     }
 
-    public Rol getRol() {
-        return rol;
+    public List<RolUsuario> getRoles() {
+        return roles;
     }
 
-    public void setRol(Rol rol) {
-        this.rol = rol;
+    public void setRoles(List<RolUsuario> roles) {
+        this.roles = roles;
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
     }
 
 }

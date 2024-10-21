@@ -12,7 +12,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Cascade;
@@ -38,15 +37,13 @@ public class Rol extends Auditor {
     @NotBlank(message = "El nombre del rol no puede estar vacío.")
     @NotNull(message = "El nombre del rol no puede ser nulo")
     @Size(min = 1, max = 250, message = "El nombre del rol debe tener entre 1 y 250 caracteres.")
-    @Pattern(regexp = "^(CLIENTE|ADMIN|AYUDANTE)$",
-            message = "El nombre de rol solo puede ser CLIENTE, ADMIN, AYUDANTE")
     private String nombre;
 
     @OneToMany(mappedBy = "rol", orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Schema(hidden = true)
-    private List<Usuario> ususarios;
+    private List<RolUsuario> ususarios;
 
     @OneToMany(mappedBy = "rol", orphanRemoval = true)//indicamos que la relacion debera ser por medio del atributo "Paciente" del objeto Tratamiento
     @Cascade(CascadeType.ALL)
@@ -79,12 +76,16 @@ public class Rol extends Auditor {
         this.permisosRol = permisosRol;
     }
 
-    public List<Usuario> getUsusarios() {
+    public List<RolUsuario> getUsusarios() {
         return ususarios;
     }
 
-    public void setUsusarios(List<Usuario> ususarios) {
+    public void setUsusarios(List<RolUsuario> ususarios) {
         this.ususarios = ususarios;
     }
 
+    @Override
+    public String toString() {
+        return "Rol [nombre=" + nombre + "]";
+    }
 }

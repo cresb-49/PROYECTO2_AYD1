@@ -29,6 +29,11 @@ public class Service {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    public String getGmailUsuarioPorJwt() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+
     /**
      * Si se falla la validacion se lanza Exception con los motivos
      *
@@ -58,12 +63,12 @@ public class Service {
      * lanzaa una excepcion.
      *
      * @param <T>
-     * @param entidad
+     * @param entidad entidad que extiende de auditor
      * @throws Exception
      */
-    public <T extends Auditor> void validarId(T entidad) throws Exception {
+    public <T extends Auditor> void validarId(T entidad, String mensaje) throws Exception {
         if (entidad == null || entidad.getId() == null || entidad.getId() <= 0) {
-            throw new Exception("Id invalido");
+            throw new Exception(mensaje);
         }
     }
 
@@ -91,7 +96,7 @@ public class Service {
     public <T extends Auditor> List<T> ignorarEliminados(List<T> entidades) {
         // Filtrar entidades donde deletedAt sea null
         return entidades.stream()
-                .filter(entidad -> entidad.getDesactivatedAt() == null)
+                .filter(entidad -> entidad.getDeletedAt() == null)
                 .collect(Collectors.toList());
     }
 

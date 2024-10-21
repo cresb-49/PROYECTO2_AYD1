@@ -1,30 +1,31 @@
 package usac.api.models.request;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import usac.api.models.TipoEmpleado;
-import usac.api.models.Usuario;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import usac.api.models.Rol;
+import usac.api.models.Usuario;
 
 class NuevoEmpleadoRequestTest {
 
     private NuevoEmpleadoRequest nuevoEmpleadoRequest;
     private Usuario usuario;
-    private TipoEmpleado tipoEmpleado;
+    private Rol rol;
 
     @BeforeEach
     void setUp() {
         // Inicializar los objetos para el test
         usuario = new Usuario();
         usuario.setEmail("test@example.com");
-        tipoEmpleado = new TipoEmpleado();
-        tipoEmpleado.setNombre("Gerente");
+        rol = new Rol("EMPLEADO");
 
         // Inicializar NuevoEmpleadoRequest con los objetos
-        nuevoEmpleadoRequest = new NuevoEmpleadoRequest(usuario, tipoEmpleado);
+        nuevoEmpleadoRequest = new NuevoEmpleadoRequest(usuario, new ArrayList<>(), rol);
     }
 
     @Test
@@ -32,8 +33,6 @@ class NuevoEmpleadoRequestTest {
         // Verificar que el constructor asigna correctamente los valores
         assertNotNull(nuevoEmpleadoRequest.getUsuario());
         assertEquals("test@example.com", nuevoEmpleadoRequest.getUsuario().getEmail());
-        assertNotNull(nuevoEmpleadoRequest.getTipoEmpleado());
-        assertEquals("Gerente", nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
     }
 
     @Test
@@ -51,24 +50,10 @@ class NuevoEmpleadoRequestTest {
     }
 
     @Test
-    void testSetTipoEmpleado() {
-        // Crear un nuevo tipo de empleado
-        TipoEmpleado nuevoTipoEmpleado = new TipoEmpleado();
-        nuevoTipoEmpleado.setNombre("Supervisor");
-
-        // Asignar el nuevo tipo de empleado
-        nuevoEmpleadoRequest.setTipoEmpleado(nuevoTipoEmpleado);
-
-        // Verificar que el tipo de empleado fue actualizado correctamente
-        assertEquals(nuevoTipoEmpleado, nuevoEmpleadoRequest.getTipoEmpleado());
-        assertEquals("Supervisor", nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
-    }
-
-    @Test
     void testConstructorSinParametros() {
         // Verificar que el constructor vacío no inicializa los valores
-        NuevoEmpleadoRequest requestVacio = new NuevoEmpleadoRequest(null, null);
+        NuevoEmpleadoRequest requestVacio = new NuevoEmpleadoRequest(null, null, null);
         assertNull(requestVacio.getUsuario());
-        assertNull(requestVacio.getTipoEmpleado());
+        assertNull(requestVacio.getRol());
     }
 }

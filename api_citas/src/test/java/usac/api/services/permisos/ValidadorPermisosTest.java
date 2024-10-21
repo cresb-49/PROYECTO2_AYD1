@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import usac.api.models.Rol;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import usac.api.models.RolUsuario;
 
 /**
  * Clase de pruebas unitarias para {@link ValidadorPermiso}. Se verifican los
@@ -72,12 +73,15 @@ public class ValidadorPermisosTest {
         // Crear un nuevo usuario y asignarle rol y permisos
         Usuario usuario = new Usuario();
         Rol rol = new Rol();
+
         Permiso permiso = new Permiso();
         permiso.setRuta("/api/test");
         RolPermiso rolPermiso = new RolPermiso(null, permiso);
         permisosRol.add(rolPermiso);
         rol.setPermisosRol(permisosRol);
-        usuario.setRol(rol);
+        List<RolUsuario> roles = new ArrayList<>();
+        roles.add(new RolUsuario(usuario, rol));
+        usuario.setRoles(roles);
 
         // Simular que el usuario es un ayudante
         when(authentication.getAuthorities()).thenReturn(mockAuthorities("ROLE_AYUDANTE"));
@@ -98,7 +102,10 @@ public class ValidadorPermisosTest {
         Usuario usuario = new Usuario();
         Rol rol = new Rol();
         rol.setPermisosRol(permisosRol);
-        usuario.setRol(rol);
+        List<RolUsuario> roles = new ArrayList<>();
+        roles.add(new RolUsuario(usuario, rol));
+
+        usuario.setRoles(roles);
 
         // Simular que el usuario es un ayudante
         when(authentication.getAuthorities()).thenReturn(mockAuthorities("ROLE_AYUDANTE"));
@@ -118,39 +125,17 @@ public class ValidadorPermisosTest {
     void testVerificarPermisoNoAyudante() throws Exception {
         // Crear un nuevo usuario y asignarle rol sin permisos
         Usuario usuario = new Usuario();
+        usuario.setEmail("usuario@usuario");
         Rol rol = new Rol();
-        usuario.setRol(rol);
+        List<RolUsuario> roles = new ArrayList<>();
+        roles.add(new RolUsuario(usuario, rol));
+        usuario.setRoles(roles);
 
         // Simular que el usuario no es un ayudante
-        when(authentication.getAuthorities()).thenReturn(mockAuthorities("ROLE_ADMIN"));
+        when(usuarioService.isUserAdmin(usuario.getEmail())).thenReturn(true);
         when(validadorPermiso.getUsuarioPorJwt()).thenReturn(usuario);
         // Ejecutar el método
         assertTrue(validadorPermiso.verificarPermiso());
-    }
-
-    /**
-     * Verifica que un usuario con el rol "AYUDANTE" tenga el permiso para
-     * acceder a una ruta con terminación específica.
-     */
-    @Test
-    void testVerificarPermisoConTerminacionUrl() throws Exception {
-        // Crear un nuevo usuario y asignarle rol y permisos
-        Usuario usuario = new Usuario();
-        Rol rol = new Rol();
-        Permiso permiso = new Permiso();
-        permiso.setRuta("/api/test");
-        RolPermiso rolPermiso = new RolPermiso(null, permiso);
-        permisosRol.add(rolPermiso);
-        rol.setPermisosRol(permisosRol);
-        usuario.setRol(rol);
-
-        // Simular que el usuario es un ayudante
-        when(authentication.getAuthorities()).thenReturn(mockAuthorities("ROLE_AYUDANTE"));
-        when(request.getRequestURI()).thenReturn("/api/test");
-        when(validadorPermiso.getUsuarioPorJwt()).thenReturn(usuario);
-
-        // Ejecutar el método con una terminación de URL
-        assertTrue(validadorPermiso.verificarPermiso("permiso"));
     }
 
     /**

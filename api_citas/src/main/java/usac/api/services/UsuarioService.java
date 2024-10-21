@@ -3,6 +3,7 @@ package usac.api.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -13,11 +14,19 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import usac.api.models.*;
+import usac.api.models.Empleado;
+import usac.api.models.HorarioEmpleado;
+import usac.api.models.Rol;
+import usac.api.models.RolUsuario;
+import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UpdateEmpleadoRequest;
 import usac.api.models.request.UserChangePasswordRequest;
+import usac.api.models.request.UsuarioRolAsignacionRequest;
+import usac.api.repositories.EmpleadoRepository;
+import usac.api.repositories.RolRepository;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
 import usac.api.services.authentification.JwtGeneratorService;
@@ -42,6 +51,12 @@ public class UsuarioService extends usac.api.services.Service {
     private JwtGeneratorService jwtGenerator;
     @Autowired
     private EmpleadoService empleadoService;
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
+    @Autowired
+    private RolRepository rolRepository;
+    @Autowired
+    private DiaService diaService;
 
     /**
      * Envía un correo electrónico de recuperación de contraseña a un usuario
@@ -87,8 +102,7 @@ public class UsuarioService extends usac.api.services.Service {
             // Usamos el servicio de correo para enviar el correo en segundo plano
             mailService.enviarCorreoDeRecuperacion(
                     actualizacion.getEmail(),
-                    actualizacion.getTokenRecuperacion()
-            );
+                    actualizacion.getTokenRecuperacion());
 
             // Retornamos un mensaje de confirmación
             return "Te hemos enviado un correo electrónico con las instrucciones para recuperar tu cuenta. Por favor revisa tu bandeja de entrada.";
@@ -165,7 +179,8 @@ public class UsuarioService extends usac.api.services.Service {
             throw new Exception("No hemos encontrado el usuario.");
         }
 
-        // Verificamos que el usuario no esté desactivado y que tenga los permisos necesarios
+        // Verificamos que el usuario no esté desactivado y que tenga los permisos
+        // necesarios
         this.isDesactivated(usuario);
         this.verificarUsuarioJwt(usuario);
 
@@ -174,13 +189,15 @@ public class UsuarioService extends usac.api.services.Service {
             throw new Exception("Contraseña actual incorrecta.");
         }
 
-        // Encriptamos la nueva contraseña y actualizamos el campo en el modelo de usuario
+        // Encriptamos la nueva contraseña y actualizamos el campo en el modelo de
+        // usuario
         usuario.setPassword(this.encriptador.encriptar(usuPassChange.getNewPassword()));
 
         // Guardamos el usuario con la nueva contraseña
         Usuario update = this.usuarioRepository.save(usuario);
 
-        // Verificamos si el cambio fue exitoso comparando el ID del usuario original y el actualizado
+        // Verificamos si el cambio fue exitoso comparando el ID del usuario original y
+        // el actualizado
         if (update != null && update.getId().longValue() == usuario.getId().longValue()) {
             return "Se cambió tu contraseña con éxito.";
         }
@@ -296,7 +313,7 @@ public class UsuarioService extends usac.api.services.Service {
 
         // Mantenemos la contraseña original y roles del usuario
         usuario.setPassword(usuarioEncontrado.getPassword());
-        usuario.setRol(usuarioEncontrado.getRol());
+        usuario.setRoles(usuarioEncontrado.getRoles());
 
         // Validamos el modelo del usuario
         this.validarModelo(usuario);
@@ -334,6 +351,11 @@ public class UsuarioService extends usac.api.services.Service {
         }
         this.isDesactivated(usuario);
         return usuario;
+    }
+
+    public Usuario getUsuarioUseJwt() throws Exception {
+        String gmailUsuarioPorJwt = this.getGmailUsuarioPorJwt();
+        return this.getByEmail(gmailUsuarioPorJwt);
     }
 
     /**
@@ -392,8 +414,13 @@ public class UsuarioService extends usac.api.services.Service {
         this.validarModelo(crear);
         // traer rol AYUDANTE
         Rol rol = this.rolService.getRolByNombre("CLIENTE");
-        // guardamos el usuario
-        Usuario userCreado = this.guardarUsuario(crear, rol);
+
+        // preparamos el rol
+        List<RolUsuario> rolesUsuario = new ArrayList<>();
+        rolesUsuario.add(new RolUsuario(crear, rol));
+
+        // guardamos el usuario con el rol
+        Usuario userCreado = this.guardarUsuario(crear, rolesUsuario);
         // Generar el JWT para el usuario creado
         UserDetails userDetails = authenticationService.loadUserByUsername(crear.getEmail());
         String jwt = jwtGenerator.generateToken(userDetails);
@@ -417,12 +444,16 @@ public class UsuarioService extends usac.api.services.Service {
     public Usuario crearAdministrador(Usuario crear) throws Exception {
         // Validamos el modelo de usuario
         this.validarModelo(crear);
-
+        // Guardamos el usuario con el rol de Administrador
+        // Usuario usuarioGuardado = this.guardarUsuario(crear, null);
         // Obtenemos el rol 'ADMIN' para asignarlo al nuevo usuario
         Rol rol = this.rolService.getRolByNombre("ADMIN");
 
+        List<RolUsuario> rolesUsuario = new ArrayList<>();
+        rolesUsuario.add(new RolUsuario(crear, rol));
+
         // Guardamos el usuario con el rol de Administrador
-        return this.guardarUsuario(crear, rol);
+        return this.guardarUsuario(crear, rolesUsuario);
     }
 
     /**
@@ -436,19 +467,110 @@ public class UsuarioService extends usac.api.services.Service {
      */
     public Usuario crearEmpleado(NuevoEmpleadoRequest nuevoEmpleadoRequest) throws Exception {
         // Validamos el modelo de usuario
+        this.validarModelo(nuevoEmpleadoRequest);
         this.validarModelo(nuevoEmpleadoRequest.getUsuario());
+        this.validarId(nuevoEmpleadoRequest.getRol(), "Id del rol invalido");
+
         // Obtenemos el rol para asignarlo al nuevo usuario
-        Rol rol = this.rolService.getRolByNombre("EMPLEADO");
-        // Guardamos el usuario con el rol de Administrador
-        Usuario usuarioGuardado = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rol);
-        //Buscamos el tipo de empleado en base a su nombre
-        TipoEmpleado tipoEmpleadoGuardado = this.empleadoService.getTipoEmpleadoByNombre(nuevoEmpleadoRequest.getTipoEmpleado().getNombre());
+        Rol rolEmpleado = this.rolService.getRolByNombre("EMPLEADO");
+        Rol rolPrincipal = this.rolService.getRolById(nuevoEmpleadoRequest.getRol().getId());
+
+        List<RolUsuario> rolesUsuario = new ArrayList<>();
+        rolesUsuario.add(new RolUsuario(nuevoEmpleadoRequest.getUsuario(), rolEmpleado));
+        rolesUsuario.add(new RolUsuario(nuevoEmpleadoRequest.getUsuario(), rolPrincipal));
+
+        Usuario usuarioGuardadoFinal = this.guardarUsuario(nuevoEmpleadoRequest.getUsuario(), rolesUsuario);
+
         // Creamos el registro de tipo de empleado
-        Empleado empleado = new Empleado(usuarioGuardado, tipoEmpleadoGuardado);
+        Empleado empleado = new Empleado(usuarioGuardadoFinal);
+        empleado.setCitas(new ArrayList<>());
+        // Guardamos el empleado
+        this.empleadoService.createEmpleado(empleado);
+        // Horarios del empleado
+        ArrayList<HorarioEmpleado> horariosEmpleadoCreado = new ArrayList<>();
+        for (HorarioEmpleado horario : nuevoEmpleadoRequest.getHorarios()) {
+            horariosEmpleadoCreado
+                    .add(new HorarioEmpleado(horario.getDia(), empleado, horario.getEntrada(), horario.getSalida()));
+        }
+        empleado.setHorarios(horariosEmpleadoCreado);
         // Guardamos el empleado
         this.empleadoService.createEmpleado(empleado);
         // Retornamos el usuario guardado
-        return usuarioGuardado;
+        return usuarioGuardadoFinal;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public Empleado actualizarEmpleado(UpdateEmpleadoRequest actualizacionEmpleado) throws Exception {
+        // Validamos el modelo de actualizacion del empleado
+        this.validarModelo(actualizacionEmpleado);
+        // Obtenemos el empleado
+        Empleado empeladoEncontrado = this.empleadoService.getEmpleadoById(actualizacionEmpleado.getId());
+        // Verificamos que existe el empelado asociado
+        if (empeladoEncontrado == null) {
+            throw new Exception("Empleado no encontrado");
+        }
+        // Obtenemos el usuario asociado al empleado
+        Usuario usuarioEncontrado = this.usuarioRepository.findById(empeladoEncontrado.getUsuario().getId())
+                .orElse(null);
+        // Verificamos que existe el usuario asociado
+        if (usuarioEncontrado == null) {
+            throw new Exception("Usuario no encontrado");
+        }
+        // Verificamos que el usuario asociado al empleado no este desactivado
+        this.isDesactivated(usuarioEncontrado);
+        // Verificamos el rol del usuario asociado al empleado
+        Rol rolEncontrado = this.rolService.getRolById(actualizacionEmpleado.getRol().getId());
+        // Verificamos que existe el rol asociado
+        if (rolEncontrado == null) {
+            throw new Exception("Rol no encontrado");
+        }
+
+        //dememos mantener la persistencia de las reservas del usuario
+        actualizacionEmpleado.getUsuario().setReservas(usuarioEncontrado.getReservas());
+
+        // Actualizamos la informacion del usuario
+        Usuario userActualizado = this.updateUsuario(actualizacionEmpleado.getUsuario());
+        empeladoEncontrado.setUsuario(userActualizado);
+        // Realizamos la actualizacion del rol del empleado, reemplazamos el rol que es
+        // diferente de empleado
+        // Obtenemos el rol Empleado
+        Rol rolEmpleado = this.rolService.getRolByNombre("EMPLEADO");
+        // Creamos un UsuarioRolAsignacionRequest
+        UsuarioRolAsignacionRequest asignacionRequest = new UsuarioRolAsignacionRequest();
+        asignacionRequest.setUsuarioId(usuarioEncontrado.getId());
+        asignacionRequest.setRoles(new ArrayList<Rol>());
+        asignacionRequest.getRoles().add(rolEmpleado);
+        asignacionRequest.getRoles().add(rolEncontrado);
+        // Actualizamos los roles del usuario
+        this.updateRoles(asignacionRequest);
+        // Actualizamos los horarios del empleado
+        // Eliminamos los horarios anteriores
+        empeladoEncontrado.getHorarios().clear();
+        // Creamos los nuevos horarios
+        for (HorarioEmpleado horario : actualizacionEmpleado.getHorarios()) {
+            HorarioEmpleado horarioEncontrado = this.empleadoService.obtenerHorarioDiaEmpleado(
+                    diaService.getDiaByNombre(horario.getDia().getNombre()), empeladoEncontrado);
+            // Si el horario ya existe, se actualiza
+            if (horarioEncontrado != null) {
+                horarioEncontrado.setEntrada(horario.getEntrada());
+                horarioEncontrado.setSalida(horario.getSalida());
+                empeladoEncontrado.getHorarios().add(horarioEncontrado);
+                // Si el horario encontrado esta eliminado, se activa
+                if (horarioEncontrado.getDeletedAt() != null) {
+                    horarioEncontrado.setDeletedAt(null);
+                }
+            } else {
+                // Si el horario no existe, se crea
+                empeladoEncontrado.getHorarios()
+                        .add(new HorarioEmpleado(diaService.getDiaByNombre(horario.getDia().getNombre()),
+                                empeladoEncontrado, horario.getEntrada(), horario.getSalida()));
+            }
+        }
+        Empleado empleadoActualizado = empleadoRepository.save(empeladoEncontrado);
+        if (empleadoActualizado != null && empleadoActualizado.getId() > 0) {
+            return empleadoActualizado;
+        }
+        throw new Exception("No se pudo actualizar el empleado");
     }
 
     /**
@@ -460,9 +582,9 @@ public class UsuarioService extends usac.api.services.Service {
      * @throws Exception
      */
     @Transactional(rollbackOn = Exception.class)
-    private Usuario guardarUsuario(Usuario crear, Rol rol) throws Exception {
+    private Usuario guardarUsuario(Usuario crear, List<RolUsuario> roles) throws Exception {
         if (this.usuarioRepository.existsByEmail(crear.getEmail())) {
-            throw new Exception("El Email ya existe.");
+            throw new Exception(String.format("El Email %s ya existe.", crear.getEmail()));
         }
 
         if (this.usuarioRepository.existsByPhone(crear.getPhone())) {
@@ -480,11 +602,127 @@ public class UsuarioService extends usac.api.services.Service {
         }
 
         // Asignamos un rol al usuario
-        crear.setRol(rol);
+        crear.setRoles(roles);
         // Encriptar la contraseña
         crear.setPassword(this.encriptador.encriptar(crear.getPassword()));
         // Guardar el usuario
         return this.usuarioRepository.save(crear);
     }
 
+    /**
+     * Actualiza los roles de un usuario. Si el usuario tiene el rol "ADMIN", se
+     * cambia a "EMPLEADO" y se asignan los nuevos roles (sin reasignar
+     * "ADMIN"). Si el usuario tiene el rol "EMPLEADO" y se le asigna el rol
+     * "ADMIN", solo se le asigna el rol "ADMIN". Si el usuario tiene el rol
+     * "CLIENTE", se lanzará un error y no se le asignarán más roles.
+     *
+     * Además, el rol "CLIENTE" no puede ser asignado de ninguna forma.
+     *
+     * @param asignacionRequest El objeto que contiene el ID del usuario y la
+     * lista de nuevos roles a asignar.
+     * @return El objeto Usuario con los roles actualizados.
+     * @throws Exception Si el usuario no se encuentra o si tiene el rol
+     * "CLIENTE" o algún rol no existe.
+     */
+    @Transactional(rollbackOn = Exception.class)
+    public Usuario updateRoles(UsuarioRolAsignacionRequest asignacionRequest) throws Exception {
+
+        this.validarModelo(asignacionRequest);
+
+        // Validar que los roles en la solicitud no sean nulos
+        if (asignacionRequest.getRoles() == null || asignacionRequest.getRoles().isEmpty()) {
+            throw new Exception("No se han proporcionado roles para asignar.");
+        }
+
+        // Obtener el usuario por ID desde la asignación
+        Usuario usuario = usuarioRepository.findById(asignacionRequest.getUsuarioId()).orElseThrow(
+                () -> new Exception("Usuario no encontrado."));
+
+        // Buscar el rol base del usuario (ADMIN, CLIENTE o EMPLEADO)
+        RolUsuario asignacionBase = usuario.getRoles().stream()
+                .filter(rol -> rol.getRol().getNombre().equals("ADMIN") || rol.getRol().getNombre().equals("CLIENTE")
+                || rol.getRol().getNombre().equals("EMPLEADO"))
+                .findFirst().orElseThrow(() -> new Exception("El usuario no tiene un rol base asignado"));
+
+        // Guardar el rol base existente
+        Rol rolBase = asignacionBase.getRol();
+
+        // Si el usuario tiene rol "CLIENTE", lanzar una excepción
+        if (rolBase.getNombre().equals("CLIENTE")) {
+            throw new Exception("No es posible asignar más roles a un usuario con rol CLIENTE.");
+        }
+
+        // Si el rol base es "ADMIN", cambiarlo a "EMPLEADO"
+        if (rolBase.getNombre().equals("ADMIN")) {
+            // Buscar el rol "EMPLEADO" en la base de datos
+            rolBase = rolRepository.findOneByNombre("EMPLEADO")
+                    .orElseThrow(() -> new Exception("Rol EMPLEADO no encontrado"));
+        }
+
+        // Buscar los roles por los ids proporcionados en la solicitud
+        List<Rol> rolesAsignados = asignacionRequest.getRoles().stream()
+                .map(nuevoRol -> {
+                    try {
+                        this.validarId(nuevoRol, "Algun id de los nuevos roles es invalido");
+                        Rol rol = rolRepository.findById(nuevoRol.getId())
+                                .orElseThrow(() -> new Exception("Rol no encontrado: " + nuevoRol.getId()));
+
+                        // Verificar si el rol es "CLIENTE" y lanzar excepción si se intenta asignar
+                        if (rol.getNombre().equals("CLIENTE")) {
+                            throw new Exception("No es posible asignar el rol 'CLIENTE'.");
+                        }
+
+                        return rol;
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage()); // Lanzar RuntimeException para no romper el flujo
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // Verificar si se le está asignando el rol "ADMIN"
+        boolean asignandoAdmin = rolesAsignados.stream()
+                .anyMatch(rol -> rol.getNombre().equals("ADMIN"));
+
+        // Si el usuario tiene el rol "EMPLEADO" y se le asigna "ADMIN"
+        if (rolBase.getNombre().equals("EMPLEADO") && asignandoAdmin) {
+            // Limpiar los roles actuales del usuario
+            usuario.getRoles().clear();
+
+            // Asignar únicamente el rol "ADMIN"
+            Rol rolAdmin = rolRepository.findOneByNombre("ADMIN")
+                    .orElseThrow(() -> new Exception("Rol ADMIN no encontrado"));
+            usuario.getRoles().add(new RolUsuario(usuario, rolAdmin));
+
+            // Guardar y retornar el usuario con solo el rol "ADMIN"
+            return usuarioRepository.save(usuario);
+        }
+
+        // Limpiar los roles actuales del usuario para evitar duplicados
+        usuario.getRoles().clear();
+
+        // Asignar nuevamente el rol base (que ahora es EMPLEADO si era ADMIN) al
+        // usuario
+        usuario.getRoles().add(new RolUsuario(usuario, rolBase));
+
+        // Iterar sobre los nuevos roles proporcionados y asignarlos
+        for (Rol rol : rolesAsignados) {
+            // Si el rol no es "ADMIN" o el rol no es duplicado, asignarlo al usuario
+            if (!(rol.getNombre().equals("ADMIN") && rolBase.getNombre().equals("ADMIN"))
+                    && !(rol.getNombre().equals("EMPLEADO") && rolBase.getNombre().equals("EMPLEADO"))) {
+                usuario.getRoles().add(new RolUsuario(usuario, rol)); // Agregar el nuevo rol al usuario
+            }
+        }
+
+        // Guardar el usuario con los roles actualizados en la base de datos
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public void eliminarUsuarioById(Long id) throws Exception {
+        Usuario usuario = this.usuarioRepository.findById(id).orElse(null);
+        if (usuario == null) {
+            throw new Exception("No se encontro el usuario");
+        }
+        this.usuarioRepository.deleteUsuarioById(id);
+    }
 }

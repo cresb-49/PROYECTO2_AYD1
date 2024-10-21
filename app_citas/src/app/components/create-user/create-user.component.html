@@ -1,75 +1,76 @@
-<form class="pb-6">
-  <div class="grid gap-6 mb-6 md:grid-cols-2">
+<div class="pb-6">
+  <div class="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-3">
     <div>
       <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombres</label>
-      <input type="text" id="first_name"
+      <input type="text" id="first_name" [(ngModel)]="empleado.nombres" (ngModelChange)="onNombresChange($event)"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="John" required />
     </div>
     <div>
       <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apellidos</label>
-      <input type="text" id="last_name"
+      <input type="text" id="last_name" [(ngModel)]="empleado.apellidos" (ngModelChange)="onApellidosChange($event)"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="Doe" required />
     </div>
     <div>
       <label for="company" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIT</label>
-      <input type="text" id="company"
+      <input type="text" id="company" [(ngModel)]="empleado.nit" (ngModelChange)="onNitChange($event)"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="123456789" required />
     </div>
     <div>
       <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Teléfono</label>
-      <input type="tel" id="phone"
+      <input type="tel" id="phone" [(ngModel)]="empleado.phone" (ngModelChange)="onPhoneChange($event)"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="1234-5678" required />
     </div>
     <div>
       <label for="website" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CUI</label>
-      <input type="number" id="website"
+      <input type="number" id="website" [(ngModel)]="empleado.cui" (ngModelChange)="onCuiChange($event)"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="12345678912" required />
     </div>
     <div>
-      <label for="tipo_empleado" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rol del
-        Usuario</label>
-      <select id="tipo_empleado"
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo Electrónico</label>
+      <input type="email" id="email" [(ngModel)]="empleado.email" (ngModelChange)="onEmailChange($event)"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="john.doe@company.com" required />
+    </div>
+    <div *ngIf="!isCliente">
+      <label for="tipo_empleado" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Rol
+      </label>
+      <select id="tipo_empleado" [(ngModel)]="empleado.rol" (ngModelChange)="onRolChange($event)"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        <option selected>Seleccionar</option>
-        <option value="1">Tipo 1</option>
-        <option value="2">Tipo 2</option>
-        <option value="3">Tipo 3</option>
-        <option value="4">Tipo 4</option>
+        <option value="0">Selecciona un Rol</option>
+        <option *ngFor="let rol of roles" [value]="rol.id">{{ rol.nombre }}</option>
       </select>
     </div>
   </div>
-  <div class="mb-6">
-    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo Electrónico</label>
-    <input type="email" id="email"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      placeholder="john.doe@company.com" required />
-  </div>
-  <div class="mb-6">
-    <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-      Contraseña
-    </label>
-    <input type="password" id="password"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      placeholder="•••••••••" required />
-  </div>
-  <div class="mb-6">
-    <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-      Confirmar Contraseña
-    </label>
-    <input type="password" id="confirm_password"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      placeholder="•••••••••" required />
+  <div class="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-3" *ngIf="!modificar">
+    <div>
+      <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Contraseña
+      </label>
+      <input type="password" id="password" [(ngModel)]="empleado.password"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="•••••••••" required />
+    </div>
+    <div>
+      <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Confirmar Contraseña
+      </label>
+      <input type="password" id="confirm_password" [(ngModel)]="empleado.confirm_password"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="•••••••••" required />
+    </div>
   </div>
   <div class="mb-6" *ngIf="confWorkSchedule">
     <h6 class="text-lg font-bold dark:text-white">Horario de Trabajo</h6>
-    <app-schedule-conf *ngIf="confWorkSchedule"></app-schedule-conf>
+    <app-schedule-conf *ngIf="confWorkSchedule" [data]="empleado.horario"
+      (dataChange)="onHorarioChange($event)"></app-schedule-conf>
   </div>
-  <button type="submit"
+  <button (click)="accionBoton()"
     class="text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full  px-5 py-2.5 text-center  dark:focus:ring-blue-800"
     [ngClass]="{
           'cursor-not-allowed': !activeButtonSave ,
@@ -80,6 +81,51 @@
           'dark:bg-blue-600': activeButtonSave,
           'dark:bg-blue-500': !activeButtonSave,
           }" [disabled]="!activeButtonSave">
-    Crear Usuario
+    {{modificar ? 'Actualizar Empleado' : 'Crear Empleado'}}
   </button>
-</form>
+  <h6 class="text-lg font-bold dark:text-white mb-4 mt-4" *ngIf="modificar">Cambio de Contraseña</h6>
+  <div *ngIf="modificar" class="mb-4">
+    <div class="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-3">
+      <div>
+        <label for="current_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Contraseña Actual
+        </label>
+        <input type="password" id="current_password" [(ngModel)]="changePassword.current_password"
+          (ngModelChange)="onUpdateCurrentPasswordChange($event)"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="•••••••••" required />
+      </div>
+      <div>
+        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Contraseña
+        </label>
+        <input type="password" id="password" [(ngModel)]="changePassword.password"
+          (ngModelChange)="onUpdatePasswordChange($event)"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="•••••••••" required />
+      </div>
+      <div>
+        <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Confirmar Contraseña
+        </label>
+        <input type="password" id="confirm_password" [(ngModel)]="changePassword.confirm_password"
+          (ngModelChange)="onUpdateConfirmPasswordChange($event)"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="•••••••••" required />
+      </div>
+    </div>
+    <button (click)="changePasswordAction()"
+      class="text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:focus:ring-blue-800"
+      [ngClass]="{
+      'cursor-not-allowed': !activeChangePassword,
+      'hover:bg-blue-800': activeChangePassword,
+      'dark:hover:bg-blue-700': activeChangePassword,
+      'bg-blue-700': activeChangePassword,
+      'bg-blue-400': !activeChangePassword,
+      'dark:bg-blue-600': activeChangePassword,
+      'dark:bg-blue-500': !activeChangePassword,
+    }" [disabled]="!activeChangePassword">
+      Cambiar Contraseña
+    </button>
+  </div>
+</div>

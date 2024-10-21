@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,20 +19,28 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import usac.api.enums.PermisoEnum;
 import usac.api.models.Cancha;
 import usac.api.models.Dia;
 import usac.api.models.HorarioCancha;
+import usac.api.models.HorarioEmpleado;
 import usac.api.models.Negocio;
+import usac.api.models.Permiso;
 import usac.api.models.Rol;
-import usac.api.models.TipoEmpleado;
+import usac.api.models.Servicio;
 import usac.api.models.Usuario;
 import usac.api.models.request.NuevoEmpleadoRequest;
+import usac.api.models.request.RolPermisoUpdateRequest;
 import usac.api.repositories.DiaRepository;
+import usac.api.repositories.PermisoRepository;
 import usac.api.repositories.RolRepository;
+import usac.api.services.B64Service;
 import usac.api.services.CanchaService;
 import usac.api.services.DiaService;
 import usac.api.services.EmpleadoService;
 import usac.api.services.NegocioService;
+import usac.api.services.RolService;
+import usac.api.services.ServicioService;
 import usac.api.services.UsuarioService;
 
 /**
@@ -42,6 +51,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
     @Autowired
     private RolRepository rolRepository;
+    @Autowired
+    private RolService rolService;
+    @Autowired
+    private PermisoRepository permisoRepository;
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
@@ -54,6 +67,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private EmpleadoService empleadoService;
     @Autowired
     private CanchaService canchaService;
+    @Autowired
+    private ServicioService servicioService;
+    @Autowired
+    private B64Service b64Service;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -69,7 +86,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
 
     public Dia insertarDia(Dia dia) throws Exception {
         try {
-            Optional<Dia> opDia = this.diaRepository.findOneByNombre(dia.getNombre());
+            Optional<Dia> opDia = this.diaRepository.findOneByNombreIgnoreCase(dia.getNombre());
             if (opDia.isPresent()) {
                 return opDia.get();
             }
@@ -77,6 +94,16 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
         } catch (Exception e) {
             throw new Exception("Error");
         }
+    }
+
+    public Permiso insertarPermisoSiNoExiste(Permiso pa) {
+        Permiso permiso
+                = this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
+        if (permiso == null) {
+            return this.permisoRepository.save(
+                    pa);
+        }
+        return permiso;
     }
 
     /*
@@ -123,15 +150,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      * }
      * }
      *
-     * public Permiso insertarPermisoSiNoExiste(Permiso pa) {
-     * Permiso permiso =
-     * this.permisoRepository.findOneByNombre(pa.getNombre()).orElse(null);
-     * if (permiso == null) {
-     * return this.permisoRepository.save(
-     * pa);
-     * }
-     * return permiso;
-     * }
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -139,23 +157,28 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             // Creacion de los dias de la semana
             Dia lunes = this.insertarDia(new Dia("Lunes"));
             Dia martes = this.insertarDia(new Dia("Martes"));
-            Dia miercoles = this.insertarDia(new Dia("Miercoles"));
+            Dia miercoles = this.insertarDia(new Dia("Miércoles"));
             Dia jueves = this.insertarDia(new Dia("Jueves"));
             Dia viernes = this.insertarDia(new Dia("Viernes"));
-            Dia sabado = this.insertarDia(new Dia("Sabado"));
+            Dia sabado = this.insertarDia(new Dia("Sábado"));
             Dia domingo = this.insertarDia(new Dia("Domingo"));
 
             // siders roles
             Rol clienteRol = this.insertarRol(new Rol("CLIENTE"));
             Rol adminRol = this.insertarRol(new Rol("ADMIN"));
             Rol empleadoRol = this.insertarRol(new Rol("EMPLEADO"));
+            Rol customRol = this.insertarRol(new Rol("Custom"));
+            Rol customRol2 = this.insertarRol(new Rol("Custom2"));
+            Rol customRol3 = this.insertarRol(new Rol("Custom3"));
+            Rol customRol4 = this.insertarRol(new Rol("Custom4"));
+            Rol customRol5 = this.insertarRol(new Rol("Custom5"));
 
             // Seeder de usuarios del sistema
             Usuario admin = new Usuario("456123789", "3322114455669",
                     "89456123",
                     "elrincondelgamer77@gmail.com",
                     "admin", "admin",
-                    "12345", adminRol);
+                    "12345");
 
             Usuario admin2 = new Usuario(
                     "777666555",
@@ -164,84 +187,106 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "carlosbpac@gmail.com",
                     "Carlos",
                     "Pac",
-                    "12345", adminRol);
+                    "12345");
 
             // 5 Usuarios de prueba en modo cliente
             Usuario cliente1 = new Usuario("123456789", "1234567891234",
                     "12345679",
                     "usuarioprueba1@email.com",
                     "Usuario", "Prueba1",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente2 = new Usuario("987654321", "9876543214321",
                     "98765432",
                     "usuarioprueba2@email.com",
                     "Usuario", "Prueba2",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente3 = new Usuario("456789123", "4567891238765",
                     "45678912",
                     "usuarioprueba3@email.com",
                     "Usuario", "Prueba3",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente4 = new Usuario("321654987", "3216549870987",
                     "32165498",
                     "usuarioprueba4@email.com",
                     "Usuario", "Prueba4",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario cliente5 = new Usuario("654987321", "6549873217654",
                     "65498732",
                     "usuarioprueba5@email.com",
                     "Usuario", "Prueba5",
-                    "12345", clienteRol);
+                    "12345");
 
             Usuario empleado1 = new Usuario("987653321", "9876543219876",
                     "98763432",
                     "empleadoprueba1@email.com",
                     "Empleado", "Prueba1",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado2 = new Usuario("123456780", "1234567801234",
                     "12385678",
                     "empleadoprueba2@email.com",
                     "Empleado", "Prueba2",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado3 = new Usuario("876543219", "8765432198765",
                     "87654321",
                     "empleadoprueba3@email.com",
                     "Empleado", "Prueba3",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado4 = new Usuario("135792468", "1357924681357",
                     "13579246",
                     "empleadoprueba4@email.com",
                     "Empleado", "Prueba4",
-                    "12345", empleadoRol);
+                    "12345");
 
             Usuario empleado5 = new Usuario("246801357", "2468013572468",
                     "24680135",
                     "empleadoprueba5@email.com",
                     "Empleado", "Prueba5",
-                    "12345", empleadoRol);
+                    "12345");
 
-            TipoEmpleado tipoEmpleado1 = new TipoEmpleado("Organizador");
-            TipoEmpleado tipoEmpleado2 = new TipoEmpleado("Limpieza");
-            TipoEmpleado tipoEmpleado3 = new TipoEmpleado("Seguridad");
-            TipoEmpleado tipoEmpleado4 = new TipoEmpleado("Cocina");
-            TipoEmpleado tipoEmpleado5 = new TipoEmpleado("Recepcion");
+            Usuario empleado6 = new Usuario("2462113", "2468014272468",
+                    "24680136",
+                    "empleadoprueba6@email.com",
+                    "Empleado", "Prueba6",
+                    "12345");
 
-            try {
-                this.empleadoService.createTipoEmpleado(tipoEmpleado1);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado2);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado3);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado4);
-                this.empleadoService.createTipoEmpleado(tipoEmpleado5);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
+            Usuario empleado7 = new Usuario("2469224", "2456781567246",
+                    "40930136",
+                    "empleadoprueba7@email.com",
+                    "Empleado", "Prueba7",
+                    "12345");
+
+            Usuario empleado8 = new Usuario("2468902", "2468013472434",
+                    "24032313",
+                    "empleadoprueba8@email.com",
+                    "Empleado", "Prueba8",
+                    "12345");
+
+            Usuario empleado9 = new Usuario("2468013", "2468013572488",
+                    "24623476",
+                    "empleadoprueba9@email.com",
+                    "Empleado", "Prueba9",
+                    "12345");
+
+            Usuario empleado10 = new Usuario("2468033", "2468013234468",
+                    "24422013",
+                    "empleadoprueba10@email.com",
+                    "Empleado", "Prueba10",
+                    "12345");
+
+            ArrayList<HorarioEmpleado> horarios = new ArrayList<>();
+            horarios.add(new HorarioEmpleado(lunes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(martes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(miercoles, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(jueves, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(viernes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horarios.add(new HorarioEmpleado(sabado, null, LocalTime.of(8, 0), LocalTime.of(13, 0)));
             try {
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
@@ -251,19 +296,28 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearUsuarioCliente(cliente4);
                 this.usuarioService.crearUsuarioCliente(cliente5);
 
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, tipoEmpleado1));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, tipoEmpleado2));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, tipoEmpleado3));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, tipoEmpleado4));
-                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, tipoEmpleado5));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, horarios, customRol2));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, horarios, customRol3));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado4, horarios, customRol4));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado5, horarios, customRol5));
+
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado6, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado7, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado8, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado9, horarios, customRol));
+                this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado10, horarios, customRol));
+
             } catch (Exception e) {
+                e.printStackTrace();
                 System.err.println(e.getMessage());
             }
             // Se crea el modelo del negocio de la APP
             // Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a
             // base64
-            String logo = cargarImagenComoBase64();
-            Negocio negocio = new Negocio(logo, "TiendaAyD", false, "2da calle XXX-XXX-XX Quetgo");
+            String logo = cargarImagenComoBase64("logo.svg");
+            Negocio negocio = new Negocio(logo, "TiendaAyD", false,
+                    "2da calle XXX-XXX-XX Quetgo", 5.0);
             try {
                 ArrayList<Dia> horario = new ArrayList<>();
                 horario.add(lunes);
@@ -282,27 +336,61 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             Cancha cancha4 = new Cancha(250.0, "Cancha de futbol 11 con cesped sintetico");
             Cancha cancha5 = new Cancha(300.0, "Cancha de futbol 11 con cesped artificial");
             //Horario generico para las canchas
-            ArrayList<HorarioCancha> horarios = new ArrayList<>();
-            horarios.add(new HorarioCancha(null, lunes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, martes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, miercoles, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, jueves, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, viernes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horarios.add(new HorarioCancha(null, sabado, LocalTime.of(8, 0), LocalTime.of(17, 0)));
-            horarios.add(new HorarioCancha(null, domingo, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+            ArrayList<HorarioCancha> horariosEmpleados = new ArrayList<>();
+            horariosEmpleados.add(new HorarioCancha(null, lunes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, martes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, miercoles, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, jueves, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, viernes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, sabado, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, domingo, LocalTime.of(8, 0), LocalTime.of(17, 0)));
             //Se crean las canchas
             try {
                 //Verificamos si ya existen 5 canchas
                 if (this.canchaService.countCanchas() < 5) {
-                    this.canchaService.crearCancha(cancha1, horarios);
-                    this.canchaService.crearCancha(cancha2, horarios);
-                    this.canchaService.crearCancha(cancha3, horarios);
-                    this.canchaService.crearCancha(cancha4, horarios);
-                    this.canchaService.crearCancha(cancha5, horarios);
+                    this.canchaService.crearCancha(cancha1, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha2, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha3, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha4, horariosEmpleados);
+                    this.canchaService.crearCancha(cancha5, horariosEmpleados);
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
+
+            List<Permiso> permisos = new ArrayList<>();
+
+            // Creacion de todos los permisos que tiene el sistema
+            for (PermisoEnum permiso : PermisoEnum.values()) {
+
+                Permiso insercion = this.insertarPermisoSiNoExiste(
+                        new Permiso(
+                                permiso.getNombrePermiso(),
+                                permiso.getRuta()));
+                permisos.add(insercion);
+            }
+
+            try {
+                // Asignacion de permisos a los usuarios
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol2.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol3.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol4.getId(), permisos));
+                this.rolService.actualizarPermisosRol(new RolPermisoUpdateRequest(customRol5.getId(), permisos));
+            } catch (Exception e) {
+            }
+
+            String imagenEjemplo = cargarImagenComoBase64("imagen_ejemplo.jpg");
+            // Creacion de los servicios de la tienda
+            try {
+                this.servicioService.crearServicio(new Servicio("Servicio 1", 1.0, imagenEjemplo, 100.0, "Descripcion del servicio 1", customRol, 2));
+                this.servicioService.crearServicio(new Servicio("Servicio 2", 2.0, imagenEjemplo, 200.0, "Descripcion del servicio 2", customRol2, 6));
+                this.servicioService.crearServicio(new Servicio("Servicio 3", 3.0, imagenEjemplo, 300.0, "Descripcion del servicio 3", customRol3, 3));
+                this.servicioService.crearServicio(new Servicio("Servicio 4", 4.0, imagenEjemplo, 400.0, "Descripcion del servicio 4", customRol4, 5));
+                this.servicioService.crearServicio(new Servicio("Servicio 5", 5.0, imagenEjemplo, 500.0, "Descripcion del servicio 5", customRol5, 5));
+            } catch (Exception e) {
+            }
+
             /*
              * Categoria categoria = new Categoria("Hogar");
              * this.insertarCategoria(categoria);
@@ -350,21 +438,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
              * } catch (Exception e) {
              * }
              *
-             * // Creacion de todos los permisos que tiene el sistema
-             * for (PermisoEnum permiso : PermisoEnum.values()) {
              *
-             * Permiso insercion = this.insertarPermisoSiNoExiste(
-             * new Permiso(
-             * permiso.getNombrePermiso(),
-             * permiso.getRuta()));
-             * try {
-             * // Asignacion de permisos a los usuarios
-             * Usuario ayudante2 = this.usuarioService.getByEmail(
-             * "luismonteg1@hotmail.com");
-             * this.usuarioService.agregarPermisoUsuario(ayudante2,
-             * insercion);
-             * } catch (Exception e) {
-             * }
              * }
              */
         } catch (Exception ex) {
@@ -372,19 +446,21 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
         }
     }
 
-    public String cargarImagenComoBase64() {
+    public String cargarImagenComoBase64(String imagen) {
         // Cargar el archivo desde resources
-        try (InputStream inputStream = getClass().getResourceAsStream("/images/logo.svg")) {
+        try (InputStream inputStream = getClass().getResourceAsStream("/images/" + imagen)) {
             if (inputStream == null) {
                 throw new IOException("No se pudo encontrar el archivo logo.svg en el directorio /resources/images");
             }
-
             // Leer todos los bytes del archivo
             byte[] bytes = inputStream.readAllBytes();
-
             // Convertir a Base64
-            return Base64.getEncoder().encodeToString(bytes);
-
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            if (this.b64Service.hasExtension(base64)) {
+                return base64;
+            } else {
+                return this.b64Service.addExtension(base64);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Error al cargar y convertir la imagen a Base64", e);
         }

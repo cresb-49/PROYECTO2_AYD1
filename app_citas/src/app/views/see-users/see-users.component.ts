@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../services/user/user.service';
+import { UserRoles, UserService } from '../../services/user/user.service';
 import { TableAction, TableComponent, TableHeader } from '../../components/table/table.component';
 import { OptionsModal, PopUpModalComponent } from '../../components/pop-up-modal/pop-up-modal.component';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
@@ -39,7 +39,7 @@ export class SeeUsersComponent implements OnInit {
   usuarios: UserInfo[] = [];
 
   actionsTable: TableAction[] = [
-    { name: 'Editar', icon: 'edit', route: '/edit-user', key: 'id' },
+    { name: 'Editar', icon: 'edit', route: '/editar-cliente', key: 'id' },
     { name: 'Eliminar', icon: 'delete', action: (data: any) => this.openModal(data), return: true }
   ]
   constructor(
@@ -56,13 +56,17 @@ export class SeeUsersComponent implements OnInit {
       next: (response: ApiResponse) => {
         console.log('Response:', response);
         const data = response.data;
-        for(let d of data) {
-          this.usuarios.push({
-            id: d.id,
-            nombres: d.nombres,
-            apellidos: d.apellidos,
-            email: d.email
-          });
+        this.usuarios = [];
+        for (let d of data) {
+          const isCliente = d.roles.find((rol: any) => rol.rol.nombre === UserRoles.CLIENTE)
+          if (isCliente) {
+            this.usuarios.push({
+              id: d.id,
+              nombres: d.nombres,
+              apellidos: d.apellidos,
+              email: d.email
+            });
+          }
         }
       },
       error: (error: ErrorApiResponse) => {
@@ -73,12 +77,20 @@ export class SeeUsersComponent implements OnInit {
 
   openModal(data: any) {
     this.hideModal = false;
-    this.optionsModal.question = `¿Estás seguro de que deseas eliminar a ${data.name} ${data.lastname}?`;
+    this.optionsModal.question = `¿Estás seguro de que deseas eliminar a ${data.nombres} ${data.apellidos}?`;
     this.optionsModal.confirmAction = () => this.deteleUser(data);
   }
 
   deteleUser(user: any) {
-    console.log('Delete user:', user);
+    this.userService.elimiarUsuario(user.id).subscribe({
+      next: (response: ApiResponse) => {
+        this.toastr.success('Usuario eliminado');
+        this.obtenerUsuarios();
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'Error al eliminar usuario');
+      }
+    });
   }
 
 }

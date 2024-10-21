@@ -82,7 +82,7 @@ public class JwtRequestFilterTest {
         when(userDetailsService.loadUserByUsername("testUser")).thenReturn(userDetails);
 
         // Simular que el token es válido
-        when(jwtGeneratorService.validateTOken("valid-jwt", userDetails)).thenReturn(true);
+        when(jwtGeneratorService.validateToken("valid-jwt", userDetails)).thenReturn(true);
 
         // Llamar al filtro
         jwtRequestFilter.doFilterInternal(request, response, filterChain);
@@ -104,7 +104,7 @@ public class JwtRequestFilterTest {
         when(jwtGeneratorService.extractUserName("invalid-jwt")).thenReturn("testUser");
 
         // Simular que el token no es válido
-        when(jwtGeneratorService.validateTOken("invalid-jwt", null)).thenReturn(false);
+        when(jwtGeneratorService.validateToken("invalid-jwt", null)).thenReturn(false);
 
         // Llamar al filtro
         jwtRequestFilter.doFilterInternal(request, response, filterChain);
@@ -151,7 +151,7 @@ public class JwtRequestFilterTest {
         when(userDetailsService.loadUserByUsername("testUser")).thenReturn(userDetails);
 
         // Simular que el token es válido
-        when(jwtGeneratorService.validateTOken("valid-jwt", userDetails)).thenReturn(true);
+        when(jwtGeneratorService.validateToken("valid-jwt", userDetails)).thenReturn(true);
 
         // Llamar al filtro
         jwtRequestFilter.doFilterInternal(request, response, filterChain);

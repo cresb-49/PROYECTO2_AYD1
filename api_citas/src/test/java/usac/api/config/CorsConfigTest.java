@@ -1,3 +1,4 @@
+package usac.api.config;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-
-import usac.api.config.AppProperties;
-import usac.api.config.CorsConfig;
 
 /**
  * Pruebas unitarias para la clase CorsConfig. Verifica que la configuración
@@ -51,12 +49,11 @@ public class CorsConfigTest {
         when(appProperties.getHostFrontDev()).thenReturn("4200");
         when(appProperties.getHostFrontPro()).thenReturn("3000");
 
-
         // Simulamos el comportamiento del método addMapping que devuelve un CorsRegistration
         when(corsRegistry.addMapping("/**")).thenReturn(corsRegistration);
 
         // Simular el comportamiento encadenado de CorsRegistration
-        when(corsRegistration.allowedOrigins(anyString())).thenReturn(corsRegistration);
+        when(corsRegistration.allowedOrigins(anyString(), anyString())).thenReturn(corsRegistration);
         when(corsRegistration.allowedMethods(any())).thenReturn(corsRegistration);
         when(corsRegistration.allowedHeaders(anyString())).thenReturn(corsRegistration);
         when(corsRegistration.allowCredentials(anyBoolean())).thenReturn(corsRegistration);
