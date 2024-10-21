@@ -152,7 +152,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<b: CUI: </b>"+$P{cui}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<b>CUI: </b>"+$P{cui}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
