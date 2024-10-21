@@ -1,18 +1,23 @@
 package usac.api.services;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import usac.api.enums.FileHttpMetaData;
+import usac.api.models.Auditor;
 import usac.api.models.Cancha;
 import usac.api.models.Dia;
 import usac.api.models.Empleado;
+import usac.api.models.Factura;
 import usac.api.models.HorarioCancha;
 import usac.api.models.HorarioEmpleado;
 import usac.api.models.Reserva;
@@ -24,6 +29,7 @@ import usac.api.models.dto.ArchivoDTO;
 import usac.api.models.request.ReservacionCanchaRequest;
 import usac.api.models.request.ReservacionServicioRequest;
 import usac.api.reportes.imprimibles.ComprobanteReservaImprimible;
+import usac.api.reportes.imprimibles.FacturaImprimible;
 import usac.api.repositories.ReservaCanchaRepository;
 import usac.api.repositories.ReservaRepository;
 import usac.api.repositories.ReservaServicioRepository;
@@ -61,6 +67,11 @@ public class ReservaService extends Service {
     private ServicioService servicioService;
     @Autowired
     private EmpleadoService empleadoService;
+    @Autowired
+    @Lazy
+    private FacturaService facturaService;
+    @Autowired
+    private FacturaImprimible facturaImprimible;
 
     /**
      * Realiza la reserva de una cancha.
@@ -104,6 +115,17 @@ public class ReservaService extends Service {
 
         // Obtener el usuario reservador desde el JWT
         Usuario reservador = this.usuarioService.getUsuarioUseJwt();
+
+        //verificar que el reservador no tenga reservas en el mismo horario
+        Long reservasDelReservasor = this.reservaRepository.countReservasDelReservadorSolapadas(
+                reservador.getId(), reservacionCanchaRequest.getFechaReservacion(),
+                reservacionCanchaRequest.getHoraInicio(),
+                reservacionCanchaRequest.getHoraFin()
+        );
+
+        if (reservasDelReservasor > 0) {
+            throw new Exception("Ya tienes una reservación en el mismo periodo.");
+        }
 
         // Calcular pagos de acuerdo a las horas de reserva y el precio de la cancha
         Double porcentajeAdelanto = this.negocioService.obtenerNegocio().getPorcentajeAnticipo();
@@ -152,6 +174,20 @@ public class ReservaService extends Service {
         LocalTime horaFin = this.manejadorFechas.sumarHoras(
                 reservacionServicioRequest.getHoraInicio(), servicio.getDuracion());
         reservacionServicioRequest.setHoraFin(horaFin); // seteamos la hora de fin del servicio
+
+        // Obtener el usuario reservador desde el JWT
+        Usuario reservador = this.usuarioService.getUsuarioUseJwt();
+
+        //verificar que el reservador no tenga reservas en el mismo horario
+        Long reservasDelReservasor = this.reservaRepository.countReservasDelReservadorSolapadas(
+                reservador.getId(), reservacionServicioRequest.getFechaReservacion(),
+                reservacionServicioRequest.getHoraInicio(),
+                reservacionServicioRequest.getHoraFin()
+        );
+
+        if (reservasDelReservasor > 0) {
+            throw new Exception("Ya tienes una reservación en el mismo periodo.");
+        }
 
         // Verificar cuántas reservas activas hay para este servicio
         Integer reservasActivas = reservaServicioRepository.countReservasActivasPorServicio(
@@ -205,9 +241,6 @@ public class ReservaService extends Service {
         // Verificar la disponibilidad del empleado en el horario solicitado
         verificarDisponibilidadEmpleado(empleadoAsignado, reservacionServicioRequest);
 
-        // Obtener el usuario reservador desde el JWT
-        Usuario reservador = this.usuarioService.getUsuarioUseJwt();
-
         // Calcular los montos a pagar
         Double porcentajeAdelanto = this.negocioService.obtenerNegocio().getPorcentajeAnticipo();
         Double precioServicio = servicio.getCosto();
@@ -226,6 +259,165 @@ public class ReservaService extends Service {
         reservaRepository.save(saveReserva);
 
         return generarReporteReserva(saveReserva);
+    }
+
+    /**
+     * Cancela una reserva existente y genera una factura por la cancelación.
+     *
+     * <p>
+     * Este método realiza las siguientes operaciones:</p>
+     * <ul>
+     * <li>Valida el ID de la reserva.</li>
+     * <li>Verifica que el usuario que solicita la cancelación sea el mismo que
+     * hizo la reserva.</li>
+     * <li>Cancela la reserva, guardando la fecha de cancelación.</li>
+     * <li>Genera una factura por el monto del adelanto debido a la
+     * cancelación.</li>
+     * <li>Genera y devuelve un archivo PDF con los detalles de la factura.</li>
+     * </ul>
+     *
+     * @param reservaId El ID de la reserva a cancelar.
+     * @return Un objeto {@link ArchivoDTO} que contiene el PDF generado de la
+     * factura de cancelación.
+     * @throws Exception Si la reserva no se encuentra, el ID es inválido, o el
+     * usuario no tiene permiso para cancelar la reserva.
+     */
+    @Transactional(rollbackOn = Exception.class)
+    public ArchivoDTO cancelarReserva(Long reservaId) throws Exception {
+        this.validarId(new Auditor(reservaId), "El id de la reserva invalido.");
+        //obtenemos la reserva segun su id
+        Reserva reserva = this.reservaRepository.findById(reservaId).orElseThrow(
+                () -> new Exception("Reserva no encontrada."));
+        this.isDesactivated(reserva);
+        this.isDeleted(reserva);
+
+        if (reserva.getCanceledAt() != null) {
+            throw new Exception("La reservacion ya ha sido cancelada.");
+        }
+        if (reserva.getRealizada()) {
+            throw new Exception("La reservacion ya ha sido realizada.");
+        }
+
+        // ahora debemos verificar que el usuario que esta intentando a cancelar sea el mismo que reservo
+        Usuario usuario = this.usuarioService.getUsuarioUseJwt();
+
+        if (!Objects.equals(usuario.getId(), reserva.getReservador().getId())) {
+            throw new Exception("No puedes cancelar una reservacion que no es tuya.");
+        }
+
+        //ahora cancelamos la cita
+        reserva.setCanceledAt(LocalDateTime.now());
+        //ahora guardamos la edicion de la cita
+        Reserva saveReserva = this.reservaRepository.save(reserva);
+
+        // ahora debemos generar la factura por el concepto de "Cancelacion de cita" y por el monto del adelanto
+        Factura factura = new Factura(
+                usuario.getNombres() + " " + usuario.getApellidos(),
+                usuario.getNit(),
+                "Cancelación de cita",
+                "",
+                reserva.getAdelanto()
+        );
+
+        Factura facturaSave = this.facturaService.crearFactura(factura,
+                saveReserva.getId());//mandar a guardar la factura
+
+        //ahora actualizamos la reservacion para que percista la relacion
+        saveReserva.setFactura(facturaSave);
+        this.reservaRepository.save(saveReserva);
+
+        //generar el pdf de la factura
+        byte[] reporte = this.facturaImprimible.init(factura, "pdf");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(FileHttpMetaData.PDF.getContentType()));
+        headers.setContentDisposition(ContentDisposition.builder(FileHttpMetaData.PDF.getContentDispoition())
+                .filename(FileHttpMetaData.PDF.getFileName())
+                .build());
+
+        //retornar el archivo
+        return new ArchivoDTO(headers, reporte);
+    }
+
+    /**
+     * Marca una reserva como realizada y genera una factura por la cita
+     * realizada.
+     *
+     * <p>
+     * Este método valida que la reserva no haya sido cancelada o ya realizada
+     * previamente. Si la reserva es válida, se marca como realizada y se genera
+     * una factura asociada.
+     *
+     * @param reservaId El ID de la reserva a marcar como realizada.
+     * @return Un objeto {@link ArchivoDTO} que contiene el reporte de la
+     * factura en formato PDF.
+     * @throws Exception Si la reserva no es encontrada, ya fue cancelada, o ya
+     * fue realizada.
+     */
+    @Transactional(rollbackOn = Exception.class)
+    public ArchivoDTO realizarLaReserva(Long reservaId) throws Exception {
+        this.validarId(new Auditor(reservaId), "El id de la reserva invalido.");
+        //obtenemos la reserva segun su id
+        Reserva reserva = this.reservaRepository.findById(reservaId).orElseThrow(
+                () -> new Exception("Reserva no encontrada."));
+        this.isDesactivated(reserva);
+        this.isDeleted(reserva);
+
+        if (reserva.getCanceledAt() != null) {
+            throw new Exception("La reservacion ya ha sido cancelada.");
+        }
+
+        if (reserva.getRealizada()) {
+            throw new Exception("La reservacion ya ha sido realizada.");
+        }
+
+        //ahora cancelamos la cita
+        reserva.setRealizada(true);
+        //ahora guardamos la edicion de la cita
+        Reserva saveReserva = this.reservaRepository.save(reserva);
+
+        // ahora debemos generar la factura por el concepto de "Cancelacion de cita" y por el monto del adelanto
+        Factura factura = new Factura(
+                reserva.getReservador().getNombres() + " " + reserva.getReservador().getApellidos(),
+                reserva.getReservador().getNit(),
+                "Cita realizada",
+                "",
+                reserva.getTotalACobrar()
+        );
+
+        Factura facturaSave = this.facturaService.crearFactura(factura,
+                saveReserva.getId());//mandar a guardar la factura
+
+        //ahora actualizamos la reservacion para que percista la relacion
+        saveReserva.setFactura(facturaSave);
+        this.reservaRepository.save(saveReserva);
+
+        //generar el pdf de la factura
+        byte[] reporte = this.facturaImprimible.init(factura, "pdf");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(FileHttpMetaData.PDF.getContentType()));
+        headers.setContentDisposition(ContentDisposition.builder(FileHttpMetaData.PDF.getContentDispoition())
+                .filename(FileHttpMetaData.PDF.getFileName())
+                .build());
+
+        //retornar el archivo
+        return new ArchivoDTO(headers, reporte);
+    }
+
+    /**
+     * Obtiene una reserva por su ID.
+     *
+     * @param reservaId El ID de la reserva.
+     * @return La reserva correspondiente al ID.
+     * @throws Exception si no se encuentra la reserva.
+     */
+    public Reserva obtenerReservaPorId(Long reservaId) throws Exception {
+        Reserva reserva = reservaRepository.findById(reservaId).
+                orElseThrow(()
+                        -> new Exception("No se encontró la reserva con el ID proporcionado: " + reservaId)
+                );
+        return reserva;
     }
 
     /**
@@ -249,7 +441,7 @@ public class ReservaService extends Service {
      * para la respuesta HTTP.
      */
     private ArchivoDTO generarReporteReserva(Reserva reserva) throws Exception {
-        byte[] reporte = this.reservaImprimible.init(reserva);
+        byte[] reporte = this.reservaImprimible.init(reserva, "pdf");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(FileHttpMetaData.PDF.getContentType()));
         headers.setContentDisposition(ContentDisposition.builder(FileHttpMetaData.PDF.getContentDispoition())
@@ -375,4 +567,5 @@ public class ReservaService extends Service {
                     horarioEmpleado.getEntrada().toString(), horarioEmpleado.getSalida().toString()));
         }
     }
+
 }

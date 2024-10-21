@@ -6,12 +6,10 @@ package usac.api.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -39,13 +37,17 @@ public class Factura extends Auditor {
     @NotBlank(message = "El NIT del cliente no puede estar vacío.")
     @NotNull(message = "El NIT del cliente no puede ser nulo.")
     @Size(min = 6, max = 12, message = "El NIT del cliente debe tener entre 6 y 12 caracteres.")
-    @Column(length = 13, unique = true)
+    @Column(length = 13)
     private String nit;
 
-    @Lob
     @NotBlank(message = "El detalle del servicio no puede estar vacío.")
     @NotNull(message = "El detalle del servicio no puede ser nulo.")
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String concepto;
+
+    @NotBlank(message = "El detalle del servicio no puede estar vacío.")
+    @NotNull(message = "El detalle del servicio no puede ser nulo.")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String detalle;
 
     @Column(name = "precio", nullable = false)
@@ -57,14 +59,23 @@ public class Factura extends Auditor {
     @JoinColumn(name = "reserva", nullable = false, unique = true)
     private Reserva reserva;
 
-    public Factura(String nombre, String nit, String detalle, Double total) {
+    public Factura(String nombre, String nit, String concepto, String detalle, Double total) {
         this.nombre = nombre;
         this.nit = nit;
+        this.concepto = concepto;
         this.detalle = detalle;
         this.total = total;
     }
 
     public Factura() {
+    }
+
+    public String getConcepto() {
+        return concepto;
+    }
+
+    public void setConcepto(String concepto) {
+        this.concepto = concepto;
     }
 
     public String getNombre() {

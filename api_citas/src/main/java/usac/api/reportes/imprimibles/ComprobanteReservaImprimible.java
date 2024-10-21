@@ -19,13 +19,13 @@ public class ComprobanteReservaImprimible extends Reporte {
 
     private Reserva reserva;
 
-    public byte[] init(Reserva reserva) throws Exception {
+    public byte[] init(Reserva reserva, String tipoExportacion) throws Exception {
         this.reserva = reserva;
         //si pasaron las comporbaciones mandamos a traer los parametros
         Map<String, Object> parametrosReporte = this.construirComprobante();
         //mandamos ha abrir el reporte
         return this.exportarReporte("ConstanciaReserva", parametrosReporte,
-                "pdf");
+                tipoExportacion);
     }
 
     private Map<String, Object> construirComprobante() throws Exception {
