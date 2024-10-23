@@ -18,8 +18,11 @@ import usac.api.models.Empleado;
 import usac.api.models.HorarioEmpleado;
 import usac.api.models.Rol;
 import usac.api.models.RolUsuario;
+import usac.api.models.TokenAuth;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
+import usac.api.models.request.CreacionClienteRequest;
+import usac.api.models.request.CreateTokenAuthRequest;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UpdateEmpleadoRequest;
@@ -57,6 +60,8 @@ public class UsuarioService extends usac.api.services.Service {
     private RolRepository rolRepository;
     @Autowired
     private DiaService diaService;
+    @Autowired
+    private TokenAuthService tokenAuthService;
 
     /**
      * Envía un correo electrónico de recuperación de contraseña a un usuario
@@ -405,15 +410,31 @@ public class UsuarioService extends usac.api.services.Service {
     /**
      * Crea un usuario cliente obteniendo el rol correspondiente
      *
-     * @param crear
+     * @param info
      * @return
      * @throws Exception
      */
-    public LoginDTO crearUsuarioCliente(Usuario crear) throws Exception {
-        // validamos
-        this.validarModelo(crear);
+    public LoginDTO crearUsuarioCliente(CreacionClienteRequest info) throws Exception {
+        this.validarModelo(info);
+        // mandamos a verificar el token
+        TokenAuth validateToken = tokenAuthService.validateToken(info.getTokenAuth());
         // traer rol AYUDANTE
         Rol rol = this.rolService.getRolByNombre("CLIENTE");
+        //obtnemos el gmail
+        String email = validateToken.getEmail();
+        //eliminar el token
+        tokenAuthService.eliminarToken(validateToken);
+        //si el token es valido entonces creamos el usuario
+
+        Usuario crear = new Usuario(
+                info.getNit(),
+                info.getCui(),
+                info.getPhone(),
+                email,
+                info.getNombres(),
+                info.getApellidos(),
+                info.getApellidos()
+        );
 
         // preparamos el rol
         List<RolUsuario> rolesUsuario = new ArrayList<>();
@@ -429,6 +450,25 @@ public class UsuarioService extends usac.api.services.Service {
             return new LoginDTO(userCreado, jwt);
         }
         throw new Exception("No pudimos crear tu usuario, inténtalo más tarde.");
+    }
+
+    /**
+     * Envía un token temporal al correo proporcionado para verificar la
+     * creación del usuario.
+     *
+     * @param request
+     * @throws Exception Si ocurre un error en el envío del correo, el email ya
+     * esta registrado en la bd o la generación del token.
+     */
+    public void enviarTokenRegistro(CreateTokenAuthRequest request) throws Exception {
+        this.validarModelo(request);
+        if (usuarioRepository.existsByEmail(request.getEmail())) {
+            throw new Exception("Usuario ya registrado.");
+        }
+        // Generar un token temporal con un tiempo de expiración (ej. 15 minutos)
+        TokenAuth token = tokenAuthService.generateToken(request.getEmail());
+        // Enviar el correo con el token
+        mailService.enviarCorreoTokenAuth(request.getEmail(), token.getToken());
     }
 
     /**
