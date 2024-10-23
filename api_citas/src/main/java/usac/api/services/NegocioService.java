@@ -46,6 +46,7 @@ public class NegocioService extends usac.api.services.Service {
         // Actualizar los datos del negocio
         negocioEncontrado.setNombre(negocio.getNombre());
         negocioEncontrado.setLogo(negocio.getLogo());
+        negocioEncontrado.setPorcentajeAnticipo(negocio.getPorcentajeAnticipo());
         negocioEncontrado.setAsignacionManual(negocio.isAsignacionManual());
         negocioEncontrado.setDireccion(negocio.getDireccion());
         // Eliminar los horarios anteriores

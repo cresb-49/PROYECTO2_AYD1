@@ -1,16 +1,17 @@
 <section class="px-20">
   <h4 class="text-2xl font-bold dark:text-white">Reservar una Cancha</h4>
-  <form class="w-full mt-4">
+  <div class="w-full mt-4">
     <!-- Primera sección del formulario -->
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div class="relative z-0 w-full mb-5 group">
         <label for="codigo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código</label>
-        <input type="text" id="codigo-input" readonly
+        <input type="text" id="codigo-input" readonly [(ngModel)]="cancha.id"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="relative z-0 w-full mb-5 group">
-        <label for="costo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo</label>
-        <input type="number" id="costo-input" readonly
+        <label for="costo-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Costo por
+          hora</label>
+        <input type="number" id="costo-input" readonly [(ngModel)]="cancha.costoHora"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
     </div>
@@ -19,29 +20,111 @@
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="relative z-0 w-full mb-5 group">
         <h4 class="text-2xl font-bold dark:text-white">Horarios Disponibles</h4>
-        <app-schedule-conf [isShowData]="true" [showNonActive]="false"></app-schedule-conf>
+        <app-schedule-conf [isShowData]="true" [showNonActive]="false" [data]="cancha.horarios"></app-schedule-conf>
       </div>
       <div class="relative z-0 w-full mb-5 group">
         <h4 class="text-2xl font-bold dark:text-white mb-4">Selecciona el Horario</h4>
         <div class="relative z-0 w-full mb-2 group">
           <label for="fecha-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha</label>
-          <input type="date" id="fecha-input"
+          <input type="date" id="fecha-input" [(ngModel)]="fecha_cita"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2">
           <div class="relative z-0 w-full mb-2 group">
             <label for="inicio-input"
               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Inicio</label>
-            <input type="time" id="inicio-input"
+            <input type="time" id="inicio-input" [(ngModel)]="inicio_cita" (ngModelChange)="inicioChange($event)"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
           </div>
           <div class="relative z-0 w-full mb-2 group">
             <label for="fin-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fin</label>
-            <input type="time" id="fin-input"
+            <input type="time" id="fin-input" [(ngModel)]="fin_cita" (ngModelChange)="finChange($event)"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
           </div>
         </div>
-        <button type="submit"
+        <label for="countries"
+          class=" text-xl font-bold block mb-2 text-sm font-medium text-gray-900 dark:text-white mt-3">
+          Datos de Pago
+        </label>
+        <blockquote class="text-sm italic font-semibold text-gray-900 dark:text-white mb-2">
+          <p>"Se cobrara un {{porcentaje_anticipo}}% de anticipo por posible cancelacion de cita"</p>
+        </blockquote>
+        <div class="relative z-0 w-full mb-4 group">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2 sm:col-span-1">
+              <label for="full_name" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                Nombre completo (en el frente de la tarjeta)*
+              </label>
+              <input type="text" id="full_name" [(ngModel)]="cardInfo.name"
+                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                placeholder="Bonnie Green" required />
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+              <label for="card-number-input" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                Numero de la tarjeta* </label>
+              <input type="text" id="card-number-input" [(ngModel)]="cardInfo.number"
+                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pe-10 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                placeholder="xxxx-xxxx-xxxx-xxxx" pattern="^4[0-9]{12}(?:[0-9]{3})?$" required />
+            </div>
+
+            <div>
+              <label for="card-expiration-input" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                Fecha de expiracion*
+              </label>
+              <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5">
+                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd"
+                      d="M5 5a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1 2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a2 2 0 0 1 2-2ZM3 19v-7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6.01-6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm-10 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <input datepicker datepicker-format="mm/yy" id="card-expiration-input" type="text"
+                  [(ngModel)]="cardInfo.fecha"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-9 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  placeholder="12/23" required />
+              </div>
+            </div>
+            <div>
+              <label for="cvv-input"
+                class="mb-2 flex items-center gap-1 text-sm font-medium text-gray-900 dark:text-white">
+                CVV*
+                <button data-tooltip-target="cvv-desc" data-tooltip-trigger="hover"
+                  class="text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white">
+                  <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 24 24">
+                    <path fill-rule="evenodd"
+                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm9.408-5.5a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2h-.01ZM10 10a1 1 0 1 0 0 2h1v3h-1a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-1v-4a1 1 0 0 0-1-1h-2Z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+                <div id="cvv-desc" role="tooltip"
+                  class="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700">
+                  The last 3 digits on back of card
+                  <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+              </label>
+              <input type="number" id="cvv-input" aria-describedby="helper-text-explanation" [(ngModel)]="cardInfo.cvv"
+                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                placeholder="•••" required />
+            </div>
+          </div>
+        </div>
+        <div class="relative z-0 w-full mb-2 group flex items-center">
+          <label for="numero-input" class="mr-4 text-sm font-medium text-gray-900 dark:text-white">Total</label>
+          <input type="number" id="numero-input"
+            [value]="(cancha.costoHora * (minutos_totales_reserva/60))" readonly
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        </div>
+        <div class="relative z-0 w-full mb-2 group flex items-center">
+          <label for="numero-input" class="mr-4 text-sm font-medium text-gray-900 dark:text-white">Cobraremos</label>
+          <input type="number" id="numero-input"
+            [value]="((porcentaje_anticipo) * cancha.costoHora * (minutos_totales_reserva/60) /100)" readonly
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        </div>
+        <button (click)="generarReserva()"
           class="mt-4 mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center  dark:focus:ring-blue-800"
           [ngClass]="{
           'cursor-not-allowed': !enableReserve ,
@@ -56,6 +139,5 @@
         </button>
       </div>
     </div>
-  </form>
-
+  </div>
 </section>
