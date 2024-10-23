@@ -10,15 +10,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import usac.api.models.Reserva;
 import usac.api.models.dto.ArchivoDTO;
+import usac.api.models.request.GetReservacionesRequest;
 import usac.api.services.ReservaService;
 import usac.api.services.permisos.ValidadorPermiso;
+import usac.api.tools.transformers.ApiBaseTransformer;
 
 /**
  *
@@ -99,6 +105,38 @@ public class ReservaController {
             return ResponseEntity.ok()
                     .headers(archivoDTO.getHeaders())
                     .body(archivoDTO.getArchivo());
+        } catch (Exception ex) {
+            // Devuelve una respuesta con un mensaje de error si ocurre algún problema
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    /**
+     * Endpoint para obtener las citas correspondientes a un mes y año
+     * específicos.
+     *
+     * @param anio Año en el que se desean obtener las citas.
+     * @param mes Mes en el que se desean obtener las citas.
+     * @return ResponseEntity con la lista de citas correspondientes al mes y
+     * año proporcionados, o un mensaje de error en caso de fallar.
+     */
+    @Operation(description = "Obtiene las citas del mes y año especificados.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Citas obtenidas exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Reserva.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
+    @GetMapping("/protected/getCitasDelMes/{anio}/{mes}")
+    public ResponseEntity<?> getCitasDelMes(
+            @Parameter(description = "Número de año al que pertenece el mes", required = true)
+            @PathVariable Integer anio,
+            @Parameter(description = "Mes donde se quieren ver las citas", required = true)
+            @PathVariable Integer mes) {
+        try {
+            GetReservacionesRequest req = new GetReservacionesRequest(mes, anio);
+            // Invoca el método para obtener las reservas
+            List<Reserva> data = reservaService.getReservasDelMes(req);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             // Devuelve una respuesta con un mensaje de error si ocurre algún problema
             return ResponseEntity.badRequest().body(ex.getMessage());

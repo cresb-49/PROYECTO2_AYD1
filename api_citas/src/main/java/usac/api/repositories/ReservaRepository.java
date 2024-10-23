@@ -6,6 +6,7 @@ package usac.api.repositories;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -25,5 +26,18 @@ public interface ReservaRepository extends CrudRepository<Reserva, Long> {
             @Param("fecha") LocalDate fecha,
             @Param("horaInicio") LocalTime horaInicio,
             @Param("horaFin") LocalTime horaFin);
+
+    @Query("SELECT r FROM Reserva r LEFT JOIN FETCH r.reservaCancha rc LEFT JOIN FETCH rc.cancha c WHERE MONTH(r.fechaReservacion) = :mes AND YEAR(r.fechaReservacion) = :anio")
+    public List<Reserva> findReservasByMesAndAnio(@Param("mes") int mes, @Param("anio") int anio);
+
+    @Query("SELECT r FROM Reserva r LEFT JOIN FETCH r.reservaCancha rc LEFT JOIN FETCH rc.cancha c WHERE r.reservador.id = :reservadorId AND MONTH(r.fechaReservacion) = :mes AND YEAR(r.fechaReservacion) = :anio")
+    public List<Reserva> findReservasByReservadorAndMesAndAnio(@Param("reservadorId") Long reservadorId,
+            @Param("mes") int mes,
+            @Param("anio") int anio);
+
+    @Query("SELECT r FROM Reserva r LEFT JOIN FETCH r.reservaServicio rs LEFT JOIN FETCH r.reservaCancha rc LEFT JOIN FETCH rc.cancha c WHERE rs.empleado.id = :empleadoId AND MONTH(r.fechaReservacion) = :mes AND YEAR(r.fechaReservacion) = :anio")
+    public List<Reserva> findReservasByEmpleadoAndMesAndAnio(@Param("empleadoId") Long empleadoId,
+            @Param("mes") int mes,
+            @Param("anio") int anio);
 
 }

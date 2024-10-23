@@ -408,6 +408,36 @@ public class UsuarioService extends usac.api.services.Service {
     }
 
     /**
+     * Crea un usuario cliente obteniendo el rol correspondiente, USADO SOLO
+     * PARA SEDDERS
+     *
+     * @param crear
+     * @return
+     * @throws Exception
+     */
+    public LoginDTO crearUsuarioCliente(Usuario crear) throws Exception {
+        // validamos
+        this.validarModelo(crear);
+        // traer rol AYUDANTE
+        Rol rol = this.rolService.getRolByNombre("CLIENTE");
+
+        // preparamos el rol
+        List<RolUsuario> rolesUsuario = new ArrayList<>();
+        rolesUsuario.add(new RolUsuario(crear, rol));
+
+        // guardamos el usuario con el rol
+        Usuario userCreado = this.guardarUsuario(crear, rolesUsuario);
+        // Generar el JWT para el usuario creado
+        UserDetails userDetails = authenticationService.loadUserByUsername(crear.getEmail());
+        String jwt = jwtGenerator.generateToken(userDetails);
+        // Retornar la confirmación con el JWT
+        if (userCreado != null && userCreado.getId() > 0) {
+            return new LoginDTO(userCreado, jwt);
+        }
+        throw new Exception("No pudimos crear tu usuario, inténtalo más tarde.");
+    }
+
+    /**
      * Crea un usuario cliente obteniendo el rol correspondiente
      *
      * @param info
