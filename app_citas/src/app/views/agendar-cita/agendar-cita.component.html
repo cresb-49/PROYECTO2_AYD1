@@ -60,11 +60,11 @@
           class=" text-xl font-bold block mb-2 text-sm font-medium text-gray-900 dark:text-white mt-3">
           Datos de Pago
         </label>
-        <blockquote class="text-lg italic font-semibold text-gray-900 dark:text-white">
-          <p>"Flowbite is just awesome. It contains tons of predesigned components and pages starting from login screen to complex dashboard. Perfect choice for your next SaaS application."</p>
-      </blockquote>
+        <blockquote class="text-sm italic font-semibold text-gray-900 dark:text-white mb-2">
+          <p>"Se cobrara un {{porcentaje_anticipo}}% de anticipo por posible cancelacion de cita"</p>
+        </blockquote>
         <div class="relative z-0 w-full mb-2 group">
-          <div class="mb-6 grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-4">
             <div class="col-span-2 sm:col-span-1">
               <label for="full_name" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                 Nombre completo (en el frente de la tarjeta)*
@@ -95,7 +95,8 @@
                       clip-rule="evenodd" />
                   </svg>
                 </div>
-                <input datepicker datepicker-format="mm/yy" id="card-expiration-input" type="text" [(ngModel)]="cardInfo.fecha"
+                <input datepicker datepicker-format="mm/yy" id="card-expiration-input" type="text"
+                  [(ngModel)]="cardInfo.fecha"
                   class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-9 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                   placeholder="12/23" required />
               </div>
@@ -125,7 +126,11 @@
             </div>
           </div>
         </div>
-
+        <div class="relative z-0 w-full mb-2 group flex items-center">
+          <label for="numero-input" class="mr-4 text-sm font-medium text-gray-900 dark:text-white">Cobraremos</label>
+          <input type="number" id="numero-input" [value]="((porcentaje_anticipo) * servicioData.precio /100)" readonly
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        </div>
         <button (click)="agendar()"
           class="mb-4 text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center  dark:focus:ring-blue-800"
           [ngClass]="{
