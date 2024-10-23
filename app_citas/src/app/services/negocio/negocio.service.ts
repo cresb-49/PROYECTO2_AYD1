@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ApiResponse, ErrorApiResponse, HttpService } from '../http/http.service';
 import { ToastrService } from 'ngx-toastr';
 import { Dia } from '../dia/dia.service';
+import { DayConfig } from '../../components/schedule-conf/schedule-conf.component';
 
 export interface Horario {
   dia: Dia;
@@ -58,4 +59,31 @@ export class NegocioService {
     return this.httpService.patch<any>('negocio/private/negocio', payload, true);
   }
 
+  obtenerHorariosNegocio(): Promise<DayConfig[]> {
+    return new Promise((resolve, reject) => {
+      this.getInfoNegocio().subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          const result = [...this.calcularHorario(data.horarios)]
+          resolve(result)
+        },
+        error: (error: ErrorApiResponse) => {
+          reject(error)
+        }
+      })
+    })
+  }
+
+  private calcularHorario(horarios: any): DayConfig[] {
+    let negocioHas: DayConfig[] = horarios.map((horario: any) => {
+      return {
+        id: horario.dia.id,
+        day: horario.dia.nombre,
+        init: horario.apertura,
+        end: horario.cierre,
+        active: true
+      } as DayConfig
+    })
+    return negocioHas;
+  }
 }
