@@ -17,6 +17,7 @@ pipeline {
                 // Aquí se comenta la compilación real del backend
                 dir('api_citas') {
                     echo 'Building Spring Boot Application...'
+                    sh 'mvn clean'
                     sh 'mvn clean package -DskipTests' // Compilar el proyecto y generar el archivo .war
                     dir('target') {
                         sh 'mv apiPY2-0.0.1-SNAPSHOT.war ROOT.war' // Renombrar el archivo .war
