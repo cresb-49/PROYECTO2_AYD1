@@ -112,4 +112,21 @@ public class ManejadorTiempo {
         return fechaFormateada;
     }
 
+    /**
+     * Convierte el número de mes y el año a un LocalDate, estableciendo el día
+     * como el primero del mes.
+     *
+     * @param mes El número del mes (1 para enero, 12 para diciembre).
+     * @param anio El año.
+     * @return LocalDate con el primer día del mes y año proporcionados.
+     * @throws IllegalArgumentException si el mes no está en el rango de 1 a 12.
+     */
+    public LocalDate mesYAnioALocalDate(int mes, int anio) throws Exception {
+        if (mes < 1 || mes > 12) {
+            throw new Exception("El mes debe estar entre 1 y 12.");
+        }
+
+        return LocalDate.of(anio, mes, 1); // Crea un LocalDate con el primer día del mes
+    }
+
 }

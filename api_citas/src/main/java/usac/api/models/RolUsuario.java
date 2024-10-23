@@ -39,6 +39,10 @@ public class RolUsuario extends Auditor {
     public RolUsuario() {
     }
 
+    public RolUsuario(Rol rol) {
+        this.rol = rol;
+    }
+
     public RolUsuario(Usuario usuario, Rol rol) {
         this.usuario = usuario;
         this.rol = rol;
