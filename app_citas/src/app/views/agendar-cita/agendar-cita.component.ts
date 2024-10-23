@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { HorarioService } from '../../services/horario/horario.service';
 import { ASOCIACION_DIAS_NOMBRE, Dia, DiaService } from '../../services/dia/dia.service';
+import { NegocioService } from '../../services/negocio/negocio.service';
 
 @Component({
   standalone: true,
@@ -29,7 +30,10 @@ export class AgendarCitaComponent implements OnInit {
     id_rol: 0
   };
 
-  dataDias: Dia[] = []
+  negocio: any = null;
+  asignacion_manual = false;
+  porcentaje_anticipo = 0;
+  dataDias: Dia[] = [];
   empleados: any[] = [];
   horario: DayConfig[] = [];
 
@@ -39,6 +43,7 @@ export class AgendarCitaComponent implements OnInit {
   fin_cita = ''
 
   constructor(
+    private negocioService: NegocioService,
     private diaService: DiaService,
     private authService: AuthService,
     private servicioService: ServicioService,
@@ -52,6 +57,7 @@ export class AgendarCitaComponent implements OnInit {
     await this.cargarDatosServicio();
     await this.empleadosServicio();
     await this.getDias();
+    await this.getInfoNegocio();
   }
 
   inicioChange(value: string) {
@@ -95,6 +101,26 @@ export class AgendarCitaComponent implements OnInit {
           reject(error);
         }
       });
+    });
+  }
+
+  getInfoNegocio(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.negocioService.getInfoNegocio().subscribe(
+        {
+          next: (response: ApiResponse) => {
+            this.negocio = response.data;
+            this.asignacion_manual = this.negocio.asignacionManual ?? false;
+            this.porcentaje_anticipo = this.negocio.porcentajeAnticipo ?? 0;
+            console.log(this.asignacion_manual);
+            console.log(this.porcentaje_anticipo);
+          },
+          error: (error: ErrorApiResponse) => {
+            this.toastr.error(error.error, 'Error al obtener la info de usuario');
+            reject(error)
+          }
+        }
+      );
     });
   }
 
@@ -156,6 +182,11 @@ export class AgendarCitaComponent implements OnInit {
       if (this.inicio_cita === null || this.inicio_cita === undefined || this.inicio_cita === '') {
         throw new Error('Debe de configurar una hora para la cita')
       }
+      const selected_id_empleado = Number(this.selected_id_empleado)
+
+      if (this.asignacion_manual && selected_id_empleado === 0) {
+        throw new Error('Debe de seleccionar un empleado')
+      }
       const configuracionDiaSeleccionado: DayConfig = {
         id: diaSeleccionado.id,
         active: true,
@@ -167,10 +198,22 @@ export class AgendarCitaComponent implements OnInit {
       this.horarioService.isDayConfigValido(this.horario, configuracionDiaSeleccionado)
       const payload = {
         fecha: this.fecha_cita,
-        id_empelado: this.selected_id_empleado === 0 ? null : this.selected_id_empleado,
+        id_empelado: selected_id_empleado,
         inicio: this.inicio_cita,
-        fin: this.fin_cita
       }
+
+      //Resevacion cahnca
+      // id_cancha
+      // inicio
+      // fin
+      // fecha
+
+      //Reservacion cita
+      //id_empleado
+      //id_servicio
+      //inicio
+      //fecha
+
       console.log(payload);
     } catch (error: any) {
       this.toastr.error(error.message, 'Error al agendar la cita');
