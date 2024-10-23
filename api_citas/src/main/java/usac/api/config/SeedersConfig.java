@@ -71,9 +71,9 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     @Autowired
     private ServicioService servicioService;
     @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
     private B64Service b64Service;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -156,11 +156,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        //si la tabla usuarios esta llena entonces abortamos la operacion
-         if (usuarioRepository.count() != 0) {
-             return;
-         }
-        
+
+        if (usuarioRepository.count() != 0) {
+            return;
+        }
         try {
             // Creacion de los dias de la semana
             Dia lunes = this.insertarDia(new Dia("Lunes"));
@@ -299,6 +298,12 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
 
+                this.usuarioService.crearUsuarioCliente(cliente1);
+                this.usuarioService.crearUsuarioCliente(cliente2);
+                this.usuarioService.crearUsuarioCliente(cliente3);
+                this.usuarioService.crearUsuarioCliente(cliente4);
+                this.usuarioService.crearUsuarioCliente(cliente5);
+
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado1, horarios, customRol));
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado2, horarios, customRol2));
                 this.usuarioService.crearEmpleado(new NuevoEmpleadoRequest(empleado3, horarios, customRol3));
@@ -314,16 +319,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println(e.getMessage());
-            }
-            //creando los clientes
-            try {
-                this.usuarioRepository.save(cliente1);
-                this.usuarioRepository.save(cliente2);
-                this.usuarioRepository.save(cliente3);
-                this.usuarioRepository.save(cliente4);
-                this.usuarioRepository.save(cliente5);
-
-            } catch (Exception e) {
             }
             // Se crea el modelo del negocio de la APP
             // Cargamos la imagen que esta en resources/images/logo.svg y la convertimos a

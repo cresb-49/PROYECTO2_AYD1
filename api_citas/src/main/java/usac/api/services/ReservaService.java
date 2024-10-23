@@ -26,6 +26,7 @@ import usac.api.models.ReservaServicio;
 import usac.api.models.Servicio;
 import usac.api.models.Usuario;
 import usac.api.models.dto.ArchivoDTO;
+import usac.api.models.request.GetReservacionesRequest;
 import usac.api.models.request.ReservacionCanchaRequest;
 import usac.api.models.request.ReservacionServicioRequest;
 import usac.api.reportes.imprimibles.ComprobanteReservaImprimible;
@@ -566,6 +567,50 @@ public class ReservaService extends Service {
             throw new Exception(String.format("La reserva no puede realizarse fuera de los horarios del empleado. El horario del empleado es de %s a %s.",
                     horarioEmpleado.getEntrada().toString(), horarioEmpleado.getSalida().toString()));
         }
+    }
+
+    /**
+     * Obtiene una lista de reservaciones que pertenecen al mes y año
+     * especificados.
+     *
+     * @param request Objeto que contiene el mes y el año para filtrar las
+     * reservaciones.
+     * @return Lista de reservaciones correspondientes al mes y año
+     * proporcionados.
+     * @throws Exception Si el modelo del request es inválido o ocurre un error
+     * en la búsqueda.
+     */
+    public List<Reserva> getReservasDelMes(GetReservacionesRequest request) throws Exception {
+        this.validarModelo(request);
+        Usuario usuario = usuarioService.getUsuarioUseJwt();
+
+        // Verificar el rol del usuario y aplicar la consulta correspondiente
+        if (usuario.getRoles().stream().anyMatch(rol
+                -> rol.getRol().getNombre().equals("CLIENTE"))) {
+
+            // Si es cliente, buscar reservas donde él sea el reservador en ese mes y año
+            return reservaRepository.findReservasByReservadorAndMesAndAnio(usuario.getId(),
+                    request.getMes(),
+                    request.getAnio());
+
+        } else if (usuario.getRoles().stream().anyMatch(rol
+                -> rol.getRol().getNombre().equals("ADMIN"))) {
+
+            // Si es administrador, buscar todas las reservas del mes
+            return reservaRepository.findReservasByMesAndAnio(request.getMes(), request.getAnio());
+
+        } else if (usuario.getRoles().stream().anyMatch(rol
+                -> rol.getRol().getNombre().equals("EMPLEADO"))) {
+
+            // Si es empleado, buscar reservas donde él esté asignado para atender
+            return reservaRepository.findReservasByEmpleadoAndMesAndAnio(usuario.getId(),
+                    request.getMes(),
+                    request.getAnio());
+
+        } else {
+            throw new Exception("El usuario no tiene permisos para ver las reservas.");
+        }
+
     }
 
 }

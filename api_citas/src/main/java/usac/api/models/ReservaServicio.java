@@ -34,6 +34,8 @@ public class ReservaServicio extends Auditor {
     @JoinColumn(name = "empleado", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NotNull(message = "El empleado no puede ser nulo.")
+    @Schema(hidden = true)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Empleado empleado;
 
     @ManyToOne//indicador de relacion muchos a uno
