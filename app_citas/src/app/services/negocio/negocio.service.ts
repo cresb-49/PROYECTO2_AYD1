@@ -26,6 +26,7 @@ export interface PayloadNegocio {
     logo: string;
     asignacionManual: boolean;
     direccion: string;
+    porcentajeAnticipo: number;
   };
   horarios: Horario[];
 }
