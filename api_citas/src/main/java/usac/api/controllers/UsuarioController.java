@@ -26,9 +26,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import javax.validation.Valid;
 import usac.api.models.Empleado;
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
+import usac.api.models.request.CreacionClienteRequest;
+import usac.api.models.request.CreateTokenAuthRequest;
 import usac.api.models.request.NuevoEmpleadoRequest;
 import usac.api.models.request.PasswordChangeRequest;
 import usac.api.models.request.UpdateEmpleadoRequest;
@@ -175,17 +178,57 @@ public class UsuarioController {
         }
     }
 
-    @Operation(description = "Crea un nuevo usuario en el sistema.")
+    /**
+     * Crea un nuevo cliente en el sistema utilizando un token de autenticación.
+     *
+     * @param crear Objeto con la información del cliente a crear.
+     * @return ResponseEntity con la información del usuario creado y el JWT.
+     * @throws Exception si ocurre un error durante la creación del usuario.
+     */
+    @Operation(
+            summary = "Crear un nuevo cliente",
+            description = "Este endpoint permite crear un nuevo usuario cliente en el sistema."
+            + " El usuario debe proporcionar un token de verificación válido,"
+            + " junto con sus datos personales como NIT, CUI, teléfono, nombres"
+            + " y apellidos. El token se valida antes de crear el usuario,"
+            + " y si es válido, se genera un JWT para el nuevo cliente."
+    )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Usuario creado exitosamente", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario.class))}),
-        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor al intentar crear el usuario.", content = {
+            @Content(mediaType = "application/json")})
     })
     @PostMapping("/public/crearCliente")
-    public ResponseEntity<?> crearCliente(@RequestBody Usuario crear) {
+    public ResponseEntity<?> crearCliente(@RequestBody CreacionClienteRequest crear) {
         try {
             LoginDTO respuesta = usuarioService.crearUsuarioCliente(crear);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    /**
+     * Endpoint para enviar un token temporal al correo del usuario para
+     * verificar la creación del cliente.
+     *
+     * @param crear Objeto que contiene el correo electrónico del cliente.
+     * @return ResponseEntity con un mensaje de éxito o error.
+     */
+    @Operation(summary = "Enviar token de registro", description = "Envía un token temporal al correo proporcionado para verificar la creación del usuario.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Token enviado exitosamente",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiBaseTransformer.class))),
+        @ApiResponse(responseCode = "400", description = "Error en la solicitud o envío del token",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiBaseTransformer.class)))
+    })
+    @PostMapping("/public/enviarTokenRegistro")
+    public ResponseEntity<?> enviarTokenRegistro(@RequestBody CreateTokenAuthRequest crear) {
+        try {
+            usuarioService.enviarTokenRegistro(crear);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK",
+                    "Hemos enviado un correo electronico con tu token.", null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
@@ -230,7 +273,7 @@ public class UsuarioController {
         @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
     @PatchMapping("/private/actualizarEmpleado")
-    public ResponseEntity<?> actualizarEmpleado(@RequestBody UpdateEmpleadoRequest actualizar){
+    public ResponseEntity<?> actualizarEmpleado(@RequestBody UpdateEmpleadoRequest actualizar) {
         try {
             Empleado respuesta = usuarioService.actualizarEmpleado(actualizar);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
@@ -272,7 +315,7 @@ public class UsuarioController {
             return new ApiBaseTransformer(HttpStatus.OK, "OK", respuesta, null, null).sendResponse();
         } catch (Exception ex) {
             ex.printStackTrace();
-           return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
     }
 

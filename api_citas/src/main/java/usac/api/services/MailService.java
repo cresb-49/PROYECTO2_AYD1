@@ -49,4 +49,22 @@ public class MailService extends Service {
         } catch (Exception ex) {
         }
     }
+
+    public void enviarCorreoTokenAuth(String correo, String codigo) {
+        try {
+            Context context = new Context();//crear nuevo contexto
+            context.setVariable("codigo", codigo);//adjuntar las variables     
+            String html = templateEngine.process("CorreoTokenAuth", context);
+            //mandamos el correo electronico
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setText(html, true);//adjuntamos el mansaje indicando que sera un html
+            helper.setTo(correo);
+            helper.setSubject("Token creacion de cuenta P2.");
+            helper.setFrom("P2 <namenotfound4004@gmail.com>");
+            mailSender.send(mimeMessage);
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
