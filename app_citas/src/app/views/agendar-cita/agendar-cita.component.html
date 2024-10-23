@@ -31,13 +31,13 @@
         <h4 class="text-2xl font-bold dark:text-white mb-4">Agenda tu Cita</h4>
         <div class="relative z-0 w-full mb-2 group">
           <label for="fecha-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha</label>
-          <input type="date" id="fecha-input"
+          <input type="date" id="fecha-input" [(ngModel)]="fecha_cita"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         </div>
         <div class="relative z-0 w-full mb-2 group">
           <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seleccionar
             Empleado</label>
-          <select id="countries"
+          <select id="countries" [(ngModel)]="selected_id_empleado"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             <option value="0">Aleatorio</option>
             <option *ngFor="let empleado of empleados" value="{{empleado.id}}">{{empleado.usuario.nombres}}</option>
@@ -47,12 +47,12 @@
           <div class="relative z-0 w-full mb-2 group">
             <label for="inicio-input"
               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Inicio</label>
-            <input type="time" id="inicio-input"
+            <input type="time" id="inicio-input" [(ngModel)]="inicio_cita" (ngModelChange)="inicioChange($event)"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
           </div>
           <div class="relative z-0 w-full mb-2 group">
             <label for="fin-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fin</label>
-            <input type="time" id="fin-input" readonly
+            <input type="time" id="fin-input" readonly [(ngModel)]="fin_cita"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
           </div>
         </div>

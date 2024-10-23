@@ -8,6 +8,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
+import { HorarioService } from '../../services/horario/horario.service';
+import { ASOCIACION_DIAS_NOMBRE, Dia, DiaService } from '../../services/dia/dia.service';
 
 @Component({
   standalone: true,
@@ -27,11 +29,20 @@ export class AgendarCitaComponent implements OnInit {
     id_rol: 0
   };
 
+  dataDias: Dia[] = []
   empleados: any[] = [];
   horario: DayConfig[] = [];
 
-  constructor(private authService: AuthService,
+  selected_id_empleado = 0;
+  fecha_cita = null
+  inicio_cita = ''
+  fin_cita = ''
+
+  constructor(
+    private diaService: DiaService,
+    private authService: AuthService,
     private servicioService: ServicioService,
+    private horarioService: HorarioService,
     private route: ActivatedRoute,
     private toastr: ToastrService
   ) { }
@@ -40,6 +51,51 @@ export class AgendarCitaComponent implements OnInit {
     this.enableCita = this.authService.isLoggedIn();
     await this.cargarDatosServicio();
     await this.empleadosServicio();
+    await this.getDias();
+  }
+
+  inicioChange(value: string) {
+    // Convierte la hora de inicio en minutos
+    const [hours, minutes] = value.split(':').map(Number);
+    let totalMinutes = hours * 60 + minutes;
+
+    // Convierte la duración de horas a minutos (ejemplo: 0.25 horas = 15 minutos)
+    const durationInMinutes = this.servicioData.duracion * 60;
+
+    // Suma la duración a los minutos totales
+    totalMinutes += durationInMinutes;
+
+    // Calcula las nuevas horas y minutos
+    const finalHours = Math.floor(totalMinutes / 60) % 24; // Para manejar valores mayores a 24 horas
+    const finalMinutes = Math.floor(totalMinutes % 60);
+
+    // Formatear la hora final (añadiendo ceros si es necesario)
+    const formattedHours = String(finalHours).padStart(2, '0');
+    const formattedMinutes = String(finalMinutes).padStart(2, '0');
+
+    // Asignamos el valor calculado a la variable de binding `fin_cita`
+    this.fin_cita = `${formattedHours}:${formattedMinutes}`;
+  }
+
+  getDias(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.diaService.getDias().subscribe({
+        next: (response: ApiResponse) => {
+          const dias = response.data ?? [];
+          dias.forEach((dia: any) => {
+            this.dataDias.push({
+              id: dia.id,
+              nombre: dia.nombre,
+            } as Dia);
+          });
+          resolve(); // Resolvemos la promesa cuando se obtienen los días
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.message, 'Error al obtener los días');
+          reject(error);
+        }
+      });
+    });
   }
 
   cargarDatosServicio(): Promise<void> {
@@ -87,7 +143,38 @@ export class AgendarCitaComponent implements OnInit {
   }
 
   agendar() {
-
+    // Suponiendo que this.fecha_cita contiene una fecha en formato 'YYYY-MM-DD'
+    const fecha = new Date(this.fecha_cita ?? '');
+    // Extraemos el día de la fecha
+    const diaSemana = fecha.getDay();
+    const nombreDiaSeleccionado = ASOCIACION_DIAS_NOMBRE.get(diaSemana);
+    const diaSeleccionado = this.dataDias.find((dia: Dia) => dia.nombre === nombreDiaSeleccionado)
+    try {
+      if (!diaSeleccionado) {
+        throw new Error('Debe de seleccionar una fecha para la cita')
+      }
+      if (this.inicio_cita === null || this.inicio_cita === undefined || this.inicio_cita === '') {
+        throw new Error('Debe de configurar una hora para la cita')
+      }
+      const configuracionDiaSeleccionado: DayConfig = {
+        id: diaSeleccionado.id,
+        active: true,
+        day: diaSeleccionado.nombre,
+        init: this.inicio_cita,
+        end: this.fin_cita
+      }
+      //Verificamos que el dia configurado exista en el horario
+      this.horarioService.isDayConfigValido(this.horario, configuracionDiaSeleccionado)
+      const payload = {
+        fecha: this.fecha_cita,
+        id_empelado: this.selected_id_empleado === 0 ? null : this.selected_id_empleado,
+        inicio: this.inicio_cita,
+        fin: this.fin_cita
+      }
+      console.log(payload);
+    } catch (error: any) {
+      this.toastr.error(error.message, 'Error al agendar la cita');
+    }
   }
 
   procesarHoarioEmpleado(data: any[]): DayConfig[][] {
