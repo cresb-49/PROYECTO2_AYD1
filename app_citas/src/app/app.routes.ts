@@ -118,6 +118,9 @@ export const routes: Routes = [
       },
       {
         path: 'info-servicio/:id', component: AgendarCitaComponent
+      },
+      {
+        path: 'reservar/:id', component: ReservarCanchaComponent
       }
     ]
   },
