@@ -9,6 +9,8 @@ import { BehaviorSubject, debounceTime, filter } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Dia, DiaService } from '../../services/dia/dia.service';
 import { ActivatedRoute } from '@angular/router';
+import { NegocioService } from '../../services/negocio/negocio.service';
+import { HorarioService } from '../../services/horario/horario.service';
 
 export interface CreateUpdateEmpleado {
   id_empleado?: number;
@@ -43,6 +45,8 @@ export class CreateUserComponent implements OnInit {
   @Input() confWorkSchedule = false;
   @Input() isCliente = false;
   @Input() modificar = false;
+
+  horariosNegocio: DayConfig[] = [];
 
   activeButtonSave = false;
   activeChangePassword = false;
@@ -84,6 +88,8 @@ export class CreateUserComponent implements OnInit {
   private changePassworSubject = new BehaviorSubject<UpdatePassword>(this.changePassword)
 
   constructor(
+    private negocioService: NegocioService,
+    private horarioService: HorarioService,
     private toastr: ToastrService,
     private userService: UserService,
     private diaService: DiaService,
@@ -93,6 +99,7 @@ export class CreateUserComponent implements OnInit {
   async ngOnInit() {
     await this.getRolesGenericos();
     await this.getDias();
+    await this.getHorariosNegocio();
     if (this.modificar) {
       await this.cargarDatosEmpleado();
     }
@@ -116,6 +123,21 @@ export class CreateUserComponent implements OnInit {
       debounceTime(300)
     ).subscribe(newData => {
       this.activeChangePassword = this.verificarChangePassword(newData);
+    })
+  }
+
+  getHorariosNegocio(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.negocioService.getInfoNegocio().subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.horariosNegocio = [...this.negocioService.calcularHorario(data.horarios)]
+          resolve(data);
+        },
+        error: (error: ErrorApiResponse) => {
+          reject(error)
+        }
+      })
     })
   }
 
@@ -275,41 +297,52 @@ export class CreateUserComponent implements OnInit {
         }
       }
       if (rolSeleccionado != null && rolSeleccionado.id != 0) {
-        const payloadEmpleado: EmpleadoUpdateCreate = {
-          usuario: {
-            id: this.empleado.id_usuario,
-            nombres: this.empleado.nombres,
-            apellidos: this.empleado.apellidos,
-            cui: this.empleado.cui,
-            email: this.empleado.email,
-            nit: this.empleado.nit,
-            phone: this.empleado.phone,
-            password: this.empleado.password,
-          },
-          rol: rolSeleccionado,
-          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
-        }
-        this.userService.crearEmpleado(payloadEmpleado).subscribe({
-          next: async (response: ApiResponse) => {
-            this.toastr.success('Empleado creado con exito', 'Empleado Creado');
-            this.empleado = {
-              nombres: '',
-              apellidos: '',
-              email: '',
-              phone: '',
-              password: '',
-              confirm_password: '',
-              cui: '',
-              rol: 0,
-              horario: []
-            }
-            const horario = await this.calcularHorario([]);
-            this.empleado.horario = horario;
-          },
-          error: (error: ErrorApiResponse) => {
-            this.toastr.error(error.error, 'Error al crear el empleado');
+        try {
+          const daysActive = this.empleado.horario.filter((day: DayConfig) => day.active);
+          for (const day of daysActive) {
+            this.horarioService.isDayConfigValido(this.horariosNegocio, day);
           }
-        });
+          if (daysActive.length <= 0) {
+            throw new Error('Debe seleccionar al menos un día para el horario del empleado');
+          }
+          const payloadEmpleado: EmpleadoUpdateCreate = {
+            usuario: {
+              id: this.empleado.id_usuario,
+              nombres: this.empleado.nombres,
+              apellidos: this.empleado.apellidos,
+              cui: this.empleado.cui,
+              email: this.empleado.email,
+              nit: this.empleado.nit,
+              phone: this.empleado.phone,
+              password: this.empleado.password,
+            },
+            rol: rolSeleccionado,
+            horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+          }
+          this.userService.crearEmpleado(payloadEmpleado).subscribe({
+            next: async (response: ApiResponse) => {
+              this.toastr.success('Empleado creado con exito', 'Empleado Creado');
+              this.empleado = {
+                nombres: '',
+                apellidos: '',
+                email: '',
+                phone: '',
+                password: '',
+                confirm_password: '',
+                cui: '',
+                rol: 0,
+                horario: []
+              }
+              const horario = await this.calcularHorario([]);
+              this.empleado.horario = horario;
+            },
+            error: (error: ErrorApiResponse) => {
+              this.toastr.error(error.error, 'Error al crear el empleado');
+            }
+          });
+        } catch (error: any) {
+          this.toastr.error(error.message, 'Error al crear el empleado');
+        }
       } else {
         this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
       }
@@ -346,29 +379,40 @@ export class CreateUserComponent implements OnInit {
         }
       }
       if (rolSeleccionado != null && rolSeleccionado.id != 0) {
-        const payloadEmpleado: EmpleadoUpdateCreate = {
-          id: Number(this.empleado.id_empleado),
-          usuario: {
-            id: this.empleado.id_usuario,
-            nombres: this.empleado.nombres,
-            apellidos: this.empleado.apellidos,
-            cui: this.empleado.cui,
-            email: this.empleado.email,
-            nit: this.empleado.nit,
-            phone: this.empleado.phone
-          },
-          rol: rolSeleccionado,
-          horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
-        }
-        this.userService.updateEmpleado(payloadEmpleado).subscribe({
-          next: async (response: ApiResponse) => {
-            this.toastr.success('Empleado modificado con exito', 'Empleado Modificado');
-            await this.cargarDatosEmpleado();
-          },
-          error: (error: ErrorApiResponse) => {
-            this.toastr.error(error.error, 'Error al crear el empleado');
+        try {
+          const daysActive = this.empleado.horario.filter((day: DayConfig) => day.active);
+          for (const day of daysActive) {
+            this.horarioService.isDayConfigValido(this.horariosNegocio, day);
           }
-        });
+          if (daysActive.length <= 0) {
+            throw new Error('Debe seleccionar al menos un día para el horario del empleado');
+          }
+          const payloadEmpleado: EmpleadoUpdateCreate = {
+            id: Number(this.empleado.id_empleado),
+            usuario: {
+              id: this.empleado.id_usuario,
+              nombres: this.empleado.nombres,
+              apellidos: this.empleado.apellidos,
+              cui: this.empleado.cui,
+              email: this.empleado.email,
+              nit: this.empleado.nit,
+              phone: this.empleado.phone
+            },
+            rol: rolSeleccionado,
+            horarios: this.obtenerHorarioEmpleado(this.empleado.horario)
+          }
+          this.userService.updateEmpleado(payloadEmpleado).subscribe({
+            next: async (response: ApiResponse) => {
+              this.toastr.success('Empleado modificado con exito', 'Empleado Modificado');
+              await this.cargarDatosEmpleado();
+            },
+            error: (error: ErrorApiResponse) => {
+              this.toastr.error(error.error, 'Error al crear el empleado');
+            }
+          });
+        } catch (error: any) {
+          this.toastr.error(error.message, 'Error al crear el empleado');
+        }
       } else {
         this.toastr.error('Debe de seleccionar un rol para el empleado', 'Error al crear el empleado');
       }
