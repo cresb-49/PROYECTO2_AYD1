@@ -29,12 +29,12 @@ export class HorarioService {
 
     // Verificamos si la hora init es menor que la configurada en el negocio
     if (initEleccion < initHorario) {
-      throw new Error(`La hora de inicio (${eleccion.init}) es anterior a la hora permitida (${horario.init})`);
+      throw new Error(`La hora de inicio (${eleccion.init}) es anterior a la hora permitida (${horario.init}) en el dia ${eleccion.day}`);
     }
 
     // Verificamos si la hora end es mayor que la configurada en el negocio
     if (endEleccion > endHorario) {
-      throw new Error(`La hora de finalización (${eleccion.end}) es posterior a la hora permitida (${horario.end})`);
+      throw new Error(`La hora de finalización (${eleccion.end}) es posterior a la hora permitida (${horario.end}) en el dia ${eleccion.day}`);
     }
 
     // Si todo está bien, retornamos true

@@ -74,7 +74,7 @@ export class NegocioService {
     })
   }
 
-  private calcularHorario(horarios: any): DayConfig[] {
+  public calcularHorario(horarios: any): DayConfig[] {
     let negocioHas: DayConfig[] = horarios.map((horario: any) => {
       return {
         id: horario.dia.id,
