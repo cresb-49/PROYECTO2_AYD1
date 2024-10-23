@@ -30,6 +30,13 @@ export class AgendarCitaComponent implements OnInit {
     id_rol: 0
   };
 
+  cardInfo: any = {
+    name: '',
+    number: '',
+    fecha: '',
+    cvv: ''
+  }
+
   negocio: any = null;
   asignacion_manual = false;
   porcentaje_anticipo = 0;
@@ -170,14 +177,22 @@ export class AgendarCitaComponent implements OnInit {
 
   agendar() {
     // Suponiendo que this.fecha_cita contiene una fecha en formato 'YYYY-MM-DD'
-    const fecha = new Date(this.fecha_cita ?? '');
+    const [year, month, day] = (this.fecha_cita ?? '').split('-').map(Number); // Dividimos la fecha en partes
+    const fechaSeleccionada = new Date(year, month - 1, day); // Crear la fecha seleccionada correctamente
+    const fechaActual = new Date(); // Fecha actual
+    // Normalizamos ambas fechas a medianoche
+    fechaSeleccionada.setHours(0, 0, 0, 0);
+    fechaActual.setHours(0, 0, 0, 0);
     // Extraemos el día de la fecha
-    const diaSemana = fecha.getDay();
+    const diaSemana = fechaSeleccionada.getDay();
     const nombreDiaSeleccionado = ASOCIACION_DIAS_NOMBRE.get(diaSemana);
     const diaSeleccionado = this.dataDias.find((dia: Dia) => dia.nombre === nombreDiaSeleccionado)
     try {
       if (!diaSeleccionado) {
         throw new Error('Debe de seleccionar una fecha para la cita')
+      }
+      if (fechaSeleccionada < fechaActual) {
+        throw new Error('La fecha seleccionada es anterior a la fecha actual.');
       }
       if (this.inicio_cita === null || this.inicio_cita === undefined || this.inicio_cita === '') {
         throw new Error('Debe de configurar una hora para la cita')
@@ -187,6 +202,7 @@ export class AgendarCitaComponent implements OnInit {
       if (this.asignacion_manual && selected_id_empleado === 0) {
         throw new Error('Debe de seleccionar un empleado')
       }
+      this.validateCardInfo(this.cardInfo);
       const configuracionDiaSeleccionado: DayConfig = {
         id: diaSeleccionado.id,
         active: true,
@@ -270,5 +286,32 @@ export class AgendarCitaComponent implements OnInit {
       })
     })
     this.horario = Array.from(diasServicio.values());
+  }
+
+  validateCardInfo(cardInfo: any): void {
+    const errors: string[] = [];
+
+    // Validar nombre
+    if (!cardInfo.name || cardInfo.name.trim() === '') {
+      throw new Error('El nombre es requerido.');
+    }
+
+    // Validar número de tarjeta (Ejemplo: Debe tener 16 dígitos)
+    const cardNumberPattern = /^[0-9]{16}$/;
+    if (!cardInfo.number || !cardNumberPattern.test(cardInfo.number)) {
+      throw new Error('El número de tarjeta es inválido. Debe contener 16 dígitos.');
+    }
+
+    // Validar fecha de expiración (Formato MM/YY)
+    const expirationDatePattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
+    if (!cardInfo.fecha || !expirationDatePattern.test(cardInfo.fecha)) {
+      throw new Error('La fecha de expiración es inválida. Debe tener el formato MM/YY.');
+    }
+
+    // Validar CVV (Ejemplo: Debe tener 3 dígitos)
+    const cvvPattern = /^[0-9]{3}$/;
+    if (!cardInfo.cvv || !cvvPattern.test(cardInfo.cvv)) {
+      throw new Error('El CVV es inválido. Debe contener 3 dígitos.');
+    }
   }
 }
