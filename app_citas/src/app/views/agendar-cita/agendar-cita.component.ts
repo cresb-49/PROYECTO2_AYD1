@@ -202,7 +202,6 @@ export class AgendarCitaComponent implements OnInit {
       if (this.asignacion_manual && selected_id_empleado === 0) {
         throw new Error('Debe de seleccionar un empleado')
       }
-      this.validateCardInfo(this.cardInfo);
       const configuracionDiaSeleccionado: DayConfig = {
         id: diaSeleccionado.id,
         active: true,
@@ -212,6 +211,7 @@ export class AgendarCitaComponent implements OnInit {
       }
       //Verificamos que el dia configurado exista en el horario
       this.horarioService.isDayConfigValido(this.horario, configuracionDiaSeleccionado)
+      this.validateCardInfo(this.cardInfo);
       const payload = {
         fecha: this.fecha_cita,
         id_empelado: selected_id_empleado,
