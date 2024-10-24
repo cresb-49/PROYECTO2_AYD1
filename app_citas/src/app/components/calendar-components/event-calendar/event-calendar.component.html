@@ -7,27 +7,26 @@
       </p>
     </div>
     <div class="dropdown relative inline-flex">
-      <button type="button" data-target="dropdown-default"
+      <button type="button" (click)="toggleDropdown()"
         class="dropdown-toggle inline-flex justify-center py-2.5 px-1 items-center gap-2 text-sm text-black dark:text-white rounded-full cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:text-purple-600">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="4" viewBox="0 0 12 4" fill="none">
           <path d="M1.85624 2.00085H1.81458M6.0343 2.00085H5.99263M10.2124 2.00085H10.1707" stroke="currentcolor"
             stroke-width="2.5" stroke-linecap="round"></path>
         </svg>
       </button>
-      <div id="dropdown-default"
-        class="dropdown-menu rounded-xl shadow-lg bg-white dark:bg-gray-700 absolute top-full -left-10 w-max mt-2 hidden"
-        aria-labelledby="dropdown-default">
+      <div *ngIf="isDropdownOpen"
+        class="dropdown-menu rounded-xl shadow-lg bg-white dark:bg-gray-700 absolute top-full -left-10 w-max mt-2">
         <ul class="py-2">
           <li>
             <a class="block px-6 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-medium"
-              href="javascript:;">
-              Edit
+              href="javascript:;" (click)="cancelar()">
+              Cancelar
             </a>
           </li>
-          <li>
+          <li *ngIf="!isCliente()">
             <a class="block px-6 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-medium"
-              href="javascript:;">
-              Remove
+              href="javascript:;" (click)="procesar()">
+              Procesar
             </a>
           </li>
         </ul>
@@ -37,3 +36,4 @@
   <h6 class="text-xl leading-8 font-semibold text-black dark:text-gray-100 mb-1">{{titulo}}</h6>
   <p class="text-base font-normal text-gray-600 dark:text-gray-400">{{descripcion}}</p>
 </div>
+<app-pop-up-modal [(hideModal)]="hideModal" [options]="optionsModal"></app-pop-up-modal>
