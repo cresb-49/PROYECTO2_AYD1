@@ -51,13 +51,13 @@ public class ReservaController {
      *
      * @param idReserva El ID de la reserva que se desea cancelar.
      * @return Un archivo PDF con la factura si la cancelación es exitosa, o un
-     *         mensaje de error en caso contrario.
+     * mensaje de error en caso contrario.
      */
     @Operation(summary = "Cancelar una reserva", description = "Este endpoint permite a un cliente cancelar una reserva existente. "
             + "Genera y devuelve un archivo PDF con la factura por el monto del adelanto.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reserva cancelada exitosamente, devuelve un archivo PDF con la factura", content = @Content(mediaType = "application/pdf")),
-            @ApiResponse(responseCode = "400", description = "Error al cancelar la reserva, devuelve un mensaje de error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+        @ApiResponse(responseCode = "200", description = "Reserva cancelada exitosamente, devuelve un archivo PDF con la factura", content = @Content(mediaType = "application/pdf")),
+        @ApiResponse(responseCode = "400", description = "Error al cancelar la reserva, devuelve un mensaje de error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/cliente/cancelarReserva/{idReserva}")
     public ResponseEntity<?> reservarServicio(@PathVariable Long idReserva) {
@@ -81,12 +81,12 @@ public class ReservaController {
      *
      * @param reservaId El ID de la reserva que se desea marcar como realizada.
      * @return Un archivo PDF con la factura si la operación es exitosa, o un
-     *         mensaje de error en caso contrario.
+     * mensaje de error en caso contrario.
      */
     @Operation(summary = "Marcar reserva como realizada", description = "Este endpoint permite marcar una reserva como realizada y genera una factura asociada.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reserva marcada como realizada exitosamente, devuelve un archivo PDF con la factura"),
-            @ApiResponse(responseCode = "400", description = "Error al marcar la reserva como realizada, devuelve un mensaje de error")
+        @ApiResponse(responseCode = "200", description = "Reserva marcada como realizada exitosamente, devuelve un archivo PDF con la factura"),
+        @ApiResponse(responseCode = "400", description = "Error al marcar la reserva como realizada, devuelve un mensaje de error")
     })
     @PatchMapping("/private/restricted/realizarReserva/{reservaId}")
     public ResponseEntity<?> realizarReserva(
@@ -111,15 +111,15 @@ public class ReservaController {
      * específicos.
      *
      * @param anio Año en el que se desean obtener las citas.
-     * @param mes  Mes en el que se desean obtener las citas.
+     * @param mes Mes en el que se desean obtener las citas.
      * @return ResponseEntity con la lista de citas correspondientes al mes y
-     *         año proporcionados, o un mensaje de error en caso de fallar.
+     * año proporcionados, o un mensaje de error en caso de fallar.
      */
     @Operation(description = "Obtiene las citas del mes y año especificados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Citas obtenidas exitosamente", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reserva.class)) }),
-            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+        @ApiResponse(responseCode = "200", description = "Citas obtenidas exitosamente", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Reserva.class))}),
+        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
     @GetMapping("/protected/getCitasDelMes/{anio}/{mes}")
     public ResponseEntity<?> getCitasDelMes(
@@ -137,4 +137,93 @@ public class ReservaController {
         }
     }
 
+    /**
+     * Endpoint protegido para obtener un comprobante de reserva en formato PDF
+     * basado en el ID proporcionado.
+     * <p>
+     * Este método expone una API GET que toma el ID de una reserva como
+     * parámetro y devuelve un comprobante de la reserva en formato PDF. Utiliza
+     * el servicio de reserva para buscar la reserva y generar el comprobante.
+     * En caso de éxito, retorna el archivo PDF junto con los headers
+     * configurados. Si ocurre algún error, devuelve una respuesta con un
+     * mensaje de error adecuado.
+     * </p>
+     *
+     * @param id El ID de la reserva que se debe buscar.
+     * @return {@link ResponseEntity} con el archivo PDF generado en el cuerpo y
+     * los headers configurados para su descarga. En caso de error, retorna una
+     * respuesta con el estado {@link HttpStatus#INTERNAL_SERVER_ERROR}.
+     */
+    @Operation(
+            summary = "Obtener comprobante de reserva por ID",
+            description = "Este endpoint protegido genera un comprobante de una"
+            + " reserva en formato PDF basándose en el ID proporcionado."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+                responseCode = "200",
+                description = "Comprobante de reserva generado con éxito.",
+                content = @Content(mediaType = "application/pdf",
+                        schema = @Schema(type = "string", format = "binary"))
+        ),
+        @ApiResponse(
+                responseCode = "500",
+                description = "Error al generar el comprobante de reserva.",
+                content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = String.class))
+        )
+    })
+    @GetMapping("/cliente/comprobanteReservaPorId/{id}")
+    public ResponseEntity<?> comprobanteReservaPorId(
+            @Parameter(description = "id de la reserva a buscar.", required = true)
+            @PathVariable Long id) {
+        try {
+            // Invoca el método para obtener las reservas
+            ArchivoDTO data = reservaService.obtenerComprobanteReservaPorId(id);
+            return ResponseEntity.ok()
+                    .headers(data.getHeaders())
+                    .body(data.getArchivo());
+        } catch (Exception ex) {
+            // Devuelve una respuesta con un mensaje de error si ocurre algún problema
+            return new ApiBaseTransformer(HttpStatus.INTERNAL_SERVER_ERROR, "Error", null, null, ex.getMessage())
+                    .sendResponse();
+        }
+    }
+
+    @Operation(
+            summary = "Obtener comprobante de reserva por ID",
+            description = "Este endpoint protegido genera un comprobante de una"
+            + " reserva en formato PDF basándose en el ID proporcionado."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+                responseCode = "200",
+                description = "Comprobante de reserva generado con éxito.",
+                content = @Content(mediaType = "application/pdf",
+                        schema = @Schema(type = "string", format = "binary"))
+        ),
+        @ApiResponse(
+                responseCode = "500",
+                description = "Error al generar el comprobante de reserva.",
+                content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = String.class))
+        )
+    })
+    @GetMapping("/private/restricted/comprobanteReservaPorId/{id}")
+    public ResponseEntity<?> comprobanteReservaPorIdAdmin(
+            @Parameter(description = "id de la reserva a buscar.", required = true)
+            @PathVariable Long id) {
+        try {
+            validadorPermiso.verificarPermiso();
+            // Invoca el método para obtener las reservas
+            ArchivoDTO data = reservaService.obtenerComprobanteReservaPorId(id);
+            return ResponseEntity.ok()
+                    .headers(data.getHeaders())
+                    .body(data.getArchivo());
+        } catch (Exception ex) {
+            // Devuelve una respuesta con un mensaje de error si ocurre algún problema
+            return new ApiBaseTransformer(HttpStatus.INTERNAL_SERVER_ERROR, "Error", null, null, ex.getMessage())
+                    .sendResponse();
+        }
+    }
 }

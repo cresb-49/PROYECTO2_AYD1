@@ -73,6 +73,11 @@ public class ReservaService extends Service {
     private FacturaService facturaService;
     @Autowired
     private FacturaImprimible facturaImprimible;
+    @Autowired
+    private ComprobanteReservaImprimible comprobanteReservaImprimible;
+
+    @Autowired
+    private ReporteService reporteService;
 
     /**
      * Realiza la reserva de una cancha.
@@ -419,6 +424,34 @@ public class ReservaService extends Service {
                         -> new Exception("No se encontró la reserva con el ID proporcionado: " + reservaId)
                 );
         return reserva;
+    }
+
+    /**
+     * Genera un comprobante de reserva en formato PDF basado en el ID de una
+     * reserva específica.
+     * <p>
+     * Este método busca la reserva correspondiente al ID proporcionado. Si se
+     * encuentra, se genera un comprobante de reserva en formato PDF utilizando
+     * la clase {@code comprobanteReservaImprimible}. Luego, se configura el
+     * objeto {@link HttpHeaders} con los metadatos adecuados para la respuesta
+     * HTTP, incluyendo el tipo de contenido (PDF).
+     * </p>
+     *
+     * @param reservaId El ID de la reserva para la cual se debe generar el
+     * comprobante.
+     * @return {@link ArchivoDTO} que contiene los bytes del comprobante PDF y
+     * los headers HTTP correspondientes.
+     * @throws Exception Si no se encuentra la reserva con el ID proporcionado o
+     * si ocurre algún error durante la generación del comprobante.
+     */
+    public ArchivoDTO obtenerComprobanteReservaPorId(Long reservaId) throws Exception {
+        Reserva reserva = reservaRepository.findById(reservaId).
+                orElseThrow(()
+                        -> new Exception("No se encontró la reserva con el ID proporcionado: " + reservaId)
+                );
+        byte[] reporte = comprobanteReservaImprimible.init(reserva, "pdf");
+        HttpHeaders headers = reporteService.setHeaders(FileHttpMetaData.PDF);
+        return new ArchivoDTO(headers, reporte);
     }
 
     /**

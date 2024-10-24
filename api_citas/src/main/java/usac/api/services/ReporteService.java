@@ -112,7 +112,7 @@ public class ReporteService extends Service {
      * @return HttpHeaders configurados con el tipo de contenido y las
      * disposiciones adecuadas.
      */
-    private HttpHeaders setHeaders(FileHttpMetaData meta) {
+    public HttpHeaders setHeaders(FileHttpMetaData meta) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(meta.getContentType()));
         headers.setContentDisposition(ContentDisposition.builder(meta.getContentDispoition())
