@@ -1,19 +1,33 @@
 import { Component, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { OptionsModal, PopUpModalComponent } from '../../pop-up-modal/pop-up-modal.component';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth/auth.service';
+import { NativeUserRoles } from '../../../services/auth/types';
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PopUpModalComponent],
   selector: 'app-event-calendar',
   templateUrl: './event-calendar.component.html',
   styleUrls: ['./event-calendar.component.css']
 })
 export class EventCalendarComponent implements OnInit {
+  hideModal = true;
+
+  optionsModal: OptionsModal = {
+    question: '¿Estás seguro que desea cancelar la Cita/Servicio?',
+    textYes: 'Sí, estoy seguro',
+    textNo: 'No, cancelar',
+    confirmAction: () => { }
+  }
+
   mes: string = 'Enero';
   dia: string | number = 10;
   year: string | number = 2020;
   isDropdownOpen: boolean = false; // Control del estado del dropdown
 
+  @Input() data: any;
   @Input() isCita: boolean = true;
   @Input() fecha: string = '2020-01-10';
   @Input() init: string = '10:00';
@@ -27,7 +41,12 @@ export class EventCalendarComponent implements OnInit {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  constructor(private elRef: ElementRef, private renderer: Renderer2) { }
+  constructor(
+    private authService: AuthService,
+    private elRef: ElementRef,
+    private renderer: Renderer2,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.desgloseFecha(this.fecha);
@@ -78,12 +97,20 @@ export class EventCalendarComponent implements OnInit {
 
   // Manejar acciones de edición y eliminación
   cancelar() {
-    console.log('Cancelar clicked');
-    this.isDropdownOpen = false; // Cerrar el dropdown después de la acción
+    this.hideModal = false;
+    this.optionsModal.confirmAction = () => this.cancelarMiReserva();
+  }
+
+  cancelarMiReserva() {
+    console.log('Se cancelos mi cita');
   }
 
   procesar() {
-    console.log('Procesar clicked');
-    this.isDropdownOpen = false; // Cerrar el dropdown después de la acción
+
+    this.router.navigate(['/procesar-reserva/' + (this.data?.id ?? 0)]);
+  }
+
+  isCliente() {
+    return this.authService.hasRole(NativeUserRoles.CLIENTE);
   }
 }
