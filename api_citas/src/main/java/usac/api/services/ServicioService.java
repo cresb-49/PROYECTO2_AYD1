@@ -109,6 +109,7 @@ public class ServicioService extends usac.api.services.Service {
         servicioActual.setDuracion(servicio.getDuracion());
         servicioActual.setImagen(servicio.getImagen());
         servicioActual.setCosto(servicio.getCosto());
+        servicioActual.setEmpleadosParalelos(servicio.getEmpleadosParalelos());
         servicioActual.setDetalles(servicio.getDetalles());
         servicioActual.setRol(rolActual);
         // Verificamos el modelo

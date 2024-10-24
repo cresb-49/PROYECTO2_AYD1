@@ -35,7 +35,8 @@ export class AgendarCitaComponent implements OnInit {
     detalles: '',
     precio: 1,
     duracion: 0.25,
-    id_rol: 0
+    id_rol: 0,
+    empleadosParalelos: 0
   };
 
   cardInfo: any = {
@@ -157,7 +158,8 @@ export class AgendarCitaComponent implements OnInit {
             id_rol: data.rol.id,
             imagen: data.imagen,
             nombre: data.nombre,
-            precio: data.costo
+            precio: data.costo,
+            empleadosParalelos: data.empleadosParalelos
           }
           resolve(data)
         },
