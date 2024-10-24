@@ -13,6 +13,7 @@ import { ASOCIACION_DIAS_NOMBRE, Dia, DiaService } from '../../services/dia/dia.
 import { NegocioService } from '../../services/negocio/negocio.service';
 import { CitaServicio, ReservaService } from '../../services/reserva/reserva.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { NativeUserRoles } from '../../services/auth/types';
 
 @Component({
   standalone: true,
@@ -69,7 +70,9 @@ export class AgendarCitaComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.enableCita = this.authService.isLoggedIn();
+    const roles = this.authService.getUserRoles();
+    const isClient = roles.includes(NativeUserRoles.CLIENTE);
+    this.enableCita = this.authService.isLoggedIn() && roles.includes(NativeUserRoles.CLIENTE);
     await this.cargarDatosServicio();
     await this.empleadosServicio();
     await this.getDias();
@@ -237,6 +240,7 @@ export class AgendarCitaComponent implements OnInit {
           const url = window.URL.createObjectURL(blob);
           // Sanitiza la URL antes de asignarla al iframe
           this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+          this.limpiarCampos();
         },
         error: (error: any) => {
           console.log(error);
@@ -247,6 +251,18 @@ export class AgendarCitaComponent implements OnInit {
     } catch (error: any) {
       this.toastr.error(error.message, 'Error al agendar la cita');
     }
+  }
+
+  private limpiarCampos() {
+    //Campos de la reserva de la cancha
+    this.inicio_cita = ''
+    this.fin_cita = ''
+    this.fecha_cita = null
+    //Campos de la tarjeta
+    this.cardInfo.name = ''
+    this.cardInfo.number = ''
+    this.cardInfo.fecha = ''
+    this.cardInfo.cvv = ''
   }
 
   procesarHoarioEmpleado(data: any[]): DayConfig[][] {

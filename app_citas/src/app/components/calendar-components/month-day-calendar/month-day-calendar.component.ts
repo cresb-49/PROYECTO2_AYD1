@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 export interface EventConfig {
   title: string;
   interval: string;
+  isReserva: boolean;
 }
 
 @Component({
@@ -20,11 +21,13 @@ export class MonthDayCalendarComponent implements OnInit {
   @Input() events: EventConfig[] = [
     {
       title: 'Event 1',
-      interval: '10:00 - 11:00'
+      interval: '10:00 - 11:00',
+      isReserva: false
     },
     {
       title: 'Event 2',
-      interval: '11:00 - 12:00'
+      interval: '11:00 - 12:00',
+      isReserva: true
     }
   ];
 

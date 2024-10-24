@@ -33,4 +33,8 @@ export class ReservaService {
     return this.httpService.post<any>('cancha/cliente/reservarCancha', payload, true, responseType);
   }
 
+  obtenerReservasCliente(year: number, month: number) {
+    return this.httpService.get<any>(`reserva/protected/getCitasDelMes/${year}/${month}`, null, true);
+  }
+
 }

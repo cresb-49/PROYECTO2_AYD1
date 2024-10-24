@@ -36,17 +36,44 @@ export class HttpService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'Unknown error occurred';
-    let errorResponse = error.error as ErrorApiResponse;
-    if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
-      errorMessage = `Client-side error: ${error.error.message}`;
+    // Verificar si el error es un Blob y el tipo es JSON
+    if (error.error instanceof Blob && error.error.type === 'application/json') {
+      return new Observable<any>((observer) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            // Convertimos el texto a JSON
+            const errorText = reader.result as string;
+            const errorJson = JSON.parse(errorText);
+
+            // Manejamos el error como siempre
+            let errorMessage = `Server-side error: ${error.status} - ${error.statusText}`;
+            observer.error({ ...errorJson, sideError: errorMessage } as ErrorApiResponse);
+          } catch (e:any) {
+            observer.error(`Error parsing JSON: ${e.message}`);
+          }
+        };
+        reader.onerror = () => {
+          observer.error('Error reading the error blob.');
+        };
+        reader.readAsText(error.error);  // Convertir el Blob a texto
+      });
     } else {
-      // Error del lado del servidor
-      errorMessage = `Server-side error: ${error.status} - ${error.message}`;
+      // Manejo estándar del error
+      let errorMessage = 'Unknown error occurred';
+      let errorResponse = error.error as ErrorApiResponse;
+
+      if (error.error instanceof ErrorEvent) {
+        // Error del lado del cliente
+        errorMessage = `Client-side error: ${error.error.message}`;
+      } else {
+        // Error del lado del servidor
+        errorMessage = `Server-side error: ${error.status} - ${error.message}`;
+      }
+      return throwError({ ...errorResponse, sideError: errorMessage } as ErrorApiResponse);
     }
-    return throwError({ ...errorResponse, sideError: errorMessage } as ErrorApiResponse);
   }
+
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({
