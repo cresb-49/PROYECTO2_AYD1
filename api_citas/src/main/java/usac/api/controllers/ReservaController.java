@@ -46,21 +46,18 @@ public class ReservaController {
      * <p>
      * Este método maneja la solicitud PATCH para cancelar una reserva realizada
      * por un cliente. Si la reserva es cancelada exitosamente, se genera y
-     * devuelve un PDF con la factura de cancelación.</p>
+     * devuelve un PDF con la factura de cancelación.
+     * </p>
      *
      * @param idReserva El ID de la reserva que se desea cancelar.
      * @return Un archivo PDF con la factura si la cancelación es exitosa, o un
-     * mensaje de error en caso contrario.
+     *         mensaje de error en caso contrario.
      */
-    @Operation(summary = "Cancelar una reserva",
-            description = "Este endpoint permite a un cliente cancelar una reserva existente. "
+    @Operation(summary = "Cancelar una reserva", description = "Este endpoint permite a un cliente cancelar una reserva existente. "
             + "Genera y devuelve un archivo PDF con la factura por el monto del adelanto.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Reserva cancelada exitosamente, devuelve un archivo PDF con la factura",
-                content = @Content(mediaType = "application/pdf")),
-        @ApiResponse(responseCode = "400", description = "Error al cancelar la reserva, devuelve un mensaje de error",
-                content = @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = String.class)))
+            @ApiResponse(responseCode = "200", description = "Reserva cancelada exitosamente, devuelve un archivo PDF con la factura", content = @Content(mediaType = "application/pdf")),
+            @ApiResponse(responseCode = "400", description = "Error al cancelar la reserva, devuelve un mensaje de error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/cliente/cancelarReserva/{idReserva}")
     public ResponseEntity<?> reservarServicio(@PathVariable Long idReserva) {
@@ -84,18 +81,16 @@ public class ReservaController {
      *
      * @param reservaId El ID de la reserva que se desea marcar como realizada.
      * @return Un archivo PDF con la factura si la operación es exitosa, o un
-     * mensaje de error en caso contrario.
+     *         mensaje de error en caso contrario.
      */
-    @Operation(summary = "Marcar reserva como realizada",
-            description = "Este endpoint permite marcar una reserva como realizada y genera una factura asociada.")
+    @Operation(summary = "Marcar reserva como realizada", description = "Este endpoint permite marcar una reserva como realizada y genera una factura asociada.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Reserva marcada como realizada exitosamente, devuelve un archivo PDF con la factura"),
-        @ApiResponse(responseCode = "400", description = "Error al marcar la reserva como realizada, devuelve un mensaje de error")
+            @ApiResponse(responseCode = "200", description = "Reserva marcada como realizada exitosamente, devuelve un archivo PDF con la factura"),
+            @ApiResponse(responseCode = "400", description = "Error al marcar la reserva como realizada, devuelve un mensaje de error")
     })
     @PatchMapping("/private/restricted/realizarReserva/{reservaId}")
     public ResponseEntity<?> realizarReserva(
-            @Parameter(description = "ID de la reserva que se desea marcar como realizada", required = true)
-            @PathVariable Long reservaId) {
+            @Parameter(description = "ID de la reserva que se desea marcar como realizada", required = true) @PathVariable Long reservaId) {
         try {
             this.validadorPermiso.verificarPermiso();
             // Invoca el método para realizar la reserva
@@ -116,22 +111,20 @@ public class ReservaController {
      * específicos.
      *
      * @param anio Año en el que se desean obtener las citas.
-     * @param mes Mes en el que se desean obtener las citas.
+     * @param mes  Mes en el que se desean obtener las citas.
      * @return ResponseEntity con la lista de citas correspondientes al mes y
-     * año proporcionados, o un mensaje de error en caso de fallar.
+     *         año proporcionados, o un mensaje de error en caso de fallar.
      */
     @Operation(description = "Obtiene las citas del mes y año especificados.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Citas obtenidas exitosamente", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = Reserva.class))}),
-        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+            @ApiResponse(responseCode = "200", description = "Citas obtenidas exitosamente", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Reserva.class)) }),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
     @GetMapping("/protected/getCitasDelMes/{anio}/{mes}")
     public ResponseEntity<?> getCitasDelMes(
-            @Parameter(description = "Número de año al que pertenece el mes", required = true)
-            @PathVariable Integer anio,
-            @Parameter(description = "Mes donde se quieren ver las citas", required = true)
-            @PathVariable Integer mes) {
+            @Parameter(description = "Número de año al que pertenece el mes", required = true) @PathVariable Integer anio,
+            @Parameter(description = "Mes donde se quieren ver las citas", required = true) @PathVariable Integer mes) {
         try {
             GetReservacionesRequest req = new GetReservacionesRequest(mes, anio);
             // Invoca el método para obtener las reservas
@@ -139,7 +132,8 @@ public class ReservaController {
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             // Devuelve una respuesta con un mensaje de error si ocurre algún problema
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return new ApiBaseTransformer(HttpStatus.INTERNAL_SERVER_ERROR, "Error", null, null, ex.getMessage())
+                    .sendResponse();
         }
     }
 
