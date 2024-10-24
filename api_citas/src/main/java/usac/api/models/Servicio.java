@@ -77,8 +77,8 @@ public class Servicio extends Auditor {
     @NotNull(message = "El rol con el que se relaciona el servicio no puede ser nulo.")
     @JoinColumn(name = "rol", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @Schema(hidden = true)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@Schema(hidden = true)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Rol rol;
 
     @OneToMany(mappedBy = "servicio", orphanRemoval = true)

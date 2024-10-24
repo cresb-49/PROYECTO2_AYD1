@@ -11,6 +11,7 @@ import { ASOCIACION_DIAS_NOMBRE, Dia, DiaService } from '../../services/dia/dia.
 import { FormsModule } from '@angular/forms';
 import { HorarioService } from '../../services/horario/horario.service';
 import { NegocioService } from '../../services/negocio/negocio.service';
+import { ReservaCancha, ReservaService } from '../../services/reserva/reserva.service';
 
 @Component({
   standalone: true,
@@ -49,6 +50,7 @@ export class ReservarCanchaComponent implements OnInit {
   fin_cita = ''
 
   constructor(
+    private reservaService: ReservaService,
     private negocioService: NegocioService,
     private authService: AuthService,
     private canchaService: CanchaService,
@@ -126,25 +128,21 @@ export class ReservarCanchaComponent implements OnInit {
       this.horarioService.isDayConfigValido(this.cancha.horarios, configuracionDiaSeleccionado)
 
       this.validateCardInfo(this.cardInfo);
-      const payload = {
-        id_cancha: this.cancha.id,
-        inicio: this.inicio_cita,
-        fin: this.fin_cita,
-        fecha: this.fecha_cita,
+      const payload: ReservaCancha = {
+        canchaId: this.cancha.id,
+        horaInicio: this.inicio_cita,
+        horaFin: this.fin_cita,
+        fechaReservacion: this.fecha_cita ?? '',
       }
 
-      //Resevacion cahnca
-      // id_cancha
-      // inicio
-      // fin
-      // fecha
-
-      //Reservacion cita
-      //id_empleado
-      //id_servicio
-      //inicio
-      //fecha
-
+      this.reservaService.reservarChancha(payload).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastr.success(response.message, 'Rerserva Completada!!!')
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al realizar la reserva!!!')
+        }
+      });
       console.log(payload);
     } catch (error: any) {
       this.toastr.error(error.message, 'Error al agendar la cita');
