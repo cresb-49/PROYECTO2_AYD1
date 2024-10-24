@@ -50,6 +50,7 @@ export class CalendarComponent implements OnInit {
   weekDays: string[] = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
   monthNames: string[] = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
   currentDate: Date = new Date();
+  currentDay:number = this.currentDate.getDate();
   currentMonth: number = this.currentDate.getMonth();
   currentYear: number = this.currentDate.getFullYear();
   diasMesActual: DayMonthCalendarComponent[] = [];
@@ -78,6 +79,8 @@ export class CalendarComponent implements OnInit {
     });
     this.setMothAndYearByDate(this.currentDate);
     this.obtenerDiasMesActual();
+    await this.cambioFechaData();
+    this.handleDaySend(this.currentDay)
   }
 
   setMothAndYearByDate(date: Date): void {

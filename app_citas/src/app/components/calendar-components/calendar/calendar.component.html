@@ -10,15 +10,14 @@
           </h2>
           <p
             class="text-base sm:text-lg font-normal text-gray-800 dark:text-gray-300 mb-4 text-center xl:text-left w-full">
-            No olvides tus pendientes
-          </p>
-          <div
-            class="flex gap-3 flex-col items-center xl:items-start w-full overflow-y-auto max-h-[524px] scrollbar-thin scrollbar-thumb-transparent scrollbar-track-transparent">
-            <app-event-calendar class="w-full lg:pr-2 md:pr-2" *ngFor="let reserva of eventosMostrar"
-              [fecha]="reserva.fechaReservacion" [init]="reserva.horaInicio" [fin]="reserva.horaFin"
-              [titulo]="reserva.reservaCancha?'Reserva de la cancha '+reserva.reservaCancha.cancha.id:'Cita '+reserva.reservaServicio?.servicio?.nombre "
-              [descripcion]="'Total a pagar: Q.'+reserva.totalACobrar+ ', Adelantado: Q.'+reserva.adelanto" />
-          </div>
+            {{eventosMostrar.length <= 0?'No tienes pendientes este dia':'No olvides tus pendientes'}} </p>
+              <div
+                class="flex gap-3 flex-col items-center xl:items-start w-full overflow-y-auto max-h-[524px] scrollbar-thin scrollbar-thumb-transparent scrollbar-track-transparent">
+                <app-event-calendar class="w-full lg:pr-2 md:pr-2" *ngFor="let reserva of eventosMostrar"
+                  [fecha]="reserva.fechaReservacion" [init]="reserva.horaInicio" [fin]="reserva.horaFin"
+                  [titulo]="reserva.reservaCancha?'Reserva de la cancha '+reserva.reservaCancha.cancha.id:'Cita '+reserva.reservaServicio?.servicio?.nombre "
+                  [descripcion]="'Total a pagar: Q.'+reserva.totalACobrar+ ', Adelantado: Q.'+reserva.adelanto" />
+              </div>
         </div>
         <div
           class="col-span-12 xl:col-span-7 px-2.5 py-5 sm:p-8 bg-gradient-to-b from-white/25 to-white dark:from-gray-800 dark:to-gray-900 xl:bg-white dark:xl:bg-gray-900 rounded-2xl max-xl:row-start-1 w-full">
