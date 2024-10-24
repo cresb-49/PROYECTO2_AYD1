@@ -145,6 +145,7 @@ export class ReservarCanchaComponent implements OnInit {
           const blob = new Blob([response], { type: 'application/pdf' });
           const url = window.URL.createObjectURL(blob);
           this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+          this.limpiarCampos();
         },
         error: (error: ErrorApiResponse) => {
           console.log(error);
@@ -155,6 +156,18 @@ export class ReservarCanchaComponent implements OnInit {
     } catch (error: any) {
       this.toastr.error(error.message, 'Error al agendar la cita');
     }
+  }
+
+  private limpiarCampos(){
+    //Campos de la reserva de la cancha
+    this.inicio_cita = ''
+    this.fin_cita = ''
+    this.fecha_cita = null
+    //Campos de la tarjeta
+    this.cardInfo.name = ''
+    this.cardInfo.number = ''
+    this.cardInfo.fecha = ''
+    this.cardInfo.cvv = ''
   }
 
   getInfoNegocio(): Promise<void> {
