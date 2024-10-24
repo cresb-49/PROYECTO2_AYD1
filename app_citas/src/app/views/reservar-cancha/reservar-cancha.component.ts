@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { HorarioService } from '../../services/horario/horario.service';
 import { NegocioService } from '../../services/negocio/negocio.service';
 import { ReservaCancha, ReservaService } from '../../services/reserva/reserva.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   standalone: true,
@@ -21,6 +22,9 @@ import { ReservaCancha, ReservaService } from '../../services/reserva/reserva.se
   styleUrls: ['./reservar-cancha.component.css']
 })
 export class ReservarCanchaComponent implements OnInit {
+
+  pdfUrl: SafeResourceUrl | null = null;
+
   enableReserve = false;
 
   dataDias: Dia[] = [];
@@ -50,6 +54,7 @@ export class ReservarCanchaComponent implements OnInit {
   fin_cita = ''
 
   constructor(
+    private sanitizer: DomSanitizer,
     private reservaService: ReservaService,
     private negocioService: NegocioService,
     private authService: AuthService,
@@ -126,7 +131,7 @@ export class ReservarCanchaComponent implements OnInit {
       }
       this.horarioService.isDayConfigValido(this.cancha.horarios, configuracionDiaSeleccionado)
 
-      this.validateCardInfo(this.cardInfo);
+      // this.validateCardInfo(this.cardInfo);
       const payload: ReservaCancha = {
         canchaId: this.cancha.id,
         horaInicio: this.inicio_cita,
@@ -134,11 +139,15 @@ export class ReservarCanchaComponent implements OnInit {
         fechaReservacion: this.fecha_cita ?? '',
       }
 
-      this.reservaService.reservarChancha(payload).subscribe({
-        next: (response: ApiResponse) => {
+      this.reservaService.reservarChancha(payload, 'blob').subscribe({
+        next: (response: Blob | any) => {
           this.toastr.success(response.message, 'Rerserva Completada!!!')
+          const blob = new Blob([response], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(blob);
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
         },
         error: (error: ErrorApiResponse) => {
+          console.log(error);
           this.toastr.error(error.error, 'Error al realizar la reserva!!!')
         }
       });
