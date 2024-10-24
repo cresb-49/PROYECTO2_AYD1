@@ -25,12 +25,16 @@ export class ReservaService {
     private httpService: HttpService
   ) { }
 
-  reservarServicio(payload: any) {
-    return this.httpService.post<any>('servicio/cliente/reservaServicio', payload, true);
+  reservarServicio(payload: any, responseType: 'json' | 'blob' = 'json') {
+    return this.httpService.post<any>('servicio/cliente/reservaServicio', payload, true, responseType);
   }
 
-  reservarChancha(payload: any) {
-    return this.httpService.post<any>('cancha/cliente/reservarCancha', payload, true);
+  reservarChancha(payload: any, responseType: 'json' | 'blob' = 'json') {
+    return this.httpService.post<any>('cancha/cliente/reservarCancha', payload, true, responseType);
+  }
+
+  obtenerReservasCliente(year: number, month: number) {
+    return this.httpService.get<any>(`reserva/protected/getCitasDelMes/${year}/${month}`, null, true);
   }
 
 }

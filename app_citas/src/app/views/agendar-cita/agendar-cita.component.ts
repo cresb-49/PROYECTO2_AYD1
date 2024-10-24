@@ -12,6 +12,8 @@ import { HorarioService } from '../../services/horario/horario.service';
 import { ASOCIACION_DIAS_NOMBRE, Dia, DiaService } from '../../services/dia/dia.service';
 import { NegocioService } from '../../services/negocio/negocio.service';
 import { CitaServicio, ReservaService } from '../../services/reserva/reserva.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { NativeUserRoles } from '../../services/auth/types';
 
 @Component({
   standalone: true,
@@ -21,7 +23,11 @@ import { CitaServicio, ReservaService } from '../../services/reserva/reserva.ser
   styleUrls: ['./agendar-cita.component.css']
 })
 export class AgendarCitaComponent implements OnInit {
+
+  pdfUrl: SafeResourceUrl | null = null;
+
   enableCita = false;
+
   servicioData: ManageServicio = {
     id: 0,
     imagen: '',
@@ -29,7 +35,8 @@ export class AgendarCitaComponent implements OnInit {
     detalles: '',
     precio: 1,
     duracion: 0.25,
-    id_rol: 0
+    id_rol: 0,
+    empleadosParalelos: 0
   };
 
   cardInfo: any = {
@@ -52,6 +59,7 @@ export class AgendarCitaComponent implements OnInit {
   fin_cita = ''
 
   constructor(
+    private sanitizer: DomSanitizer,
     private reservaService: ReservaService,
     private negocioService: NegocioService,
     private diaService: DiaService,
@@ -63,7 +71,9 @@ export class AgendarCitaComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.enableCita = this.authService.isLoggedIn();
+    const roles = this.authService.getUserRoles();
+    const isClient = roles.includes(NativeUserRoles.CLIENTE);
+    this.enableCita = this.authService.isLoggedIn() && roles.includes(NativeUserRoles.CLIENTE);
     await this.cargarDatosServicio();
     await this.empleadosServicio();
     await this.getDias();
@@ -148,7 +158,8 @@ export class AgendarCitaComponent implements OnInit {
             id_rol: data.rol.id,
             imagen: data.imagen,
             nombre: data.nombre,
-            precio: data.costo
+            precio: data.costo,
+            empleadosParalelos: data.empleadosParalelos
           }
           resolve(data)
         },
@@ -214,7 +225,7 @@ export class AgendarCitaComponent implements OnInit {
       }
       //Verificamos que el dia configurado exista en el horario
       this.horarioService.isDayConfigValido(this.horario, configuracionDiaSeleccionado)
-      
+
       this.validateCardInfo(this.cardInfo);
 
       const payload: CitaServicio = {
@@ -224,18 +235,36 @@ export class AgendarCitaComponent implements OnInit {
         fechaReservacion: this.fecha_cita ?? '',
       }
 
-      this.reservaService.reservarServicio(payload).subscribe({
-        next: (response: ApiResponse) => {
-          this.toastr.success(response.message, 'Cita Completada!!!')
+      this.reservaService.reservarServicio(payload, 'blob').subscribe({
+        next: (response: Blob | any) => {
+          this.toastr.success('Se genero la cita correctamente', 'Cita Completada!!!')
+          const blob = new Blob([response], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(blob);
+          // Sanitiza la URL antes de asignarla al iframe
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+          this.limpiarCampos();
         },
-        error: (error: ErrorApiResponse) => {
-          this.toastr.error(error.error, 'Error al realizar la cita!!!')
+        error: (error: any) => {
+          console.log(error);
+          this.toastr.error('Fallo al crear la cita', 'Error al realizar la cita!!!')
         }
       });
 
     } catch (error: any) {
       this.toastr.error(error.message, 'Error al agendar la cita');
     }
+  }
+
+  private limpiarCampos() {
+    //Campos de la reserva de la cancha
+    this.inicio_cita = ''
+    this.fin_cita = ''
+    this.fecha_cita = null
+    //Campos de la tarjeta
+    this.cardInfo.name = ''
+    this.cardInfo.number = ''
+    this.cardInfo.fecha = ''
+    this.cardInfo.cvv = ''
   }
 
   procesarHoarioEmpleado(data: any[]): DayConfig[][] {

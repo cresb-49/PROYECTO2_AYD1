@@ -12,6 +12,7 @@ export interface Servicio {
   costo: number;
   detalles: string;
   rol: Rol;
+  empleadosParalelos: number;
 }
 
 @Injectable({
