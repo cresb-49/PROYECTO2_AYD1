@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { HorarioService } from '../../services/horario/horario.service';
 import { ASOCIACION_DIAS_NOMBRE, Dia, DiaService } from '../../services/dia/dia.service';
 import { NegocioService } from '../../services/negocio/negocio.service';
+import { CitaServicio, ReservaService } from '../../services/reserva/reserva.service';
 
 @Component({
   standalone: true,
@@ -22,6 +23,7 @@ import { NegocioService } from '../../services/negocio/negocio.service';
 export class AgendarCitaComponent implements OnInit {
   enableCita = false;
   servicioData: ManageServicio = {
+    id: 0,
     imagen: '',
     nombre: '',
     detalles: '',
@@ -50,6 +52,7 @@ export class AgendarCitaComponent implements OnInit {
   fin_cita = ''
 
   constructor(
+    private reservaService: ReservaService,
     private negocioService: NegocioService,
     private diaService: DiaService,
     private authService: AuthService,
@@ -211,26 +214,25 @@ export class AgendarCitaComponent implements OnInit {
       }
       //Verificamos que el dia configurado exista en el horario
       this.horarioService.isDayConfigValido(this.horario, configuracionDiaSeleccionado)
+      
       this.validateCardInfo(this.cardInfo);
-      const payload = {
-        fecha: this.fecha_cita,
-        id_empelado: selected_id_empleado,
-        inicio: this.inicio_cita,
+
+      const payload: CitaServicio = {
+        servicioId: this.servicioData.id ?? 0,
+        empleadoId: selected_id_empleado,
+        horaInicio: this.inicio_cita,
+        fechaReservacion: this.fecha_cita ?? '',
       }
 
-      //Resevacion cahnca
-      // id_cancha
-      // inicio
-      // fin
-      // fecha
+      this.reservaService.reservarServicio(payload).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastr.success(response.message, 'Cita Completada!!!')
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al realizar la cita!!!')
+        }
+      });
 
-      //Reservacion cita
-      //id_empleado
-      //id_servicio
-      //inicio
-      //fecha
-
-      console.log(payload);
     } catch (error: any) {
       this.toastr.error(error.message, 'Error al agendar la cita');
     }
