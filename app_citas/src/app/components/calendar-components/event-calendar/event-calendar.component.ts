@@ -13,6 +13,7 @@ export class EventCalendarComponent implements OnInit {
   dia: string | number = 10;
   year: string | number = 2020;
 
+  @Input() isCita: boolean = true;
   @Input() fecha: string = '2020-01-10';
   @Input() init: string = '10:00';
   @Input() fin: string = '11:00';

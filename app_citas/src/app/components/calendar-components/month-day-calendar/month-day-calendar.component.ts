@@ -16,6 +16,8 @@ export interface EventConfig {
 })
 export class MonthDayCalendarComponent implements OnInit {
   @Output() daySend: EventEmitter<number> = new EventEmitter();
+
+  @Input() countCitasReservas: { reservas: number, citas: number } = { reservas: 0, citas: 0 }
   @Input() isMonthDay: boolean = true;
   @Input() dayNumber: number = 1;
   @Input() showEvents: boolean = true;

@@ -227,8 +227,8 @@ export class CalendarComponent implements OnInit {
     })
     this.setMothAndYearByDate(this.currentDate); // Actualizamos currentMonth y currentYear
     this.obtenerDiasMesActual(); // Actualizamos los días del mes actual
-    this.diaSeleccionado = null;
-    this.eventosMostrar = [];
+    this.diaSeleccionado = this.currentDay;
+    this.handleDaySend(this.currentDay);
   }
 
   handleDaySend(day: number) {

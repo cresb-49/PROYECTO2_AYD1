@@ -16,7 +16,8 @@
                 <app-event-calendar class="w-full lg:pr-2 md:pr-2" *ngFor="let reserva of eventosMostrar"
                   [fecha]="reserva.fechaReservacion" [init]="reserva.horaInicio" [fin]="reserva.horaFin"
                   [titulo]="reserva.reservaCancha?'Reserva de la cancha '+reserva.reservaCancha.cancha.id:'Cita '+reserva.reservaServicio?.servicio?.nombre "
-                  [descripcion]="'Total a pagar: Q.'+reserva.totalACobrar+ ', Adelantado: Q.'+reserva.adelanto" />
+                  [descripcion]="'Total a pagar: Q.'+reserva.totalACobrar+ ', Adelantado: Q.'+reserva.adelanto"
+                  [isCita]="reserva.reservaServicio?true:false" />
               </div>
         </div>
         <div
@@ -59,8 +60,8 @@
               </div>
               <div class="grid grid-cols-7 rounded-b-xl w-full">
                 <app-month-day-calendar *ngFor="let dia of diasMesActual" [isMonthDay]="dia.isMonthDay"
-                  [dayNumber]="dia.numberDay" [showEvents]="dia.showEvents" (daySend)="handleDaySend($event)"
-                  class="w-full" />
+                  [dayNumber]="dia.numberDay" (daySend)="handleDaySend($event)"
+                  [countCitasReservas]="calcularEventosDelDia(dia.numberDay)" class="w-full" />
               </div>
             </div>
           </div>
