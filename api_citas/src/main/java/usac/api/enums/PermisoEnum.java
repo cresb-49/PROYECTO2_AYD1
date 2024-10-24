@@ -17,7 +17,13 @@ public enum PermisoEnum {
     ACTUALIZAR_PERMISOS_ROLES("Actualizar permisos en roles",
             "/api/rol/private/restricted/actualizarPermisosRol"),
     TERMINAR_RESERVAS("Marcar como 'Realizadas' las reservas",
-            "/api/reserva/private/restricted/realizarReserva"),;
+            "/api/reserva/private/restricted/realizarReserva"),
+    //REPORTES
+
+    EXPORTAR_REPORTES("Exportar reportes",
+            "/api/reporte/private/restricted/exportarReporte"),
+    REPORTE_VENTAS("Generar reportes de ventas",
+            "/api/reporte/private/restricted/reporteVentas"),;
 
     private final String nombrePermiso;
     private final String ruta;
