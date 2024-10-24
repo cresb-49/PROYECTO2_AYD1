@@ -6,7 +6,7 @@
         <div class="col-span-12 xl:col-span-5 flex flex-col items-center xl:items-start w-full">
           <h2
             class="font-manrope text-2xl sm:text-3xl leading-tight text-gray-900 dark:text-gray-100 mb-1.5 text-center xl:text-left w-full">
-            Actividades del dia
+            {{diaSeleccionado?'Actividades del dia '+diaSeleccionado:'Actividades del dia'}}
           </h2>
           <p
             class="text-base sm:text-lg font-normal text-gray-800 dark:text-gray-300 mb-4 text-center xl:text-left w-full">
@@ -14,12 +14,10 @@
           </p>
           <div
             class="flex gap-3 flex-col items-center xl:items-start w-full overflow-y-auto max-h-[524px] scrollbar-thin scrollbar-thumb-transparent scrollbar-track-transparent">
-            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
-            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
-            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
-            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
-            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
-            <app-event-calendar class="w-full lg:pr-2 md:pr-2"></app-event-calendar>
+            <app-event-calendar class="w-full lg:pr-2 md:pr-2" *ngFor="let reserva of eventosMostrar"
+              [fecha]="reserva.fechaReservacion" [init]="reserva.horaInicio" [fin]="reserva.horaFin"
+              [titulo]="reserva.reservaCancha?'Reserva de la cancha '+reserva.reservaCancha.cancha.id:'Cita '+reserva.reservaServicio?.servicio?.nombre "
+              [descripcion]="'Total a pagar: Q.'+reserva.totalACobrar+ ', Adelantado: Q.'+reserva.adelanto" />
           </div>
         </div>
         <div
@@ -62,7 +60,8 @@
               </div>
               <div class="grid grid-cols-7 rounded-b-xl w-full">
                 <app-month-day-calendar *ngFor="let dia of diasMesActual" [isMonthDay]="dia.isMonthDay"
-                  [dayNumber]="dia.numberDay" [showEvents]="dia.showEvents" class="w-full" />
+                  [dayNumber]="dia.numberDay" [showEvents]="dia.showEvents" (daySend)="handleDaySend($event)"
+                  class="w-full" />
               </div>
             </div>
           </div>
