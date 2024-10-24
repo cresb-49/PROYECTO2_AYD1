@@ -463,7 +463,7 @@ public class UsuarioService extends usac.api.services.Service {
                 email,
                 info.getNombres(),
                 info.getApellidos(),
-                info.getApellidos()
+                info.getPassword()
         );
 
         // preparamos el rol
