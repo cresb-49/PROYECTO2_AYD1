@@ -18,6 +18,9 @@ public enum PermisoEnum {
             "/api/rol/private/restricted/actualizarPermisosRol"),
     TERMINAR_RESERVAS("Marcar como 'Realizadas' las reservas",
             "/api/reserva/private/restricted/realizarReserva"),
+    //Ver comprobantes de citas
+    EXPORTAR_COMPROBANTES("Exportar comprobantes de citas",
+            "/api/reserva/private/restricted/comprobanteReservaPorId"),
     //REPORTES
 
     EXPORTAR_REPORTES("Exportar reportes",
