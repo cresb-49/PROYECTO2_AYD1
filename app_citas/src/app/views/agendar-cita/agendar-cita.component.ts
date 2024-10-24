@@ -221,7 +221,7 @@ export class AgendarCitaComponent implements OnInit {
       //Verificamos que el dia configurado exista en el horario
       this.horarioService.isDayConfigValido(this.horario, configuracionDiaSeleccionado)
 
-      // this.validateCardInfo(this.cardInfo);
+      this.validateCardInfo(this.cardInfo);
 
       const payload: CitaServicio = {
         servicioId: this.servicioData.id ?? 0,

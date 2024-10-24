@@ -29,8 +29,8 @@ export class ReservaService {
     return this.httpService.post<any>('servicio/cliente/reservaServicio', payload, true, responseType);
   }
 
-  reservarChancha(payload: any) {
-    return this.httpService.post<any>('cancha/cliente/reservarCancha', payload, true);
+  reservarChancha(payload: any, responseType: 'json' | 'blob' = 'json') {
+    return this.httpService.post<any>('cancha/cliente/reservarCancha', payload, true, responseType);
   }
 
 }
