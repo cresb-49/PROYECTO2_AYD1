@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface EventConfig {
@@ -15,6 +15,9 @@ export interface EventConfig {
   styleUrls: ['./month-day-calendar.component.css']
 })
 export class MonthDayCalendarComponent implements OnInit {
+  @Output() daySend: EventEmitter<number> = new EventEmitter();
+
+  @Input() countCitasReservas: { reservas: number, citas: number } = { reservas: 0, citas: 0 }
   @Input() isMonthDay: boolean = true;
   @Input() dayNumber: number = 1;
   @Input() showEvents: boolean = true;
@@ -62,5 +65,9 @@ export class MonthDayCalendarComponent implements OnInit {
       top: '-20px', // Ajusta la posición vertical del popover
       left: '-40px' // Ajusta la posición horizontal del popover
     };
+  }
+
+  diaSeleccionado(diaSeleccionado: number) {
+    this.daySend.emit(diaSeleccionado)
   }
 }

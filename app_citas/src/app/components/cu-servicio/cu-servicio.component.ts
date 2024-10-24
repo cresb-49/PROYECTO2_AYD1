@@ -16,6 +16,7 @@ export interface ManageServicio {
   precio: number;
   duracion: number;
   id_rol: number;
+  empleadosParalelos: number
 }
 
 @Component({
@@ -37,7 +38,8 @@ export class CuServicioComponent implements OnInit {
     detalles: '',
     precio: 1,
     duracion: 0.25,
-    id_rol: 0
+    id_rol: 0,
+    empleadosParalelos: 0
   };
   servicioOriginalData: ManageServicio = {
     imagen: '',
@@ -45,7 +47,8 @@ export class CuServicioComponent implements OnInit {
     detalles: '',
     precio: 1,
     duracion: 0.25,
-    id_rol: 0
+    id_rol: 0,
+    empleadosParalelos: 0
   };
 
   private servicioDataSubject = new BehaviorSubject<ManageServicio>(this.servicioData); // Para observar cambios
@@ -76,6 +79,10 @@ export class CuServicioComponent implements OnInit {
 
   onRolChange(event: any) {
     this.servicioData.id_rol = Number(event ?? 0)
+    this.servicioDataSubject.next(this.servicioData);
+  }
+
+  onEmpleadosParalelosChange(event: any) {
     this.servicioDataSubject.next(this.servicioData);
   }
 
@@ -125,7 +132,8 @@ export class CuServicioComponent implements OnInit {
           duracion: this.servicioData.duracion,
           imagen: this.servicioData.imagen,
           nombre: this.servicioData.nombre,
-          rol: rolSeleccionado
+          rol: rolSeleccionado,
+          empleadosParalelos: this.servicioData.empleadosParalelos
         };
         this.servicioService.createServicio(createServicio).subscribe({
           next: (response: ApiResponse) => {
@@ -137,7 +145,8 @@ export class CuServicioComponent implements OnInit {
               detalles: '',
               precio: 1,
               duracion: 0.25,
-              id_rol: 0
+              id_rol: 0,
+              empleadosParalelos: 0
             };
             this.servicioDataSubject.next(this.servicioData);
           },
@@ -170,7 +179,8 @@ export class CuServicioComponent implements OnInit {
         duracion: this.servicioData.duracion,
         imagen: this.servicioData.imagen,
         nombre: this.servicioData.nombre,
-        rol: rolSeleccionado
+        rol: rolSeleccionado,
+        empleadosParalelos: this.servicioData.empleadosParalelos
       };
 
       this.servicioService.updateServicio(updateService).subscribe({
@@ -183,7 +193,8 @@ export class CuServicioComponent implements OnInit {
             duracion: updateService.duracion,
             id_rol: updateService.rol.id,
             imagen: updateService.imagen,
-            nombre: updateService.nombre
+            nombre: updateService.nombre,
+            empleadosParalelos: updateService.empleadosParalelos
           }
           this.servicioOriginalData = {
             id: updateService.id,
@@ -192,7 +203,8 @@ export class CuServicioComponent implements OnInit {
             duracion: updateService.duracion,
             id_rol: updateService.rol.id,
             imagen: updateService.imagen,
-            nombre: updateService.nombre
+            nombre: updateService.nombre,
+            empleadosParalelos: updateService.empleadosParalelos
           };
           this.servicioDataSubject.next(this.servicioData);
         },
@@ -235,7 +247,8 @@ export class CuServicioComponent implements OnInit {
             id_rol: data.rol.id,
             imagen: data.imagen,
             nombre: data.nombre,
-            precio: data.costo
+            precio: data.costo,
+            empleadosParalelos: data.empleadosParalelos
           }
           this.imageSrc = data.imagen;
           this.servicioOriginalData = {
@@ -245,7 +258,8 @@ export class CuServicioComponent implements OnInit {
             id_rol: data.rol.id,
             imagen: data.imagen,
             nombre: data.nombre,
-            precio: data.costo
+            precio: data.costo,
+            empleadosParalelos: data.empleadosParalelos
           }
           this.servicioDataSubject.next(this.servicioData);
           resolve();

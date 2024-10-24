@@ -50,10 +50,16 @@ export class CalendarComponent implements OnInit {
   weekDays: string[] = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
   monthNames: string[] = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
   currentDate: Date = new Date();
+  currentDay:number = this.currentDate.getDate();
   currentMonth: number = this.currentDate.getMonth();
   currentYear: number = this.currentDate.getFullYear();
   diasMesActual: DayMonthCalendarComponent[] = [];
+
   reservasMap: Map<string, ReservaResponse[]> = new Map();
+
+  eventosMostrar: ReservaResponse[] = [];
+
+  diaSeleccionado: string | number | null = null;
 
   private currentDateSubject = new BehaviorSubject<{ currentYear: number, currentMonth: number }>({
     currentYear: this.currentYear,
@@ -73,6 +79,8 @@ export class CalendarComponent implements OnInit {
     });
     this.setMothAndYearByDate(this.currentDate);
     this.obtenerDiasMesActual();
+    await this.cambioFechaData();
+    this.handleDaySend(this.currentDay)
   }
 
   setMothAndYearByDate(date: Date): void {
@@ -89,6 +97,7 @@ export class CalendarComponent implements OnInit {
             const citasReservas = this.parseDataCitasReservas(data);
             this.mapearDia(citasReservas);
             this.toastrService.success(response.message, 'Citas/Reservas recuperadas con exito!!!')
+            console.log(this.reservasMap);
             resolve(data)
           },
           error: (error: ErrorApiResponse) => {
@@ -218,5 +227,32 @@ export class CalendarComponent implements OnInit {
     })
     this.setMothAndYearByDate(this.currentDate); // Actualizamos currentMonth y currentYear
     this.obtenerDiasMesActual(); // Actualizamos los días del mes actual
+    this.diaSeleccionado = this.currentDay;
+    this.handleDaySend(this.currentDay);
+  }
+
+  handleDaySend(day: number) {
+    console.log('Dia seleccionado: ', day);
+    this.diaSeleccionado = day
+    const day_s = day < 10 ? `0${day}` : `${day}`;
+    console.log(day_s);
+
+    const eventos = this.reservasMap.get(day_s) ?? [];
+    this.eventosMostrar = eventos;
+  }
+
+  calcularEventosDelDia(day: number): { reservas: number, citas: number } {
+    const day_s = day < 10 ? `0${day}` : `${day}`;
+    let reservas = 0;
+    let citas = 0;
+    const eventos = this.reservasMap.get(day_s) ?? [];
+    eventos.map((value: ReservaResponse) => {
+      if (value.reservaCancha) {
+        reservas++;
+      } else if (value.reservaServicio) {
+        citas++;
+      }
+    })
+    return { reservas, citas }
   }
 }
