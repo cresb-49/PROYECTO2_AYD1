@@ -13,6 +13,7 @@ import { ASOCIACION_DIAS_NOMBRE, Dia, DiaService } from '../../services/dia/dia.
 import { NegocioService } from '../../services/negocio/negocio.service';
 import { CitaServicio, ReservaService } from '../../services/reserva/reserva.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { NativeUserRoles } from '../../services/auth/types';
 
 @Component({
   standalone: true,
@@ -69,7 +70,9 @@ export class AgendarCitaComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.enableCita = this.authService.isLoggedIn();
+    const roles = this.authService.getUserRoles();
+    const isClient = roles.includes(NativeUserRoles.CLIENTE);
+    this.enableCita = this.authService.isLoggedIn() && roles.includes(NativeUserRoles.CLIENTE);
     await this.cargarDatosServicio();
     await this.empleadosServicio();
     await this.getDias();

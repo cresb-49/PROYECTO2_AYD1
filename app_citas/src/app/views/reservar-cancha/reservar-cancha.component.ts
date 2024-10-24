@@ -64,7 +64,6 @@ export class ReservarCanchaComponent implements OnInit {
     const roles = this.authService.getUserRoles();
     const isClient = roles.includes(NativeUserRoles.CLIENTE);
     this.enableReserve = this.authService.isLoggedIn() && roles.includes(NativeUserRoles.CLIENTE);
-    console.log('enableReserve:', this.enableReserve);
     await this.getDias();
     await this.cargarDatosCancha();
     await this.getInfoNegocio();
