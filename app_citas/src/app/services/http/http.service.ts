@@ -62,20 +62,25 @@ export class HttpService {
     });
   }
 
-  get<T>(endpoint: string, params?: any, auth: boolean = false): Observable<T> {
+  get<T>(endpoint: string, params?: any, auth: boolean = false, responseType: 'json' | 'blob' = 'json'): Observable<T | Blob> {
     return this.http
       .get<T>(`${this.baseUrl}/${endpoint}`, {
         headers: auth ? this.getAuthHeaders() : this.getHeaders(),
         params: params,
+        responseType: responseType === 'blob' ? 'blob' as 'json' : 'json' as 'json'
       })
       .pipe(retry(2), catchError(this.handleError));
   }
 
-  post<T>(endpoint: string, body: any, auth: boolean = false): Observable<T> {
+  post<T>(endpoint: string, body: any, auth: boolean = false, responseType: 'json' | 'blob' = 'json'): Observable<T | Blob> {
     return this.http
-      .post<T>(`${this.baseUrl}/${endpoint}`, body, { headers: auth ? this.getAuthHeaders() : this.getHeaders() })
+      .post<T | Blob>(`${this.baseUrl}/${endpoint}`, body, {
+        headers: auth ? this.getAuthHeaders() : this.getHeaders(),
+        responseType: responseType === 'blob' ? 'blob' as 'json' : 'json' as 'json'
+      })
       .pipe(catchError(this.handleError));
   }
+
 
   put<T>(endpoint: string, body: any, auth: boolean = false): Observable<T> {
     return this.http

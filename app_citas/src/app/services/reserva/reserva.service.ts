@@ -25,8 +25,8 @@ export class ReservaService {
     private httpService: HttpService
   ) { }
 
-  reservarServicio(payload: any) {
-    return this.httpService.post<any>('servicio/cliente/reservaServicio', payload, true);
+  reservarServicio(payload: any, responseType: 'json' | 'blob' = 'json') {
+    return this.httpService.post<any>('servicio/cliente/reservaServicio', payload, true, responseType);
   }
 
   reservarChancha(payload: any) {
