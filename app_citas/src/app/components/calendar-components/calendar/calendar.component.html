@@ -17,7 +17,7 @@
                   [fecha]="reserva.fechaReservacion" [init]="reserva.horaInicio" [fin]="reserva.horaFin"
                   [titulo]="reserva.reservaCancha?'Reserva de la cancha '+reserva.reservaCancha.cancha.id:'Cita '+reserva.reservaServicio?.servicio?.nombre "
                   [descripcion]="'Total a pagar: Q.'+reserva.totalACobrar+ ', Adelantado: Q.'+reserva.adelanto"
-                  [isCita]="reserva.reservaServicio?true:false" />
+                  [isCita]="reserva.reservaServicio?true:false" [data]="reserva" />
               </div>
         </div>
         <div

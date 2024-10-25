@@ -4,6 +4,9 @@ import { OptionsModal, PopUpModalComponent } from '../../pop-up-modal/pop-up-mod
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth.service';
 import { NativeUserRoles } from '../../../services/auth/types';
+import { ReservaService } from '../../../services/reserva/reserva.service';
+import { ToastrService } from 'ngx-toastr';
+import { ErrorApiResponse } from '../../../services/http/http.service';
 
 @Component({
   standalone: true,
@@ -43,6 +46,8 @@ export class EventCalendarComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private toastr: ToastrService,
+    private reservaService: ReservaService,
     private elRef: ElementRef,
     private renderer: Renderer2,
     private router: Router
@@ -98,15 +103,55 @@ export class EventCalendarComponent implements OnInit {
   // Manejar acciones de edición y eliminación
   cancelar() {
     this.hideModal = false;
-    this.optionsModal.confirmAction = () => this.cancelarMiReserva();
+    this.optionsModal.confirmAction = () => this.cancelarMiReserva(this.data.id);
   }
 
-  cancelarMiReserva() {
-    console.log('Se cancelos mi cita');
+  cancelarMiReserva(id: any) {
+    if (id) {
+      this.reservaService.cancelarReserva(id).subscribe({
+        next: () => {
+          this.toastr.success('Cita cancelada correctamente');
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'No se pudo cancelar la cita');
+        }
+      });
+    } else {
+      this.toastr.error('No se pudo cancelar la cita');
+    }
+  }
+
+  descargarFactura(id: any) {
+
+  }
+
+  descargarComprobante(id: any) {
+    if (this.isCliente()) {
+      this.reservaService.getComprobanteReservaByCliente(id).subscribe({
+        next: (response: Blob | any) => {
+          const blob = new Blob([response], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(blob);
+          window.open(url);
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'No se pudo descargar el comprobante de la reserva');
+        }
+      });
+    } else {
+      this.reservaService.getComprobanteReservaByAdmin(id).subscribe({
+        next: (response: Blob | any) => {
+          const blob = new Blob([response], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(blob);
+          window.open(url);
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'No se pudo descargar el comprobante de la reserva');
+        }
+      });
+    }
   }
 
   procesar() {
-
     this.router.navigate(['/procesar-reserva/' + (this.data?.id ?? 0)]);
   }
 
