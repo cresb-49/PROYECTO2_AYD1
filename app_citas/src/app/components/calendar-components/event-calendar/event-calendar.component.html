@@ -6,34 +6,32 @@
       <p class="text-base font-medium text-gray-900 dark:text-gray-100">{{mes}} {{dia}},{{year}} - {{init}} - {{fin}}
       </p>
     </div>
-    <div class="dropdown relative inline-flex">
-      <button type="button" (click)="toggleDropdown()"
-        class="dropdown-toggle inline-flex justify-center py-2.5 px-1 items-center gap-2 text-sm text-black dark:text-white rounded-full cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:text-purple-600">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="4" viewBox="0 0 12 4" fill="none">
-          <path d="M1.85624 2.00085H1.81458M6.0343 2.00085H5.99263M10.2124 2.00085H10.1707" stroke="currentcolor"
-            stroke-width="2.5" stroke-linecap="round"></path>
-        </svg>
-      </button>
-      <div *ngIf="isDropdownOpen"
-        class="dropdown-menu rounded-xl shadow-lg bg-white dark:bg-gray-700 absolute top-full -left-10 w-max mt-2">
-        <ul class="py-2">
-          <li>
-            <a class="block px-6 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-medium"
-              href="javascript:;" (click)="cancelar()">
-              Cancelar
-            </a>
-          </li>
-          <li *ngIf="!isCliente()">
-            <a class="block px-6 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-medium"
-              href="javascript:;" (click)="procesar()">
-              Procesar
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
   </div>
-  <h6 class="text-xl leading-8 font-semibold text-black dark:text-gray-100 mb-1">{{titulo}}</h6>
-  <p class="text-base font-normal text-gray-600 dark:text-gray-400">{{descripcion}}</p>
+  <h6 class="text-xl leading-8 font-semibold text-black dark:text-gray-100 mb-1">
+    {{(data.canceledAt == null || data.canceledAt == undefined) ? titulo:titulo + ' - Cancelada'}}
+  </h6>
+  <p class="text-base font-normal text-gray-600 dark:text-gray-400" *ngIf="(data.canceledAt == null || data.canceledAt == undefined)">
+    {{descripcion}}
+  </p>
+  <div class="grid gap-2 md:grid-cols-3 lg:grid-cols-2 mt-2">
+    <button type="button" (click)="descargarComprobante(this.data.id)"
+      class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+      Descargar Constancia
+    </button>
+    <button type="button" *ngIf="data.realizada"
+      class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+      Descargar Factura
+    </button>
+    <button type="button" (click)="cancelar()"
+      *ngIf="!data.realizada && (data.canceledAt == null || data.canceledAt == undefined)"
+      class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+      Cancelar
+    </button>
+    <button type="button" *ngIf="!isCliente() && (data.canceledAt == null || data.canceledAt == undefined)"
+      (click)="procesar()"
+      class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+      Procesar
+    </button>
+  </div>
 </div>
 <app-pop-up-modal [(hideModal)]="hideModal" [options]="optionsModal"></app-pop-up-modal>

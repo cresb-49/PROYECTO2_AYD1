@@ -37,4 +37,16 @@ export class ReservaService {
     return this.httpService.get<any>(`reserva/protected/getCitasDelMes/${year}/${month}`, null, true);
   }
 
+  cancelarReserva(id: number) {
+    return this.httpService.patch<any>(`reserva/cliente/cancelarReserva/${id}`, null, true);
+  }
+
+  getComprobanteReservaByCliente(id: number) {
+    return this.httpService.get<any>(`reserva/cliente/comprobanteReservaPorId/${id}`, null, true, 'blob');
+  }
+
+  getComprobanteReservaByAdmin(id: number) {
+    return this.httpService.get<any>(`reserva/private/restricted/comprobanteReservaPorId/${id}`, null, true, 'blob');
+  }
+
 }
