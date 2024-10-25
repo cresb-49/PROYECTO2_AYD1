@@ -7,22 +7,28 @@
       </p>
     </div>
   </div>
-  <h6 class="text-xl leading-8 font-semibold text-black dark:text-gray-100 mb-1">{{titulo}}</h6>
-  <p class="text-base font-normal text-gray-600 dark:text-gray-400">{{descripcion}}</p>
+  <h6 class="text-xl leading-8 font-semibold text-black dark:text-gray-100 mb-1">
+    {{(data.canceledAt == null || data.canceledAt == undefined) ? titulo:titulo + ' - Cancelada'}}
+  </h6>
+  <p class="text-base font-normal text-gray-600 dark:text-gray-400" *ngIf="(data.canceledAt == null || data.canceledAt == undefined)">
+    {{descripcion}}
+  </p>
   <div class="grid gap-2 md:grid-cols-3 lg:grid-cols-2 mt-2">
-    <button type="button"
+    <button type="button" (click)="descargarComprobante(this.data.id)"
       class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
       Descargar Constancia
     </button>
-    <button type="button"
+    <button type="button" *ngIf="data.realizada"
       class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
       Descargar Factura
     </button>
-    <button type="button" (click)="cancelar()" *ngIf="!data.realizada"
+    <button type="button" (click)="cancelar()"
+      *ngIf="!data.realizada && (data.canceledAt == null || data.canceledAt == undefined)"
       class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
       Cancelar
     </button>
-    <button type="button" *ngIf="!isCliente()" (click)="procesar()"
+    <button type="button" *ngIf="!isCliente() && (data.canceledAt == null || data.canceledAt == undefined)"
+      (click)="procesar()"
       class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
       Procesar
     </button>

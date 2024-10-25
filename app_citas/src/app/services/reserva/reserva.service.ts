@@ -38,7 +38,7 @@ export class ReservaService {
   }
 
   cancelarReserva(id: number) {
-    return this.httpService.patch<any>(`reserva//cliente/cancelarReserva/${id}`, null, true);
+    return this.httpService.patch<any>(`reserva/cliente/cancelarReserva/${id}`, null, true);
   }
 
   getComprobanteReservaByCliente(id: number) {

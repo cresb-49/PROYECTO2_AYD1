@@ -20,6 +20,7 @@ export interface ReservaResponse {
   horaFin: string;
   fechaReservacion: string;
   realizada: boolean;
+  canceledAt: string | null;
   adelanto: number;
   totalACobrar: number;
   reservaCancha: {
@@ -118,6 +119,7 @@ export class CalendarComponent implements OnInit {
         horaFin: value.horaFin,
         fechaReservacion: value.fechaReservacion,
         realizada: value.realizada,
+        canceledAt: value.canceledAt,
         adelanto: value.adelanto,
         totalACobrar: value.totalACobrar,
         reservaCancha: value.reservaCancha ? {
