@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import usac.api.models.dto.ArchivoDTO;
+import usac.api.models.dto.reportes.ReporteClientesFrecuentesDto;
+import usac.api.models.dto.reportes.ReporteServiciosDTO;
 import usac.api.models.dto.reportes.ReporteVentasDTO;
 import usac.api.models.request.ReporteExportRequest;
 import usac.api.models.request.ReporteRequest;
@@ -124,11 +126,59 @@ public class ReportesController {
     })
     @PostMapping("/private/restricted/reporteVentas")
     public ResponseEntity<?> reporteVentas(
-        @RequestBody ReporteRequest request
+            @RequestBody ReporteRequest request
     ) {
         try {
             validadorPermiso.verificarPermiso();
             ReporteVentasDTO data = reporteService.getReporteVentas(request);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    /**
+     * Genera un reporte de clientes frecuentes basado en el rango de fechas
+     * proporcionado.
+     *
+     * @param request Objeto con las fechas de inicio y fin para filtrar los
+     * clientes.
+     * @return ResponseEntity con los datos del reporte de clientes frecuentes
+     * en caso de éxito, o un mensaje de error en caso de fallo.
+     */
+    @Operation(summary = "Generar reporte de clientes frecuentes",
+            description = "Obtiene un reporte de los clientes frecuentes en"
+            + " función del número de reservaciones y el valor total de"
+            + " las compras realizadas en el período de tiempo especificado.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Reporte generado correctamente",
+                content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ReporteClientesFrecuentesDto.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/private/restricted/reporteClientes")
+    public ResponseEntity<?> reporteClientes(
+            @RequestBody ReporteRequest request
+    ) {
+        try {
+            validadorPermiso.verificarPermiso();
+            ReporteClientesFrecuentesDto data = reporteService.getReporteClientesFrecuentes(request);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @PostMapping("/private/restricted/serviciosMasSolicitados")
+    public ResponseEntity<?> serviciosMasSolicitados(
+            @RequestBody ReporteRequest request
+    ) {
+        try {
+            validadorPermiso.verificarPermiso();
+            ReporteServiciosDTO data = reporteService.getReporteServicios(request);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             ex.printStackTrace();
