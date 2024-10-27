@@ -65,10 +65,10 @@ public class ReporteVentasImprimible extends Reporte {
 
         // Agregar parámetros al mapa
         parametrosReporte.put("tablaVentas", tablaVentas);
-        parametrosReporte.put("total", "Q" + ventasDTO.getTotal());
+        parametrosReporte.put("total", "Q " + ventasDTO.getTotal());
         parametrosReporte.put("noVentas", "" + ventasDTO.getNoVentas());
         parametrosReporte.put("adelanto", "Q " + ventasDTO.getTotalAdelantos());
-        parametrosReporte.put("subtotal", "Q" + ventasDTO.getTotalNoAdelanto());
+        parametrosReporte.put("subtotal", "Q " + ventasDTO.getTotalNoAdelanto());
         parametrosReporte.put("fecha1", ventasDTO.getFecha1());
         parametrosReporte.put("fecha2", ventasDTO.getFecha2());
         parametrosReporte.put("fecha",

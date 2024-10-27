@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import usac.api.models.Reserva;
+import usac.api.models.dto.reportes.ServicioMasDemandadoDto;
 
 /**
  *
@@ -39,5 +40,30 @@ public interface ReservaRepository extends CrudRepository<Reserva, Long> {
     public List<Reserva> findReservasByEmpleadoAndMesAndAnio(@Param("empleadoId") Long empleadoId,
             @Param("mes") int mes,
             @Param("anio") int anio);
+
+    //REPORTES 
+    @Query("SELECT new usac.api.models.dto.reportes.ServicioMasDemandadoDto("
+            + "c.cancha.id, c.cancha.descripcion, COUNT(c)) "
+            + "FROM ReservaCancha c "
+            + "JOIN c.reserva r "
+            + "WHERE (:fechaInicio IS NULL OR DATE(r.fechaReservacion) >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR DATE(r.fechaReservacion) <= :fechaFin) "
+            + "GROUP BY c.cancha.id, c.cancha.descripcion "
+            + "ORDER BY COUNT(c) DESC")
+    public List<ServicioMasDemandadoDto> findCanchasMasDemandadas(
+            @Param("fechaInicio") java.sql.Date fechaInicio,
+            @Param("fechaFin") java.sql.Date fechaFin);
+
+    @Query("SELECT new usac.api.models.dto.reportes.ServicioMasDemandadoDto("
+            + "s.servicio.id, s.servicio.nombre, COUNT(s)) "
+            + "FROM ReservaServicio s "
+            + "JOIN s.reserva r "
+            + "WHERE (:fechaInicio IS NULL OR DATE(r.fechaReservacion) >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR DATE(r.fechaReservacion) <= :fechaFin) "
+            + "GROUP BY s.servicio.id, s.servicio.nombre "
+            + "ORDER BY COUNT(s) DESC")
+    public List<ServicioMasDemandadoDto> findServiciosMasDemandados(
+            @Param("fechaInicio") java.sql.Date fechaInicio,
+            @Param("fechaFin") java.sql.Date fechaFin);
 
 }
