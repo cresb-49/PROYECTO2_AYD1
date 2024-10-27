@@ -19,6 +19,7 @@ export interface ReservaResponse {
   horaInicio: string;
   horaFin: string;
   fechaReservacion: string;
+  idFactura: number | null;
   realizada: boolean;
   canceledAt: string | null;
   adelanto: number;
@@ -51,7 +52,7 @@ export class CalendarComponent implements OnInit {
   weekDays: string[] = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
   monthNames: string[] = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
   currentDate: Date = new Date();
-  currentDay:number = this.currentDate.getDate();
+  currentDay: number = this.currentDate.getDate();
   currentMonth: number = this.currentDate.getMonth();
   currentYear: number = this.currentDate.getFullYear();
   diasMesActual: DayMonthCalendarComponent[] = [];
@@ -118,6 +119,7 @@ export class CalendarComponent implements OnInit {
         horaInicio: value.horaInicio,
         horaFin: value.horaFin,
         fechaReservacion: value.fechaReservacion,
+        idFactura: value.idFactura,
         realizada: value.realizada,
         canceledAt: value.canceledAt,
         adelanto: value.adelanto,
