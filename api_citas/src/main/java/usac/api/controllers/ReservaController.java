@@ -26,6 +26,7 @@ import usac.api.models.request.GetReservacionesRequest;
 import usac.api.services.ReservaService;
 import usac.api.services.permisos.ValidadorPermiso;
 import usac.api.tools.transformers.ApiBaseTransformer;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  *
@@ -72,8 +73,8 @@ public class ReservaController {
         } catch (Exception ex) {
             ex.printStackTrace();
             // Devuelve una respuesta con un mensaje de error si ocurre algún problema
-            return ResponseEntity.badRequest().body(ex.getMessage());
-
+            return new ApiBaseTransformer(HttpStatus.INTERNAL_SERVER_ERROR, "Error", null, null, ex.getMessage())
+                    .sendResponse();
         }
     }
 
@@ -103,7 +104,19 @@ public class ReservaController {
                     .body(archivoDTO.getArchivo());
         } catch (Exception ex) {
             // Devuelve una respuesta con un mensaje de error si ocurre algún problema
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return new ApiBaseTransformer(HttpStatus.INTERNAL_SERVER_ERROR, "Error", null, null, ex.getMessage())
+                    .sendResponse();
+        }
+    }
+
+    @GetMapping("/private/reserva/{reservaId}")
+    public ResponseEntity<?> getReservaByID(@PathVariable Long reservaId) {
+        try {
+            ReservaDTO reserva = reservaService.obtenerReservaDTO(reservaId);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", reserva, null, null).sendResponse();
+        } catch (Exception ex) {
+            return new ApiBaseTransformer(HttpStatus.INTERNAL_SERVER_ERROR, "Error", null, null, ex.getMessage())
+                    .sendResponse();
         }
     }
 

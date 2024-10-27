@@ -86,6 +86,16 @@ public class FacturaController {
         }
     }
 
+    @Operation(
+            summary = "Obtiene todas las facturas (Admin)",
+            description = "Recupera una lista de todas las facturas disponibles en el sistema. Solo accesible para administradores con los permisos adecuados."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de todas las facturas",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = Factura.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/private/restricted/facturas")
     public ResponseEntity<?> getFacturas() {
         try {
@@ -103,6 +113,16 @@ public class FacturaController {
         }
     }
 
+    @Operation(
+            summary = "Obtiene factura por ID (Admin)",
+            description = "Recupera la factura específica correspondiente al ID proporcionado. Solo accesible para administradores con los permisos adecuados."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Factura obtenida exitosamente",
+                content = @Content(mediaType = "application/pdf", schema = @Schema(type = "string", format = "binary"))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/private/restricted/facturaPorId/{facturaId}")
     public ResponseEntity<?> getFacturaPorIdAdmin(
             @Parameter(description = "id de la factura a buscar.", required = true)

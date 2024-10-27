@@ -118,6 +118,17 @@ public class FacturaService extends Service {
         return facturaRepository.findAllByReserva_Reservador_Id(usuario.getId());
     }
 
+    /**
+     * Obtiene todas las facturas asociadas al cliente autenticado.
+     *
+     * Este método verifica el usuario autenticado mediante JWT y recupera todas
+     * las facturas asociadas a sus reservas en la base de datos.
+     *
+     * @return List de Factura que contiene todas las facturas del cliente
+     * autenticado.
+     * @throws Exception Si el usuario no está autorizado o ocurre un error en
+     * el proceso.
+     */
     public List<Factura> getFacturasAdmin() throws Exception {
         //obtenemos las facturas del cliente
         return (List<Factura>) facturaRepository.findAll();

@@ -112,24 +112,19 @@ public class ServicioController {
      * del empleado en el horario seleccionado.
      *
      * @param reservacionServicioRequest Objeto que contiene los detalles de la
-     * solicitud de reserva.
+     *                                   solicitud de reserva.
      * @return Respuesta HTTP que contiene el reporte en formato PDF o un
-     * mensaje de error.
+     *         mensaje de error.
      */
-    @Operation(summary = "Reserva un servicio",
-            description = "Realiza una reserva de servicio asignando un empleado"
-            + " aleatoriamente o de manera manual.",
-            tags = {"Reservas", "Servicios"})
+    @Operation(summary = "Reserva un servicio", description = "Realiza una reserva de servicio asignando un empleado"
+            + " aleatoriamente o de manera manual.", tags = { "Reservas", "Servicios" })
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Reserva realizada "
-                + "con éxito y reporte generado",
-                content = {
-                    @Content(mediaType = "application/pdf",
-                            schema = @Schema(type = "string", format = "binary"))}),
-        @ApiResponse(responseCode = "400", description = "Solicitud incorrecta "
-                + "o error en la validación de datos",
-                content = @Content),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Reserva realizada "
+                    + "con éxito y reporte generado", content = {
+                            @Content(mediaType = "application/pdf", schema = @Schema(type = "string", format = "binary")) }),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta "
+                    + "o error en la validación de datos", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
     })
     @PostMapping("/cliente/reservaServicio")
     public ResponseEntity<?> reservarServicio(@RequestBody ReservacionServicioRequest reservacionServicioRequest) {
@@ -142,13 +137,15 @@ public class ServicioController {
                     .body(data.getArchivo());
         } catch (Exception ex) {
             // Devuelve una respuesta con un mensaje de error si ocurre algún problema
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
     }
 
     /*
      * Retorna los empleados asociados a un servicio
+     * 
      * @param id id del servicio
+     * 
      * @return empleados asociados al servicio
      */
     @GetMapping("public/servicio/{id}/empleados")

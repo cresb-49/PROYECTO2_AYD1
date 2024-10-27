@@ -122,7 +122,16 @@ export class EventCalendarComponent implements OnInit {
   }
 
   descargarFactura(id: any) {
-
+    this.reservaService.getFacturaByid(id).subscribe({
+      next: (response: Blob | any) => {
+        const blob = new Blob([response], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url);
+      },
+      error: (error: ErrorApiResponse) => {
+        this.toastr.error(error.error, 'No se pudo descargar la factura');
+      }
+    });
   }
 
   descargarComprobante(id: any) {
