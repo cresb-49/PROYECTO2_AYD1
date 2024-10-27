@@ -35,7 +35,7 @@ public class FacturaController {
             @PathVariable Long facturaId) {
         try {
             // Invoca el método para obtener las reservas
-            ArchivoDTO data = facturaService.obtenerFacturaPorId(id);
+            ArchivoDTO data = facturaService.obtenerFacturaPorId(facturaId);
             return ResponseEntity.ok()
                     .headers(data.getHeaders())
                     .body(data.getArchivo());

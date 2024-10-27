@@ -49,4 +49,8 @@ export class ReservaService {
     return this.httpService.get<any>(`reserva/private/restricted/comprobanteReservaPorId/${id}`, null, true, 'blob');
   }
 
+  getFacturaByid(id: number) {
+    return this.httpService.get<any>(`factura/cliente/facturaPorId/${id}`, null, true, 'blob');
+  }
+
 }
