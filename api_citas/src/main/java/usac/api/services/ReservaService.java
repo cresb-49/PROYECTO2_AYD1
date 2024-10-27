@@ -678,6 +678,7 @@ public class ReservaService extends Service {
             user.setId(reserva.getReservador().getId());
             user.setNombres(reserva.getReservador().getNombres());
             user.setApellidos(reserva.getReservador().getApellidos());
+            reservaDTO.setReservador(user);
             reservaDTO.setHoraInicio(reserva.getHoraInicio());
             reservaDTO.setHoraFin(reserva.getHoraFin());
             reservaDTO.setFechaReservacion(reserva.getFechaReservacion());

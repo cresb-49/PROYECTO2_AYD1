@@ -16,6 +16,11 @@ export interface DayMonthCalendarComponent {
 
 export interface ReservaResponse {
   id: number;
+  reservador: {
+    id: number;
+    nombres: string;
+    apellidos: string;
+  },
   horaInicio: string;
   horaFin: string;
   fechaReservacion: string;
@@ -116,6 +121,11 @@ export class CalendarComponent implements OnInit {
     (data ?? []).forEach((value: any) => {
       citasReservas.push({
         id: value.id,
+        reservador: {
+          id: value.reservador.id,
+          nombres: value.reservador.nombres,
+          apellidos: value.reservador.apellidos
+        },
         horaInicio: value.horaInicio,
         horaFin: value.horaFin,
         fechaReservacion: value.fechaReservacion,
