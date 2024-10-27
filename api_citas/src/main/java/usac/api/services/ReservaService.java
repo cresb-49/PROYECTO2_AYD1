@@ -435,6 +435,36 @@ public class ReservaService extends Service {
     }
 
     /**
+     * Obtiene una reserva por su ID y la convierte a un objeto {@link ReservaDTO}.
+     * 
+     * @param reservaId
+     * @return
+     * @throws Exception
+     */
+    public ReservaDTO obtenerReservaDTO(Long reservaId) throws Exception {
+        Reserva reserva = this.obtenerReservaPorId(reservaId);
+        ReservaDTO reservaDTO = new ReservaDTO();
+        reservaDTO.setId(reserva.getId());
+        Usuario user = new Usuario();
+        user.setId(reserva.getReservador().getId());
+        user.setNombres(reserva.getReservador().getNombres());
+        user.setApellidos(reserva.getReservador().getApellidos());
+        user.setNit(reserva.getReservador().getNit());
+        reservaDTO.setReservador(user);
+        reservaDTO.setHoraInicio(reserva.getHoraInicio());
+        reservaDTO.setHoraFin(reserva.getHoraFin());
+        reservaDTO.setFechaReservacion(reserva.getFechaReservacion());
+        reservaDTO.setIdFactura(reserva.getFactura() != null ? reserva.getFactura().getId() : null);
+        reservaDTO.setRealizada(reserva.getRealizada());
+        reservaDTO.setCanceledAt(reserva.getCanceledAt());
+        reservaDTO.setAdelanto(reserva.getAdelanto());
+        reservaDTO.setTotalACobrar(reserva.getTotalACobrar());
+        reservaDTO.setReservaCancha(reserva.getReservaCancha());
+        reservaDTO.setReservaServicio(reserva.getReservaServicio());
+        return reservaDTO;
+    }
+
+    /**
      * Genera un comprobante de reserva en formato PDF basado en el ID de una
      * reserva específica.
      * <p>
@@ -664,6 +694,7 @@ public class ReservaService extends Service {
 
     /**
      * Obtiene una lista de reservaciones que pertenecen al mes y año
+     * 
      * @param request
      * @return
      * @throws Exception
@@ -678,6 +709,7 @@ public class ReservaService extends Service {
             user.setId(reserva.getReservador().getId());
             user.setNombres(reserva.getReservador().getNombres());
             user.setApellidos(reserva.getReservador().getApellidos());
+            user.setNit(reserva.getReservador().getNit());
             reservaDTO.setReservador(user);
             reservaDTO.setHoraInicio(reserva.getHoraInicio());
             reservaDTO.setHoraFin(reserva.getHoraFin());

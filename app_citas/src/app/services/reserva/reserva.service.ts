@@ -41,6 +41,14 @@ export class ReservaService {
     return this.httpService.patch<any>(`reserva/cliente/cancelarReserva/${id}`, null, true);
   }
 
+  reservaById(id: number) {
+    return this.httpService.get<any>(`reserva/private/reserva/${id}`, null, true);
+  }
+
+  procesarReserva(id: number) {
+    return this.httpService.patch<any>(`reserva/private/restricted/realizarReserva/${id}`, null, true, 'blob');
+  }
+
   getComprobanteReservaByCliente(id: number) {
     return this.httpService.get<any>(`reserva/cliente/comprobanteReservaPorId/${id}`, null, true, 'blob');
   }

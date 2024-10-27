@@ -20,6 +20,7 @@ export interface ReservaResponse {
     id: number;
     nombres: string;
     apellidos: string;
+    nit?: string | null;
   },
   horaInicio: string;
   horaFin: string;

@@ -49,7 +49,7 @@ export class HttpService {
             // Manejamos el error como siempre
             let errorMessage = `Server-side error: ${error.status} - ${error.statusText}`;
             observer.error({ ...errorJson, sideError: errorMessage } as ErrorApiResponse);
-          } catch (e:any) {
+          } catch (e: any) {
             observer.error(`Error parsing JSON: ${e.message}`);
           }
         };
@@ -111,13 +111,18 @@ export class HttpService {
 
   put<T>(endpoint: string, body: any, auth: boolean = false): Observable<T> {
     return this.http
-      .put<T>(`${this.baseUrl}/${endpoint}`, body, { headers: auth ? this.getAuthHeaders() : this.getHeaders() })
+      .put<T>(`${this.baseUrl}/${endpoint}`, body, {
+        headers: auth ? this.getAuthHeaders() : this.getHeaders(),
+      })
       .pipe(catchError(this.handleError));
   }
 
-  patch<T>(endpoint: string, body: any, auth: boolean = false): Observable<T> {
+  patch<T>(endpoint: string, body: any, auth: boolean = false, responseType: 'json' | 'blob' = 'json'): Observable<T> {
     return this.http
-      .patch<T>(`${this.baseUrl}/${endpoint}`, body, { headers: auth ? this.getAuthHeaders() : this.getHeaders() })
+      .patch<T>(`${this.baseUrl}/${endpoint}`, body, {
+        headers: auth ? this.getAuthHeaders() : this.getHeaders(),
+        responseType: responseType === 'blob' ? 'blob' as 'json' : 'json' as 'json'
+      })
       .pipe(catchError(this.handleError));
   }
 
