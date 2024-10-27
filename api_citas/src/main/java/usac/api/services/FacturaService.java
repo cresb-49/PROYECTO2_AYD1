@@ -4,10 +4,19 @@
  */
 package usac.api.services;
 
+import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import usac.api.enums.FileHttpMetaData;
 import usac.api.models.Factura;
 import usac.api.models.Reserva;
+import usac.api.models.Usuario;
+import usac.api.models.dto.ArchivoDTO;
+import usac.api.reportes.imprimibles.FacturaImprimible;
 import usac.api.repositories.FacturaRepository;
 
 /**
@@ -22,6 +31,13 @@ public class FacturaService extends Service {
 
     @Autowired
     private ReservaService reservaService;
+
+    @Autowired
+    private FacturaImprimible facturaImprimible;
+
+    @Autowired
+    @Lazy
+    private UsuarioService usuarioService;
 
     /**
      * Crea una factura para una reserva.
@@ -52,9 +68,34 @@ public class FacturaService extends Service {
         // Asignar la factura a la reserva
         factura.setReserva(reserva);
 
-
         // Guardar la factura
         return facturaRepository.save(factura);
+    }
+
+    public ArchivoDTO obtenerFacturaPorId(Long id) throws Exception {
+        Usuario usuario = usuarioService.getUsuarioUseJwt();
+        this.verificarUsuarioJwt(usuario);
+
+        //obtener factura por id
+        Factura factura = facturaRepository.findById(id).orElseThrow(
+                () -> new Exception("Factura no econtrada."));
+
+        byte[] reporte = facturaImprimible.init(factura, "pdf");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(FileHttpMetaData.PDF.getContentType()));
+        headers.setContentDisposition(ContentDisposition.builder(FileHttpMetaData.PDF.getContentDispoition())
+                .filename(FileHttpMetaData.PDF.getFileName())
+                .build());
+
+        return new ArchivoDTO(headers, reporte);
+    }
+
+    public List<Factura> getFacturasCliente() throws Exception {
+        Usuario usuario = usuarioService.getUsuarioUseJwt();
+        this.verificarUsuarioJwt(usuario);
+        //obtenemos las facturas del cliente
+        return facturaRepository.findAllByReserva_Reservador_Id(usuario.getId());
     }
 
 }

@@ -27,6 +27,9 @@ public interface FacturaRepository extends CrudRepository<Factura, Long> {
             @Param("fechaInicio") LocalDate fechaInicio,
             @Param("fechaFin") LocalDate fechaFin);
 
+    public List<Factura> findAllByReserva_Reservador_Id(
+            Long idReservador);
+
     // Consulta que agrupa por cliente y realiza los cálculos directamente en la base de datos
     /*@Query("SELECT new usac.api.models.dto.reportes.ClienteFrecuenteDto( "
             + "r.reservador.id, r.reservador.nombres, COUNT(f), SUM(f.total), SUM(f.total) / COUNT(f)) "
