@@ -26,6 +26,7 @@ import usac.api.models.ReservaServicio;
 import usac.api.models.Servicio;
 import usac.api.models.Usuario;
 import usac.api.models.dto.ArchivoDTO;
+import usac.api.models.dto.ReservaDTO;
 import usac.api.models.request.GetReservacionesRequest;
 import usac.api.models.request.ReservacionCanchaRequest;
 import usac.api.models.request.ReservacionServicioRequest;
@@ -83,7 +84,7 @@ public class ReservaService extends Service {
      * Realiza la reserva de una cancha.
      *
      * @param reservacionCanchaRequest Objeto que contiene los detalles de la
-     * reserva de cancha.
+     *                                 reserva de cancha.
      * @return ArchivoDTO que contiene el reporte de la reserva en formato PDF.
      * @throws Exception si ocurre algún error durante el proceso de reserva.
      */
@@ -100,11 +101,14 @@ public class ReservaService extends Service {
         Cancha cancha = this.canchaService.getCanchaById(reservacionCanchaRequest.getCanchaId());
 
         // Obtener el día de la reserva y el horario de la cancha
-        String diaReserva = this.manejadorFechas.localDateANombreDia(reservacionCanchaRequest.getFechaReservacion());
+        String diaReserva = this.manejadorFechas
+                .localDateANombreDia(reservacionCanchaRequest.getFechaReservacion());
         Dia dia = this.diaService.getDiaByNombre(diaReserva);
 
-        // Vamos a obtener el horario de la cancha y verificar que las horas sean de acuerdo al horario
-        HorarioCancha obtenerHorarioPorDiaYCancha = this.horarioCanchaService.obtenerHorarioPorDiaYCancha(dia, cancha);
+        // Vamos a obtener el horario de la cancha y verificar que las horas sean de
+        // acuerdo al horario
+        HorarioCancha obtenerHorarioPorDiaYCancha = this.horarioCanchaService.obtenerHorarioPorDiaYCancha(dia,
+                cancha);
 
         verificarHoras(reservacionCanchaRequest.getHoraInicio(),
                 reservacionCanchaRequest.getHoraFin(),
@@ -117,17 +121,17 @@ public class ReservaService extends Service {
                 reservacionCanchaRequest.getHoraInicio(),
                 reservacionCanchaRequest.getHoraFin());
 
-        verificarDisponibilidadHoraria(reservasSolapadas, "La cancha ya está ocupada en el horario solicitado.");
+        verificarDisponibilidadHoraria(reservasSolapadas,
+                "La cancha ya está ocupada en el horario solicitado.");
 
         // Obtener el usuario reservador desde el JWT
         Usuario reservador = this.usuarioService.getUsuarioUseJwt();
 
-        //verificar que el reservador no tenga reservas en el mismo horario
+        // verificar que el reservador no tenga reservas en el mismo horario
         Long reservasDelReservasor = this.reservaRepository.countReservasDelReservadorSolapadas(
                 reservador.getId(), reservacionCanchaRequest.getFechaReservacion(),
                 reservacionCanchaRequest.getHoraInicio(),
-                reservacionCanchaRequest.getHoraFin()
-        );
+                reservacionCanchaRequest.getHoraFin());
 
         if (reservasDelReservasor > 0) {
             throw new Exception("Ya tienes una reservación en el mismo periodo.");
@@ -143,7 +147,9 @@ public class ReservaService extends Service {
         double[] pagos = calcularPagos(porcentajeAdelanto, horas, precioHoraCancha);
 
         // Crear la entidad de reserva
-        Reserva reserva = crearReserva(reservador, reservacionCanchaRequest.getHoraInicio(), reservacionCanchaRequest.getHoraFin(), reservacionCanchaRequest.getFechaReservacion(), pagos[0], pagos[1]);
+        Reserva reserva = crearReserva(reservador, reservacionCanchaRequest.getHoraInicio(),
+                reservacionCanchaRequest.getHoraFin(), reservacionCanchaRequest.getFechaReservacion(),
+                pagos[0], pagos[1]);
 
         // Guardar la reserva y su relación con la cancha
         Reserva saveReserva = reservaRepository.save(reserva);
@@ -159,7 +165,7 @@ public class ReservaService extends Service {
      * Realiza la reserva de un servicio.
      *
      * @param reservacionServicioRequest Objeto con los detalles de la reserva
-     * de servicio.
+     *                                   de servicio.
      * @return ArchivoDTO que contiene el reporte de la reserva en formato PDF.
      * @throws Exception si ocurre algún error durante el proceso de reserva.
      */
@@ -176,7 +182,8 @@ public class ReservaService extends Service {
         // Obtener el servicio y su límite de empleados paralelos
         Integer maxEmpleadosParalelos = servicio.getEmpleadosParalelos();
 
-        // Calculamos la hora de fin al hacer la sumatoria de la hora de inicio y el tiempo estimado del servicio
+        // Calculamos la hora de fin al hacer la sumatoria de la hora de inicio y el
+        // tiempo estimado del servicio
         LocalTime horaFin = this.manejadorFechas.sumarHoras(
                 reservacionServicioRequest.getHoraInicio(), servicio.getDuracion());
         reservacionServicioRequest.setHoraFin(horaFin); // seteamos la hora de fin del servicio
@@ -184,12 +191,11 @@ public class ReservaService extends Service {
         // Obtener el usuario reservador desde el JWT
         Usuario reservador = this.usuarioService.getUsuarioUseJwt();
 
-        //verificar que el reservador no tenga reservas en el mismo horario
+        // verificar que el reservador no tenga reservas en el mismo horario
         Long reservasDelReservasor = this.reservaRepository.countReservasDelReservadorSolapadas(
                 reservador.getId(), reservacionServicioRequest.getFechaReservacion(),
                 reservacionServicioRequest.getHoraInicio(),
-                reservacionServicioRequest.getHoraFin()
-        );
+                reservacionServicioRequest.getHoraFin());
 
         if (reservasDelReservasor > 0) {
             throw new Exception("Ya tienes una reservación en el mismo periodo.");
@@ -217,7 +223,8 @@ public class ReservaService extends Service {
                     reservacionServicioRequest.getEmpleadoId());
         }
 
-        // Verificar que el empleado asignado tenga el rol adecuado para realizar el servicio comparando el ID
+        // Verificar que el empleado asignado tenga el rol adecuado para realizar el
+        // servicio comparando el ID
         List<Empleado> empleadosDisponibles = this.empleadoService.getEmpleadosPorServicio(
                 servicio);
 
@@ -254,7 +261,8 @@ public class ReservaService extends Service {
 
         // Crear la entidad de reserva
         Reserva reserva = crearReserva(reservador, reservacionServicioRequest.getHoraInicio(),
-                reservacionServicioRequest.getHoraFin(), reservacionServicioRequest.getFechaReservacion(),
+                reservacionServicioRequest.getHoraFin(),
+                reservacionServicioRequest.getFechaReservacion(),
                 pagos[0], pagos[1]);
 
         // Guardar la reserva y su relación con el servicio
@@ -271,7 +279,8 @@ public class ReservaService extends Service {
      * Cancela una reserva existente y genera una factura por la cancelación.
      *
      * <p>
-     * Este método realiza las siguientes operaciones:</p>
+     * Este método realiza las siguientes operaciones:
+     * </p>
      * <ul>
      * <li>Valida el ID de la reserva.</li>
      * <li>Verifica que el usuario que solicita la cancelación sea el mismo que
@@ -284,14 +293,14 @@ public class ReservaService extends Service {
      *
      * @param reservaId El ID de la reserva a cancelar.
      * @return Un objeto {@link ArchivoDTO} que contiene el PDF generado de la
-     * factura de cancelación.
+     *         factura de cancelación.
      * @throws Exception Si la reserva no se encuentra, el ID es inválido, o el
-     * usuario no tiene permiso para cancelar la reserva.
+     *                   usuario no tiene permiso para cancelar la reserva.
      */
     @Transactional(rollbackOn = Exception.class)
     public ArchivoDTO cancelarReserva(Long reservaId) throws Exception {
         this.validarId(new Auditor(reservaId), "El id de la reserva invalido.");
-        //obtenemos la reserva segun su id
+        // obtenemos la reserva segun su id
         Reserva reserva = this.reservaRepository.findById(reservaId).orElseThrow(
                 () -> new Exception("Reserva no encontrada."));
         this.isDesactivated(reserva);
@@ -304,35 +313,36 @@ public class ReservaService extends Service {
             throw new Exception("La reservacion ya ha sido realizada.");
         }
 
-        // ahora debemos verificar que el usuario que esta intentando a cancelar sea el mismo que reservo
+        // ahora debemos verificar que el usuario que esta intentando a cancelar sea el
+        // mismo que reservo
         Usuario usuario = this.usuarioService.getUsuarioUseJwt();
 
         if (!Objects.equals(usuario.getId(), reserva.getReservador().getId())) {
             throw new Exception("No puedes cancelar una reservacion que no es tuya.");
         }
 
-        //ahora cancelamos la cita
+        // ahora cancelamos la cita
         reserva.setCanceledAt(LocalDateTime.now());
-        //ahora guardamos la edicion de la cita
+        // ahora guardamos la edicion de la cita
         Reserva saveReserva = this.reservaRepository.save(reserva);
 
-        // ahora debemos generar la factura por el concepto de "Cancelacion de cita" y por el monto del adelanto
+        // ahora debemos generar la factura por el concepto de "Cancelacion de cita" y
+        // por el monto del adelanto
         Factura factura = new Factura(
                 usuario.getNombres() + " " + usuario.getApellidos(),
                 usuario.getNit(),
                 "Cancelación de cita",
                 "",
-                reserva.getAdelanto()
-        );
+                reserva.getAdelanto());
 
         Factura facturaSave = this.facturaService.crearFactura(factura,
-                saveReserva.getId());//mandar a guardar la factura
+                saveReserva.getId());// mandar a guardar la factura
 
-        //ahora actualizamos la reservacion para que percista la relacion
+        // ahora actualizamos la reservacion para que percista la relacion
         saveReserva.setFactura(facturaSave);
         this.reservaRepository.save(saveReserva);
 
-        //generar el pdf de la factura
+        // generar el pdf de la factura
         byte[] reporte = this.facturaImprimible.init(factura, "pdf");
 
         HttpHeaders headers = new HttpHeaders();
@@ -341,7 +351,7 @@ public class ReservaService extends Service {
                 .filename(FileHttpMetaData.PDF.getFileName())
                 .build());
 
-        //retornar el archivo
+        // retornar el archivo
         return new ArchivoDTO(headers, reporte);
     }
 
@@ -356,14 +366,14 @@ public class ReservaService extends Service {
      *
      * @param reservaId El ID de la reserva a marcar como realizada.
      * @return Un objeto {@link ArchivoDTO} que contiene el reporte de la
-     * factura en formato PDF.
+     *         factura en formato PDF.
      * @throws Exception Si la reserva no es encontrada, ya fue cancelada, o ya
-     * fue realizada.
+     *                   fue realizada.
      */
     @Transactional(rollbackOn = Exception.class)
     public ArchivoDTO realizarLaReserva(Long reservaId) throws Exception {
         this.validarId(new Auditor(reservaId), "El id de la reserva invalido.");
-        //obtenemos la reserva segun su id
+        // obtenemos la reserva segun su id
         Reserva reserva = this.reservaRepository.findById(reservaId).orElseThrow(
                 () -> new Exception("Reserva no encontrada."));
         this.isDesactivated(reserva);
@@ -377,28 +387,28 @@ public class ReservaService extends Service {
             throw new Exception("La reservacion ya ha sido realizada.");
         }
 
-        //ahora cancelamos la cita
+        // ahora cancelamos la cita
         reserva.setRealizada(true);
-        //ahora guardamos la edicion de la cita
+        // ahora guardamos la edicion de la cita
         Reserva saveReserva = this.reservaRepository.save(reserva);
 
-        // ahora debemos generar la factura por el concepto de "Cancelacion de cita" y por el monto del adelanto
+        // ahora debemos generar la factura por el concepto de "Cancelacion de cita" y
+        // por el monto del adelanto
         Factura factura = new Factura(
                 reserva.getReservador().getNombres() + " " + reserva.getReservador().getApellidos(),
                 reserva.getReservador().getNit(),
                 "Cita realizada",
                 "",
-                reserva.getTotalACobrar()
-        );
+                reserva.getTotalACobrar());
 
         Factura facturaSave = this.facturaService.crearFactura(factura,
-                saveReserva.getId());//mandar a guardar la factura
+                saveReserva.getId());// mandar a guardar la factura
 
-        //ahora actualizamos la reservacion para que percista la relacion
+        // ahora actualizamos la reservacion para que percista la relacion
         saveReserva.setFactura(facturaSave);
         this.reservaRepository.save(saveReserva);
 
-        //generar el pdf de la factura
+        // generar el pdf de la factura
         byte[] reporte = this.facturaImprimible.init(factura, "pdf");
 
         HttpHeaders headers = new HttpHeaders();
@@ -407,7 +417,7 @@ public class ReservaService extends Service {
                 .filename(FileHttpMetaData.PDF.getFileName())
                 .build());
 
-        //retornar el archivo
+        // retornar el archivo
         return new ArchivoDTO(headers, reporte);
     }
 
@@ -419,10 +429,8 @@ public class ReservaService extends Service {
      * @throws Exception si no se encuentra la reserva.
      */
     public Reserva obtenerReservaPorId(Long reservaId) throws Exception {
-        Reserva reserva = reservaRepository.findById(reservaId).
-                orElseThrow(()
-                        -> new Exception("No se encontró la reserva con el ID proporcionado: " + reservaId)
-                );
+        Reserva reserva = reservaRepository.findById(reservaId).orElseThrow(
+                () -> new Exception("No se encontró la reserva con el ID proporcionado: " + reservaId));
         return reserva;
     }
 
@@ -438,17 +446,16 @@ public class ReservaService extends Service {
      * </p>
      *
      * @param reservaId El ID de la reserva para la cual se debe generar el
-     * comprobante.
+     *                  comprobante.
      * @return {@link ArchivoDTO} que contiene los bytes del comprobante PDF y
-     * los headers HTTP correspondientes.
+     *         los headers HTTP correspondientes.
      * @throws Exception Si no se encuentra la reserva con el ID proporcionado o
-     * si ocurre algún error durante la generación del comprobante.
+     *                   si ocurre algún error durante la generación del
+     *                   comprobante.
      */
     public ArchivoDTO obtenerComprobanteReservaPorId(Long reservaId) throws Exception {
-        Reserva reserva = reservaRepository.findById(reservaId).
-                orElseThrow(()
-                        -> new Exception("No se encontró la reserva con el ID proporcionado: " + reservaId)
-                );
+        Reserva reserva = reservaRepository.findById(reservaId).orElseThrow(
+                () -> new Exception("No se encontró la reserva con el ID proporcionado: " + reservaId));
         byte[] reporte = comprobanteReservaImprimible.init(reserva, "pdf");
         HttpHeaders headers = reporteService.setHeaders(FileHttpMetaData.PDF);
         return new ArchivoDTO(headers, reporte);
@@ -457,7 +464,8 @@ public class ReservaService extends Service {
     /**
      * Crea una entidad Reserva con los datos proporcionados.
      */
-    private Reserva crearReserva(Usuario reservador, LocalTime horaInicio, LocalTime horaFin, LocalDate fechaReservacion, Double adelanto, Double totalACobrar) {
+    private Reserva crearReserva(Usuario reservador, LocalTime horaInicio, LocalTime horaFin,
+            LocalDate fechaReservacion, Double adelanto, Double totalACobrar) {
         return new Reserva(
                 reservador,
                 horaInicio,
@@ -466,8 +474,7 @@ public class ReservaService extends Service {
                 null, // Factura opcional
                 false,
                 adelanto,
-                totalACobrar
-        );
+                totalACobrar);
     }
 
     /**
@@ -501,7 +508,7 @@ public class ReservaService extends Service {
     private double[] calcularPagos(Double porcentajeAdelanto, Long horas, Double precioHora) {
         Double totalAPagar = horas * precioHora;
         Double adelanto = totalAPagar * (porcentajeAdelanto / 100);
-        return new double[]{adelanto, totalAPagar};
+        return new double[] { adelanto, totalAPagar };
     }
 
     /**
@@ -521,28 +528,35 @@ public class ReservaService extends Service {
         // Buscar el día en la base de datos por su nombre
         Dia dia = this.diaService.getDiaByNombre(diaReserva);
 
-        // Filtrar empleados que trabajen el día solicitado y estén disponibles en el horario
+        // Filtrar empleados que trabajen el día solicitado y estén disponibles en el
+        // horario
         Empleado empleadoAsignado = empleadosDisponibles.stream()
                 .filter(empleado -> {
                     // Verificar si el empleado trabaja ese día
-                    HorarioEmpleado horarioEmpleado = this.empleadoService.
-                            obtenerHorarioDiaEmpleado(dia, empleado);
+                    HorarioEmpleado horarioEmpleado = this.empleadoService
+                            .obtenerHorarioDiaEmpleado(dia, empleado);
                     if (horarioEmpleado != null) {
                         try {
-                            // Verificar que el horario solicitado esté dentro de los horarios del empleado
+                            // Verificar que el horario solicitado esté dentro de los
+                            // horarios del empleado
                             this.verificarHoras(reservacionServicioRequest.getHoraInicio(),
-                                    reservacionServicioRequest.getHoraFin(), horarioEmpleado);
-                            this.verificarDisponibilidadEmpleado(empleado, reservacionServicioRequest);
+                                    reservacionServicioRequest.getHoraFin(),
+                                    horarioEmpleado);
+                            this.verificarDisponibilidadEmpleado(empleado,
+                                    reservacionServicioRequest);
                             return true;
                         } catch (Exception e) {
-                            // Si no está disponible en el horario, pasar al siguiente empleado
+                            // Si no está disponible en el horario, pasar al siguiente
+                            // empleado
                             return false;
                         }
                     }
                     return false;
                 })
-                .min(Comparator.comparing(empleado -> getCantidadReservasEmpleado(empleado, reservacionServicioRequest)))
-                .orElseThrow(() -> new Exception("No hay empleados disponibles para este servicio en el día y horario solicitado."));
+                .min(Comparator.comparing(empleado -> getCantidadReservasEmpleado(empleado,
+                        reservacionServicioRequest)))
+                .orElseThrow(() -> new Exception(
+                        "No hay empleados disponibles para este servicio en el día y horario solicitado."));
 
         return empleadoAsignado;
     }
@@ -551,35 +565,38 @@ public class ReservaService extends Service {
      * Retorna la cantidad de reservas que tiene un empleado en la fecha
      * solicitada.
      */
-    private Long getCantidadReservasEmpleado(Empleado empleado, ReservacionServicioRequest reservacionServicioRequest) {
+    private Long getCantidadReservasEmpleado(Empleado empleado,
+            ReservacionServicioRequest reservacionServicioRequest) {
         return reservaServicioRepository.countReservasByEmpleadoAndFecha(
                 empleado.getId(),
-                reservacionServicioRequest.getFechaReservacion()
-        );
+                reservacionServicioRequest.getFechaReservacion());
     }
 
     /**
      * Verifica si el empleado tiene disponibilidad en el horario solicitado.
      */
-    private void verificarDisponibilidadEmpleado(Empleado empleado, ReservacionServicioRequest reservacionServicioRequest) throws Exception {
+    private void verificarDisponibilidadEmpleado(Empleado empleado,
+            ReservacionServicioRequest reservacionServicioRequest) throws Exception {
         List<ReservaServicio> reservas = reservaServicioRepository.findReservasSolapadasEmpleado(
                 reservacionServicioRequest.getFechaReservacion(),
                 empleado.getId(),
                 reservacionServicioRequest.getHoraInicio(),
-                reservacionServicioRequest.getHoraFin()
-        );
+                reservacionServicioRequest.getHoraFin());
         verificarDisponibilidadHoraria(reservas, "El empleado ya tiene una reserva en el horario solicitado.");
     }
 
     /**
      * Verifica que la hora de inicio sea menor a la hora de fin.
      */
-    private void verificarHoras(LocalTime horaInicio, LocalTime horaFin, HorarioCancha horarioCancha) throws Exception {
+    private void verificarHoras(LocalTime horaInicio, LocalTime horaFin, HorarioCancha horarioCancha)
+            throws Exception {
         if (!this.manejadorFechas.esPrimeraHoraAntes(horaInicio, horaFin)) {
             throw new Exception("La hora de inicio no puede ser mayor a la hora de fin.");
         }
-        if (!this.manejadorFechas.isHorarioEnLimites(horarioCancha.getApertura(), horarioCancha.getCierre(), horaInicio, horaFin)) {
-            throw new Exception(String.format("La reserva no puede realizarse fuera de los horarios permitidos. El horario de la cancha es de %s a %s.",
+        if (!this.manejadorFechas.isHorarioEnLimites(horarioCancha.getApertura(), horarioCancha.getCierre(),
+                horaInicio, horaFin)) {
+            throw new Exception(String.format(
+                    "La reserva no puede realizarse fuera de los horarios permitidos. El horario de la cancha es de %s a %s.",
                     horarioCancha.getApertura().toString(), horarioCancha.getCierre().toString()));
         }
     }
@@ -588,7 +605,8 @@ public class ReservaService extends Service {
      * Verifica que la hora de inicio sea menor a la hora de fin para un
      * empleado.
      */
-    private void verificarHoras(LocalTime horaInicio, LocalTime horaFin, HorarioEmpleado horarioEmpleado) throws Exception {
+    private void verificarHoras(LocalTime horaInicio, LocalTime horaFin, HorarioEmpleado horarioEmpleado)
+            throws Exception {
 
         if (!this.manejadorFechas.esPrimeraHoraAntes(horaInicio, horaFin)) {
             throw new Exception("La hora de inicio no puede ser mayor a la hora de fin.");
@@ -597,8 +615,10 @@ public class ReservaService extends Service {
         if (!this.manejadorFechas.isHorarioEnLimites(horarioEmpleado.getEntrada(),
                 horarioEmpleado.getSalida(), horaInicio, horaFin)) {
 
-            throw new Exception(String.format("La reserva no puede realizarse fuera de los horarios del empleado. El horario del empleado es de %s a %s.",
-                    horarioEmpleado.getEntrada().toString(), horarioEmpleado.getSalida().toString()));
+            throw new Exception(String.format(
+                    "La reserva no puede realizarse fuera de los horarios del empleado. El horario del empleado es de %s a %s.",
+                    horarioEmpleado.getEntrada().toString(),
+                    horarioEmpleado.getSalida().toString()));
         }
     }
 
@@ -607,33 +627,30 @@ public class ReservaService extends Service {
      * especificados.
      *
      * @param request Objeto que contiene el mes y el año para filtrar las
-     * reservaciones.
+     *                reservaciones.
      * @return Lista de reservaciones correspondientes al mes y año
-     * proporcionados.
+     *         proporcionados.
      * @throws Exception Si el modelo del request es inválido o ocurre un error
-     * en la búsqueda.
+     *                   en la búsqueda.
      */
     public List<Reserva> getReservasDelMes(GetReservacionesRequest request) throws Exception {
         this.validarModelo(request);
         Usuario usuario = usuarioService.getUsuarioUseJwt();
 
         // Verificar el rol del usuario y aplicar la consulta correspondiente
-        if (usuario.getRoles().stream().anyMatch(rol
-                -> rol.getRol().getNombre().equals("CLIENTE"))) {
+        if (usuario.getRoles().stream().anyMatch(rol -> rol.getRol().getNombre().equals("CLIENTE"))) {
 
             // Si es cliente, buscar reservas donde él sea el reservador en ese mes y año
             return reservaRepository.findReservasByReservadorAndMesAndAnio(usuario.getId(),
                     request.getMes(),
                     request.getAnio());
 
-        } else if (usuario.getRoles().stream().anyMatch(rol
-                -> rol.getRol().getNombre().equals("ADMIN"))) {
+        } else if (usuario.getRoles().stream().anyMatch(rol -> rol.getRol().getNombre().equals("ADMIN"))) {
 
             // Si es administrador, buscar todas las reservas del mes
             return reservaRepository.findReservasByMesAndAnio(request.getMes(), request.getAnio());
 
-        } else if (usuario.getRoles().stream().anyMatch(rol
-                -> rol.getRol().getNombre().equals("EMPLEADO"))) {
+        } else if (usuario.getRoles().stream().anyMatch(rol -> rol.getRol().getNombre().equals("EMPLEADO"))) {
 
             // Si es empleado, buscar reservas donde él esté asignado para atender
             return reservaRepository.findReservasByEmpleadoAndMesAndAnio(usuario.getId(),
@@ -643,7 +660,38 @@ public class ReservaService extends Service {
         } else {
             throw new Exception("El usuario no tiene permisos para ver las reservas.");
         }
+    }
 
+    /**
+     * Obtiene una lista de reservaciones que pertenecen al mes y año
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    public List<ReservaDTO> getReservasDelMesResponse(GetReservacionesRequest request) throws Exception {
+        List<Reserva> reservas = this.getReservasDelMes(request);
+        List<ReservaDTO> reservasDTO = new java.util.ArrayList<>();
+        for (Reserva reserva : reservas) {
+            ReservaDTO reservaDTO = new ReservaDTO();
+            reservaDTO.setId(reserva.getId());
+            Usuario user = new Usuario();
+            user.setId(reserva.getReservador().getId());
+            user.setNombres(reserva.getReservador().getNombres());
+            user.setApellidos(reserva.getReservador().getApellidos());
+            reservaDTO.setReservador(user);
+            reservaDTO.setHoraInicio(reserva.getHoraInicio());
+            reservaDTO.setHoraFin(reserva.getHoraFin());
+            reservaDTO.setFechaReservacion(reserva.getFechaReservacion());
+            reservaDTO.setIdFactura(reserva.getFactura() != null ? reserva.getFactura().getId() : null);
+            reservaDTO.setRealizada(reserva.getRealizada());
+            reservaDTO.setCanceledAt(reserva.getCanceledAt());
+            reservaDTO.setAdelanto(reserva.getAdelanto());
+            reservaDTO.setTotalACobrar(reserva.getTotalACobrar());
+            reservaDTO.setReservaCancha(reserva.getReservaCancha());
+            reservaDTO.setReservaServicio(reserva.getReservaServicio());
+            reservasDTO.add(reservaDTO);
+        }
+        return reservasDTO;
     }
 
 }
