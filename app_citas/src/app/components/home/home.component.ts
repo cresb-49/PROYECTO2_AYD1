@@ -1,13 +1,13 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ServicioService } from '../../services/servicio/servicio.service';
-import { ApiResponse } from '../../services/http/http.service';
+import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
 import { ToastrService } from 'ngx-toastr';
 import { CardAction, CardActionsComponent } from '../card-actions/card-actions.component';
-
+import { FormsModule } from '@angular/forms';
 @Component({
   standalone: true,
-  imports: [CommonModule, CardActionsComponent],
+  imports: [CommonModule, CardActionsComponent, FormsModule],
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit {
         const data = response.data;
         this.serviciosList = data;
       },
-      error: (error: ApiResponse) => {
+      error: (error: ErrorApiResponse) => {
         this.toastr.error(error.error, 'Error al obtener los servicios');
       }
     });
@@ -64,6 +64,34 @@ export class HomeComponent implements OnInit {
       !this.elementRef.nativeElement.querySelector('#dropdown-button-2').contains(event.target)
     ) {
       this.searchTypeMenuOpen = false;
+    }
+  }
+
+
+  buscarServicios() {
+    console.log('buscarServicios', this.searchValue);
+    //Si el texto de busqueda esta vacio, se muestran todos los servicios
+    // o si es una cadena vacia con espacios o tabs
+    if (this.searchValue === '' || this.searchValue.trim() === '') {
+      this.servicioService.getServicios().subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.serviciosList = data;
+        },
+        error: (error: ApiResponse) => {
+          this.toastr.error(error.error, 'Error al obtener los servicios');
+        }
+      });
+    } else {
+      this.servicioService.getServiciosLikeName(this.searchValue).subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.serviciosList = data;
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al obtener los servicios');
+        }
+      });
     }
   }
 

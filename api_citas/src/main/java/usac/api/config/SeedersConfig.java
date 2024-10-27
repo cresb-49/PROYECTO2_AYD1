@@ -34,6 +34,7 @@ import usac.api.models.request.RolPermisoUpdateRequest;
 import usac.api.repositories.DiaRepository;
 import usac.api.repositories.PermisoRepository;
 import usac.api.repositories.RolRepository;
+import usac.api.repositories.UsuarioRepository;
 import usac.api.services.B64Service;
 import usac.api.services.CanchaService;
 import usac.api.services.DiaService;
@@ -71,6 +72,8 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
     private ServicioService servicioService;
     @Autowired
     private B64Service b64Service;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public Rol insertarRol(Rol rol) throws Exception {
         try {
@@ -153,6 +156,10 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        if (usuarioRepository.count() != 0) {
+            return;
+        }
         try {
             // Creacion de los dias de la semana
             Dia lunes = this.insertarDia(new Dia("Lunes"));
@@ -290,6 +297,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             try {
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
+
                 this.usuarioService.crearUsuarioCliente(cliente1);
                 this.usuarioService.crearUsuarioCliente(cliente2);
                 this.usuarioService.crearUsuarioCliente(cliente3);

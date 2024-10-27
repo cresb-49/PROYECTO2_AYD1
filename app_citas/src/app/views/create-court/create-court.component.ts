@@ -9,6 +9,8 @@ import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service'
 import { FormsModule } from '@angular/forms';
 import { Dia, DiaService } from '../../services/dia/dia.service';
 import { BehaviorSubject, debounceTime } from 'rxjs';
+import { NegocioService } from '../../services/negocio/negocio.service';
+import { HorarioService } from '../../services/horario/horario.service';
 
 @Component({
   standalone: true,
@@ -22,6 +24,8 @@ export class CreateCourtComponent implements OnInit {
   activeButtonSave = true;
 
   dataDias: Dia[] = [];
+
+  horariosNegocio: DayConfig[] = [];
 
   cancha: Cancha = {
     id: 0,
@@ -40,6 +44,8 @@ export class CreateCourtComponent implements OnInit {
   private canchaSubject = new BehaviorSubject<Cancha>(this.cancha);
 
   constructor(
+    private negocioService: NegocioService,
+    private horarioService: HorarioService,
     private authService: AuthService,
     private canchaService: CanchaService,
     private toastr: ToastrService,
@@ -49,35 +55,41 @@ export class CreateCourtComponent implements OnInit {
 
   async ngOnInit() {
     await this.getDias();
+    await this.getHorariosNegocio();
     //Se suscribe a los cambios de los datos de la cancha
     const horario = await this.calcularHorario([]);
     this.cancha.horarios = horario;
   }
 
   actualizarCancha() {
-    const daysActive = this.cancha.horarios.filter((day: DayConfig) => day.active);
-    const horario: Horario[] = daysActive.map((day: DayConfig) => {
-      return {
-        dia: {
-          id: day.id,
-          nombre: day.day
+    try {
+      const daysActive = this.cancha.horarios.filter((day: DayConfig) => day.active);
+      //Verificamos que los dias esten dentro del horario del negocio
+      for (const day of daysActive) {
+        this.horarioService.isDayConfigValido(this.horariosNegocio, day);
+      }
+      const horario: Horario[] = daysActive.map((day: DayConfig) => {
+        return {
+          dia: {
+            id: day.id,
+            nombre: day.day
+          },
+          apertura: day.init,
+          cierre: day.end
+        } as Horario
+      });
+      const payload: CanchaPayloadUpdateCreate = {
+        cancha: {
+          id: this.cancha.id,
+          costoHora: this.cancha.costoHora,
+          descripcion: this.cancha.descripcion
         },
-        apertura: day.init,
-        cierre: day.end
-      } as Horario
-    });
-    const payload: CanchaPayloadUpdateCreate = {
-      cancha: {
-        id: this.cancha.id,
-        costoHora: this.cancha.costoHora,
-        descripcion: this.cancha.descripcion
-      },
-      horarios: horario
-    }
-    //Verificamos que almenos tenga un dia en el horario
-    if (horario.length <= 0) {
-      this.toastr.error('Debe de almenos de configurar un dia', 'Error al crear cancha');
-    } else {
+        horarios: horario
+      }
+      //Verificamos que almenos tenga un dia en el horario
+      if (horario.length <= 0) {
+        throw new Error('Debe seleccionar al menos un día para la cancha');
+      }
       this.canchaService.createCanche(payload).subscribe({
         next: async (response: ApiResponse) => {
           this.toastr.success('Se creo la cancha con exito!!!', 'Cancha Creada');
@@ -92,7 +104,10 @@ export class CreateCourtComponent implements OnInit {
           this.toastr.error(error.error, 'Error al crear la cancha');
         }
       });
+    } catch (error: any) {
+      this.toastr.error(error.message, 'Error al crear cancha');
     }
+
   }
 
   onCostoHoraChange(newData: number) {
@@ -186,5 +201,20 @@ export class CreateCourtComponent implements OnInit {
         }
       });
     });
+  }
+
+  getHorariosNegocio(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.negocioService.getInfoNegocio().subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.horariosNegocio = [...this.negocioService.calcularHorario(data.horarios)]
+          resolve(data);
+        },
+        error: (error: ErrorApiResponse) => {
+          reject(error)
+        }
+      })
+    })
   }
 }

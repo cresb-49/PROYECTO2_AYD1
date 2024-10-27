@@ -30,11 +30,17 @@ public class NegocioController {
     @GetMapping("/public/negocio")
     public ResponseEntity<?> infoNegocio() {
         try {
+            // Negocio data = negocioService.obtenerNegocio();
+            // boolean hasExtension = b64Service.hasExtension(data.getLogo());
+            // String logo = hasExtension ? data.getLogo() :
+            // b64Service.addExtension(data.getLogo());
+            // NegocioPublicDTO negocioDTO = new NegocioPublicDTO(data.getId(),
+            // data.getNombre(), logo);
             Negocio data = negocioService.obtenerNegocio();
             boolean hasExtension = b64Service.hasExtension(data.getLogo());
             String logo = hasExtension ? data.getLogo() : b64Service.addExtension(data.getLogo());
-            NegocioPublicDTO negocioDTO = new NegocioPublicDTO(data.getId(), data.getNombre(), logo);
-            return new ApiBaseTransformer(HttpStatus.OK, "OK", negocioDTO, null, null).sendResponse();
+            data.setLogo(logo);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }
@@ -62,7 +68,7 @@ public class NegocioController {
             Negocio data = negocioService.actualizarNegocio(negocio, horarios);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
-            //Imprimir el trace del error
+            // Imprimir el trace del error
             ex.printStackTrace();
             return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
         }

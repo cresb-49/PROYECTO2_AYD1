@@ -42,9 +42,9 @@ export class SeeCourtsComponent implements OnInit {
     this.getCanchas();
     const isCliente = await this.isCliente();
     if (isCliente) {
-      this.acciones_canchas.push({ description: 'Reservar', route: '/reservar-cancha', enabled: true } as CardAction);
+      this.acciones_canchas.push({ description: 'Reservar', route: '/reservar', key: 'id', enabled: true } as CardAction);
     } else {
-      this.acciones_canchas.push({ description: 'Editar', route: '/edit-cancha', key:'id', enabled: true } as CardAction);
+      this.acciones_canchas.push({ description: 'Editar', route: '/edit-cancha', key: 'id', enabled: true } as CardAction);
       this.acciones_canchas.push({ description: 'Eliminar', action: (data: any) => this.openModal(data), enabled: true } as CardAction);
     }
   }

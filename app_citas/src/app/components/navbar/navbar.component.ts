@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
 import { InfoNegocio, NegocioService } from '../../services/negocio/negocio.service';
 import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service';
+import { NativeUserRoles } from '../../services/auth/types';
 
 @Component({
   standalone: true,
@@ -115,5 +116,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     ) {
       this.navbarOpen = false;
     }
+  }
+
+  isCliente() {
+    return this.authService.hasRole(NativeUserRoles.CLIENTE);
   }
 }

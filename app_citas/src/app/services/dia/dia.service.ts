@@ -8,6 +8,28 @@ export interface Dia {
   nombre: string;
 }
 
+export enum NombresDias {
+  LUNES = 'Lunes',
+  MARTES = 'Martes',
+  MIERCOLES = 'Miércoles',
+  JUEVES = 'Jueves',
+  VIERNES = 'Viernes',
+  SABADO = 'Sábado',
+  DOMINGO = 'Domingo'
+}
+
+export const ASOCIACION_DIAS_NOMBRE: Map<number, string> = new Map(
+  [
+    [0, NombresDias.LUNES],
+    [1, NombresDias.MARTES],
+    [2, NombresDias.MIERCOLES],
+    [3, NombresDias.JUEVES],
+    [4, NombresDias.VIERNES],
+    [5, NombresDias.SABADO],
+    [6, NombresDias.DOMINGO]
+  ]
+);
+
 @Injectable({
   providedIn: 'root'
 })

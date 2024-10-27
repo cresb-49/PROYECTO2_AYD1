@@ -65,7 +65,9 @@
         placeholder="•••••••••" required />
     </div>
   </div>
-  <div class="mb-6" *ngIf="confWorkSchedule">
+  <h4 class="text-lg font-bold dark:text-white">Horario del Negocio</h4>
+  <app-schedule-conf [data]="horariosNegocio" [isShowData]="true"></app-schedule-conf>
+  <div class="mb-6 mt-4" *ngIf="confWorkSchedule">
     <h6 class="text-lg font-bold dark:text-white">Horario de Trabajo</h6>
     <app-schedule-conf *ngIf="confWorkSchedule" [data]="empleado.horario"
       (dataChange)="onHorarioChange($event)"></app-schedule-conf>

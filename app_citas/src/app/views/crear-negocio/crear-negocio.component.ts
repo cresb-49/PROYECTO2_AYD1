@@ -13,6 +13,7 @@ export interface ManageNegocio {
   id: number;
   nombre: string;
   logo: string;
+  porcentaje_anticipo: number;
   asignacion_manual: boolean;
   direccion: string;
   horarios: DayConfig[];
@@ -35,6 +36,7 @@ export class CrearNegocioComponent implements OnInit {
     id: 0,
     nombre: '',
     logo: '',
+    porcentaje_anticipo: 0,
     asignacion_manual: false,
     direccion: '',
     horarios: []
@@ -44,6 +46,7 @@ export class CrearNegocioComponent implements OnInit {
     id: 0,
     nombre: '',
     logo: '',
+    porcentaje_anticipo: 0,
     asignacion_manual: false,
     direccion: '',
     horarios: []
@@ -79,6 +82,7 @@ export class CrearNegocioComponent implements OnInit {
             id: response.data.id,
             nombre: response.data.nombre,
             logo: response.data.logo,
+            porcentaje_anticipo: response.data.porcentajeAnticipo,
             asignacion_manual: response.data.asignacionManual,
             direccion: response.data.direccion,
             horarios: [...this.calcularHorario(response.data.horarios)],
@@ -88,6 +92,7 @@ export class CrearNegocioComponent implements OnInit {
             id: response.data.id,
             nombre: response.data.nombre,
             logo: response.data.logo,
+            porcentaje_anticipo: response.data.porcentajeAnticipo,
             asignacion_manual: response.data.asignacionManual,
             direccion: response.data.direccion,
             horarios: [...this.calcularHorario(response.data.horarios)],
@@ -143,6 +148,11 @@ export class CrearNegocioComponent implements OnInit {
     this.negocioDataSubject.next(this.negocioData);
   }
 
+  onPorcentajeAnticipoChange(newPorcentaje: number): void {
+    this.negocioData.porcentaje_anticipo = newPorcentaje;
+    this.negocioDataSubject.next(this.negocioData);
+  }
+
   // Se actualiza el campo direccion y emitimos el cambio
   onDireccionChange(newDireccion: string): void {
     this.negocioData.direccion = newDireccion;
@@ -191,7 +201,8 @@ export class CrearNegocioComponent implements OnInit {
         nombre: this.negocioData.nombre,
         logo: this.negocioData.logo,
         asignacionManual: this.negocioData.asignacion_manual,
-        direccion: this.negocioData.direccion
+        direccion: this.negocioData.direccion,
+        porcentajeAnticipo: this.negocioData.porcentaje_anticipo
       },
       horarios: horario
     };
@@ -203,7 +214,7 @@ export class CrearNegocioComponent implements OnInit {
         this.activeButtonSave = false; // Desactivamos el botón de guardar
       },
       error: (error: ErrorApiResponse) => {
-        this.toastr.error(error.message, 'Error al actualizar el negocio');
+        this.toastr.error(error.error, 'Error al actualizar el negocio');
       }
     });
   }

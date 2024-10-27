@@ -19,13 +19,13 @@ public class ComprobanteReservaImprimible extends Reporte {
 
     private Reserva reserva;
 
-    public byte[] init(Reserva reserva) throws Exception {
+    public byte[] init(Reserva reserva, String tipoExportacion) throws Exception {
         this.reserva = reserva;
         //si pasaron las comporbaciones mandamos a traer los parametros
         Map<String, Object> parametrosReporte = this.construirComprobante();
         //mandamos ha abrir el reporte
         return this.exportarReporte("ConstanciaReserva", parametrosReporte,
-                "pdf");
+                tipoExportacion);
     }
 
     private Map<String, Object> construirComprobante() throws Exception {
@@ -46,7 +46,8 @@ public class ComprobanteReservaImprimible extends Reporte {
             empleadoNombre = "N/A";
         } else if (this.reserva.getReservaServicio() != null) {
             nombreServicio = this.reserva.getReservaServicio().getServicio().getNombre();
-            empleadoNombre = this.reserva.getReservaServicio().getEmpleado().getUsuario().getNombres();
+            empleadoNombre = this.reserva.getReservaServicio().getEmpleado().getUsuario().getNombres()
+                    + " " + this.reserva.getReservaServicio().getEmpleado().getUsuario().getApellidos();
         } else {
             nombreServicio = "Error";
             empleadoNombre = "Error";
@@ -61,6 +62,8 @@ public class ComprobanteReservaImprimible extends Reporte {
         }
 
         parametrosReporte.put("nombre", this.reserva.getReservador().getNombres());
+        parametrosReporte.put("nit", this.reserva.getReservador().getNit());
+        parametrosReporte.put("cui", this.reserva.getReservador().getCui());
         parametrosReporte.put("apellidos", this.reserva.getReservador().getApellidos());
         parametrosReporte.put("adelanto", "Q " + this.reserva.getAdelanto());
         parametrosReporte.put("idReserva", this.reserva.getId());

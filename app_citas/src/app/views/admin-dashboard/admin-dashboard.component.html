@@ -2,7 +2,7 @@
   <h3 class="text-3xl font-bold dark:text-white mb-4">Usuarios</h3>
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <app-card-button [title]="'Clientes'" [description]="'Listado de todos los cliente'" [ruta]="'/usuarios'" />
-    <app-card-button [title]="'Crear Cliente'" [description]="'Crear un cliente nuevo'" [ruta]="'/crear-cliente'"/>
+    <!-- <app-card-button [title]="'Crear Cliente'" [description]="'Crear un cliente nuevo'" [ruta]="'/crear-cliente'"/> -->
     <app-card-button [title]="'Empleados'" [description]="'Listado de todos los empleados'" [ruta]="'/empleados'" />
     <app-card-button [title]="'Crear Empleado'" [description]="'Crear un empleado'" [ruta]="'/crear-empleado'" />
     <app-card-button [title]="'Admins'" [description]="'Listado de todos los admins'" [ruta]="'/admins'" />
@@ -22,7 +22,7 @@
   </div>
   <h3 class="text-3xl font-bold dark:text-white mb-4 mt-4">Reportes</h3>
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-    <app-card-button [title]="'Reportes Varios'" [description]="'Reportes de ventas, empleados, negocios, etc.'" />
+    <app-card-button [title]="'Reportes Varios'" [description]="'Reportes de ventas, empleados, negocios, etc.'" [ruta]="'/reportes'"/>
     <app-card-button [title]="'Graficas'" [description]="'Graficas de ventas, empleados, negocios, etc.'" />
   </div>
   <h3 class="text-3xl font-bold dark:text-white mb-4 mt-4">Configuracion</h3>

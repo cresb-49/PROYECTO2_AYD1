@@ -4,8 +4,14 @@
  */
 package usac.api.repositories;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import usac.api.models.Reserva;
+import usac.api.models.dto.reportes.ServicioMasDemandadoDto;
 
 /**
  *
@@ -13,5 +19,51 @@ import usac.api.models.Reserva;
  */
 public interface ReservaRepository extends CrudRepository<Reserva, Long> {
 
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.reservador.id = :usuarioId"
+            + " AND r.fechaReservacion = :fecha"
+            + " AND (r.horaInicio < :horaFin AND r.horaFin > :horaInicio)"
+            + " AND r.canceledAt IS NULL AND r.desactivatedAt IS NULL AND r.deletedAt IS NULL")
+    public Long countReservasDelReservadorSolapadas(@Param("usuarioId") Long usuarioId,
+            @Param("fecha") LocalDate fecha,
+            @Param("horaInicio") LocalTime horaInicio,
+            @Param("horaFin") LocalTime horaFin);
+
+    @Query("SELECT r FROM Reserva r LEFT JOIN FETCH r.reservaCancha rc LEFT JOIN FETCH rc.cancha c WHERE MONTH(r.fechaReservacion) = :mes AND YEAR(r.fechaReservacion) = :anio")
+    public List<Reserva> findReservasByMesAndAnio(@Param("mes") int mes, @Param("anio") int anio);
+
+    @Query("SELECT r FROM Reserva r LEFT JOIN FETCH r.reservaCancha rc LEFT JOIN FETCH rc.cancha c WHERE r.reservador.id = :reservadorId AND MONTH(r.fechaReservacion) = :mes AND YEAR(r.fechaReservacion) = :anio")
+    public List<Reserva> findReservasByReservadorAndMesAndAnio(@Param("reservadorId") Long reservadorId,
+            @Param("mes") int mes,
+            @Param("anio") int anio);
+
+    @Query("SELECT r FROM Reserva r LEFT JOIN FETCH r.reservaServicio rs LEFT JOIN FETCH r.reservaCancha rc LEFT JOIN FETCH rc.cancha c WHERE rs.empleado.id = :empleadoId AND MONTH(r.fechaReservacion) = :mes AND YEAR(r.fechaReservacion) = :anio")
+    public List<Reserva> findReservasByEmpleadoAndMesAndAnio(@Param("empleadoId") Long empleadoId,
+            @Param("mes") int mes,
+            @Param("anio") int anio);
+
+    //REPORTES 
+    @Query("SELECT new usac.api.models.dto.reportes.ServicioMasDemandadoDto("
+            + "c.cancha.id, c.cancha.descripcion, COUNT(c)) "
+            + "FROM ReservaCancha c "
+            + "JOIN c.reserva r "
+            + "WHERE (:fechaInicio IS NULL OR DATE(r.fechaReservacion) >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR DATE(r.fechaReservacion) <= :fechaFin) "
+            + "GROUP BY c.cancha.id, c.cancha.descripcion "
+            + "ORDER BY COUNT(c) DESC")
+    public List<ServicioMasDemandadoDto> findCanchasMasDemandadas(
+            @Param("fechaInicio") java.sql.Date fechaInicio,
+            @Param("fechaFin") java.sql.Date fechaFin);
+
+    @Query("SELECT new usac.api.models.dto.reportes.ServicioMasDemandadoDto("
+            + "s.servicio.id, s.servicio.nombre, COUNT(s)) "
+            + "FROM ReservaServicio s "
+            + "JOIN s.reserva r "
+            + "WHERE (:fechaInicio IS NULL OR DATE(r.fechaReservacion) >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR DATE(r.fechaReservacion) <= :fechaFin) "
+            + "GROUP BY s.servicio.id, s.servicio.nombre "
+            + "ORDER BY COUNT(s) DESC")
+    public List<ServicioMasDemandadoDto> findServiciosMasDemandados(
+            @Param("fechaInicio") java.sql.Date fechaInicio,
+            @Param("fechaFin") java.sql.Date fechaFin);
 
 }

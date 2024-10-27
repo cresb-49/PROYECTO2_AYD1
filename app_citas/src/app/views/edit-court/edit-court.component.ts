@@ -9,6 +9,8 @@ import { ApiResponse, ErrorApiResponse } from '../../services/http/http.service'
 import { FormsModule } from '@angular/forms';
 import { Dia, DiaService } from '../../services/dia/dia.service';
 import { BehaviorSubject, debounceTime } from 'rxjs';
+import { NegocioService } from '../../services/negocio/negocio.service';
+import { HorarioService } from '../../services/horario/horario.service';
 @Component({
   standalone: true,
   imports: [ScheduleConfComponent, CommonModule, FormsModule],
@@ -21,6 +23,8 @@ export class EditCourtComponent implements OnInit {
   activeButtonSave = false;
 
   dataDias: Dia[] = [];
+
+  horariosNegocio: DayConfig[] = [];
 
   cancha: Cancha = {
     id: 0,
@@ -39,6 +43,8 @@ export class EditCourtComponent implements OnInit {
   private canchaSubject = new BehaviorSubject<Cancha>(this.cancha);
 
   constructor(
+    private negocioService: NegocioService,
+    private horarioService: HorarioService,
     private authService: AuthService,
     private canchaService: CanchaService,
     private toastr: ToastrService,
@@ -49,6 +55,7 @@ export class EditCourtComponent implements OnInit {
   async ngOnInit() {
     await this.getDias();
     await this.cargarDatosCancha();
+    await this.getHorariosNegocio();
     //Se suscribe a los cambios de los datos de la cancha
     this.canchaSubject.pipe(
       debounceTime(300)
@@ -60,36 +67,63 @@ export class EditCourtComponent implements OnInit {
     })
   }
 
-  actualizarCancha() {
-    const daysActive = this.cancha.horarios.filter((day: DayConfig) => day.active);
-    const horario: Horario[] = daysActive.map((day: DayConfig) => {
-      return {
-        dia: {
-          id: day.id,
-          nombre: day.day
+  getHorariosNegocio(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.negocioService.getInfoNegocio().subscribe({
+        next: (response: ApiResponse) => {
+          const data = response.data;
+          this.horariosNegocio = [...this.negocioService.calcularHorario(data.horarios)]
+          resolve(data);
         },
-        apertura: day.init,
-        cierre: day.end
-      } as Horario
-    });
-    const payload: CanchaPayloadUpdateCreate = {
-      cancha: {
-        id: this.cancha.id,
-        costoHora: this.cancha.costoHora,
-        descripcion: this.cancha.descripcion
-      },
-      horarios: horario
-    }
-    this.canchaService.updateCancha(payload).subscribe({
-      next: (response: ApiResponse) => {
-        this.toastr.success('Cancha actualizada correctamente');
-        this.cargarDatosCancha();
-        this.activeButtonSave = false;
-      },
-      error: (error: ErrorApiResponse) => {
-        this.toastr.error(error.error, 'Error al actualizar la cancha');
+        error: (error: ErrorApiResponse) => {
+          reject(error)
+        }
+      })
+    })
+  }
+
+  actualizarCancha() {
+    try {
+      const daysActive = this.cancha.horarios.filter((day: DayConfig) => day.active);
+      //Verificamos que los dias esten dentro del horario del negocio
+      for (const day of daysActive) {
+        this.horarioService.isDayConfigValido(this.horariosNegocio, day);
       }
-    });
+      const horario: Horario[] = daysActive.map((day: DayConfig) => {
+        return {
+          dia: {
+            id: day.id,
+            nombre: day.day
+          },
+          apertura: day.init,
+          cierre: day.end
+        } as Horario
+      });
+      //Verificamos que almenos tenga un dia en el horario
+      if (horario.length <= 0) {
+        throw new Error('Debe seleccionar al menos un día para la cancha');
+      }
+      const payload: CanchaPayloadUpdateCreate = {
+        cancha: {
+          id: this.cancha.id,
+          costoHora: this.cancha.costoHora,
+          descripcion: this.cancha.descripcion
+        },
+        horarios: horario
+      }
+      this.canchaService.updateCancha(payload).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastr.success('Cancha actualizada correctamente');
+          this.cargarDatosCancha();
+          this.activeButtonSave = false;
+        },
+        error: (error: ErrorApiResponse) => {
+          this.toastr.error(error.error, 'Error al actualizar la cancha');
+        }
+      });
+    } catch (error: any) {
+      this.toastr.error(error.message, 'Error al crear cancha');
+    }
   }
 
   onCostoHoraChange(newData: number) {

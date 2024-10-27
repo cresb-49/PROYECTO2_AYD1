@@ -31,6 +31,8 @@ import { EditClienteComponent } from './views/edit-cliente/edit-cliente.componen
 import { SeeRolesComponent } from './views/see-roles/see-roles.component';
 import { CrearRolComponent } from './views/crear-rol/crear-rol.component';
 import { EditarRolComponent } from './views/editar-rol/editar-rol.component';
+import { ProcesarCitaComponent } from './views/procesar-cita/procesar-cita.component';
+import { ReportesComponent } from './views/reportes/reportes.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -118,6 +120,15 @@ export const routes: Routes = [
       },
       {
         path: 'info-servicio/:id', component: AgendarCitaComponent
+      },
+      {
+        path: 'reservar/:id', component: ReservarCanchaComponent
+      },
+      {
+        path: 'procesar-reserva/:id', component: ProcesarCitaComponent
+      },
+      {
+        path: 'reportes', component: ReportesComponent
       }
     ]
   },

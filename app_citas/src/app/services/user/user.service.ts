@@ -6,7 +6,8 @@ import { Dia } from '../dia/dia.service';
 export interface signUpCliente {
   nombres: string;
   apellidos: string;
-  email: string;
+  email?: string;
+  tokenAuth?: string;
   password: string;
   phone: string;
   nit: string;
@@ -79,6 +80,10 @@ export class UserService {
     private httpService: HttpService,
     private toastr: ToastrService
   ) { }
+
+  sendEmailVerificacion(email: string) {
+    return this.httpService.post<any>('usuario/public/enviarTokenRegistro', { email: email })
+  }
 
   signUpCliente(payload: signUpCliente) {
     return this.httpService.post<any>('usuario/public/crearCliente', payload);

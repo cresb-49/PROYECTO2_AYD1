@@ -1,0 +1,67 @@
+<div>
+  <div
+    class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 dark:bg-gray-800 dark:border-gray-700">
+    <h5 class="mb-3 text-base font-semibold text-gray-900 md:text-xl dark:text-white">
+      {{title}}
+    </h5>
+    <p class="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4">{{description}}</p>
+    <div id="date-range-picker" date-rangepicker class="">
+      <div class="relative">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+          </svg>
+        </div>
+        <input id="datepicker-range-start" name="start" type="date" [(ngModel)]="init_date"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Fecha Inicio">
+      </div>
+      <span class="mx-4 text-gray-500">to</span>
+      <div class="relative">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+          </svg>
+        </div>
+        <input id="datepicker-range-end" name="end" type="date" [(ngModel)]="end_date"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Fecha Fin">
+      </div>
+    </div>
+    <ul class="my-4 space-y-3">
+      <li>
+        <button (click)="downloadReport(report_type,ExportType.pdf)"
+          class="w-full text-left flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+          <img src="pdf-ico.svg" alt="Excel" class="h-6">
+          <span class="flex-1 ms-3 whitespace-nowrap">PDF</span>
+        </button>
+      </li>
+      <li>
+        <button (click)="downloadReport(report_type,ExportType.excel)"
+          class="w-full text-left flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+          <img src="excel-ico.svg" alt="Excel" class="h-6">
+          <span class="flex-1 ms-3 whitespace-nowrap">Excel</span>
+        </button>
+      </li>
+      <li>
+        <button (click)="downloadReport(report_type,ExportType.word)"
+          class="w-full text-left flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+          <img src="word-ico.svg" alt="CSV" class="h-6">
+          <span class="flex-1 ms-3 whitespace-nowrap">Word</span>
+        </button>
+      </li>
+      <li>
+        <button (click)="downloadReport(report_type,ExportType.img)"
+          class="w-full text-left flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+          <img src="image-ico.svg" alt="CSV" class="h-6">
+          <span class="flex-1 ms-3 whitespace-nowrap">Imagen</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+</div>
