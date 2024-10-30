@@ -21,6 +21,12 @@ public enum PermisoEnum {
     //Ver comprobantes de citas
     EXPORTAR_COMPROBANTES("Exportar comprobantes de citas",
             "/api/reserva/private/restricted/comprobanteReservaPorId"),
+    //FACTURAS
+
+    VER_FACTURAS("Ver facturas del negocio",
+            "/api/factura/private/restricted/facturas"),
+    EXPORTAR_PDF_FACTURAS("Exportar las facturas del negocio a PDF",
+            "/api/factura/private/restricted/facturaPorId"),
     //REPORTES
 
     EXPORTAR_REPORTES("Exportar reportes",

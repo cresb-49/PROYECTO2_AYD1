@@ -5,6 +5,7 @@
 package usac.api.services;
 
 import java.util.List;
+import java.util.Objects;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -72,14 +73,7 @@ public class FacturaService extends Service {
         return facturaRepository.save(factura);
     }
 
-    public ArchivoDTO obtenerFacturaPorId(Long id) throws Exception {
-        Usuario usuario = usuarioService.getUsuarioUseJwt();
-        this.verificarUsuarioJwt(usuario);
-
-        //obtener factura por id
-        Factura factura = facturaRepository.findById(id).orElseThrow(
-                () -> new Exception("Factura no econtrada."));
-
+    public ArchivoDTO obtenerFacturaImprimible(Factura factura) throws Exception {
         byte[] reporte = facturaImprimible.init(factura, "pdf");
 
         HttpHeaders headers = new HttpHeaders();
@@ -91,11 +85,53 @@ public class FacturaService extends Service {
         return new ArchivoDTO(headers, reporte);
     }
 
+    public ArchivoDTO obtenerFacturaPorIdCliente(Long id) throws Exception {
+        //obtener factura por id
+        Factura factura = facturaRepository.findById(id).orElseThrow(
+                () -> new Exception("Factura no econtrada."));
+
+        this.verificarUsuarioJwt(factura.getReserva().getReservador());
+        return obtenerFacturaImprimible(factura);
+    }
+
+    public ArchivoDTO obtenerFacturaPorIdAdmin(Long id) throws Exception {
+        //obtener factura por id
+        Factura factura = facturaRepository.findById(id).orElseThrow(
+                () -> new Exception("Factura no econtrada."));
+        return obtenerFacturaImprimible(factura);
+    }
+
+    /**
+     * Obtiene todas las facturas asociadas al cliente autenticado.
+     *
+     * Este método verifica el usuario autenticado mediante JWT y recupera todas
+     * las facturas asociadas a sus reservas en la base de datos.
+     *
+     * @return List de Factura que contiene todas las facturas del cliente
+     * autenticado.
+     * @throws Exception Si el usuario no está autorizado o ocurre un error en
+     * el proceso.
+     */
     public List<Factura> getFacturasCliente() throws Exception {
         Usuario usuario = usuarioService.getUsuarioUseJwt();
-        this.verificarUsuarioJwt(usuario);
         //obtenemos las facturas del cliente
         return facturaRepository.findAllByReserva_Reservador_Id(usuario.getId());
+    }
+
+    /**
+     * Obtiene todas las facturas asociadas al cliente autenticado.
+     *
+     * Este método verifica el usuario autenticado mediante JWT y recupera todas
+     * las facturas asociadas a sus reservas en la base de datos.
+     *
+     * @return List de Factura que contiene todas las facturas del cliente
+     * autenticado.
+     * @throws Exception Si el usuario no está autorizado o ocurre un error en
+     * el proceso.
+     */
+    public List<Factura> getFacturasAdmin() throws Exception {
+        //obtenemos las facturas del cliente
+        return (List<Factura>) facturaRepository.findAll();
     }
 
 }
