@@ -13,4 +13,8 @@ export class ReporteService {
   downloadReport(report_type: string, export_type: string, init_date: string, end_date: string) {
     return this.httpService.post(`reporte/private/restricted/exportarReporte`, { tipoReporte: report_type, tipoExporte: export_type, fecha1: init_date, fecha2: end_date }, true, 'blob');
   }
+
+  serviciosMasSolicitados(init_date: string, end_date: string) {
+    return this.httpService.post<any>('reporte/private/restricted/serviciosMasSolicitados', { fecha1: init_date, fecha2: end_date });
+  }
 }
