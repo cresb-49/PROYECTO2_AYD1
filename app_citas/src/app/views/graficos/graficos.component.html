@@ -1,6 +1,6 @@
 <div class="px-20">
   <h4 class="text-2xl font-bold dark:text-white mb-4">Graficos</h4>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4">
     <div>
       <h5 class="text-xl font-bold dark:text-white mb-2">Demanda Servicios y Canchas</h5>
       <div class="bg-white p-4 rounded shadow mb-4">
@@ -35,25 +35,38 @@
     </div>
 
     <div>
-      <h5 class="text-xl font-bold dark:text-white mb-2">Grafico 2</h5>
-      <div class="bg-white p-4 rounded shadow">
-        <canvas id="chart2" class="responsive-chart"></canvas>
+      <h5 class="text-xl font-bold dark:text-white mb-2">
+        Clientes Frecuentes
+      </h5>
+      <div class="bg-white p-4 rounded shadow mb-4">
+        <canvas id="clientesFrecuentesChart" class="responsive-chart"></canvas>
       </div>
-    </div>
+      <form [formGroup]="datesRange.get('clientesFrecuentesChart')!" (ngSubmit)="createClientesFrecuentesChart()"
+        class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center max-w-full">
+        <div class="w-full">
+          <label for="datepicker-range-start" class="sr-only">Fecha inicio</label>
+          <input id="datepicker-range-start" formControlName="start" type="date"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Select date start">
+        </div>
 
-    <div>
-      <h5 class="text-xl font-bold dark:text-white mb-2">Grafico 3</h5>
-      <div class="bg-white p-4 rounded shadow">
-        <canvas id="chart3" class="responsive-chart"></canvas>
-      </div>
-    </div>
+        <span class="text-gray-500 text-center">to</span>
 
-    <div>
-      <h5 class="text-xl font-bold dark:text-white mb-2">Grafico 4</h5>
-      <div class="bg-white p-4 rounded shadow">
-        <canvas id="chart4" class="responsive-chart"></canvas>
-      </div>
-    </div>
+        <div class="w-full">
+          <label for="datepicker-range-end" class="sr-only">Fecha fin</label>
+          <input id="datepicker-range-end" formControlName="end" type="date"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Select date end">
+        </div>
 
+        <!-- Botón de envío en una fila separada para que esté abajo -->
+        <div class="col-span-1 md:col-span-3">
+          <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 w-full">
+            Generar
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

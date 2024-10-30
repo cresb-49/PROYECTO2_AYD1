@@ -15,6 +15,10 @@ export class ReporteService {
   }
 
   serviciosMasSolicitados(init_date: string, end_date: string) {
-    return this.httpService.post<any>('reporte/private/restricted/serviciosMasSolicitados', { fecha1: init_date, fecha2: end_date });
+    return this.httpService.post<any>('reporte/private/restricted/serviciosMasSolicitados', { fecha1: init_date, fecha2: end_date }, true);
+  }
+
+  clientesFrecuentes(init_date: string, end_date: string) {
+    return this.httpService.post<any>('reporte/private/restricted/reporteClientes', { fecha1: init_date, fecha2: end_date }, true);
   }
 }
