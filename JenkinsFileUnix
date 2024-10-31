@@ -11,18 +11,19 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/cresb-49/PROYECTO2_AYD1.git'
             }
         }
-        stage('Run Unit Tests') { // Etapa para ejecutar pruebas unitarias antes de la compilación
+        stage('Run Unit Tests') {
             steps {
                 dir('api_citas') {
                     echo 'Running unit tests...'
-                    // Ejecuta pruebas y exporta el resultado en formato XML
-                    sh 'mvn test -Dmaven.test.failure.ignore=true' // Ejecutar pruebas sin detener el build en caso de fallo
+                    sh 'mvn test -Dmaven.test.failure.ignore=true'
                 }
             }
             post {
                 always {
-                    // Archivar resultados de pruebas unitarias para que Jenkins los reconozca
-                    junit 'api_citas/target/surefire-reports/*.xml' // Importar resultados en Jenkins
+                    junit 'api_citas/target/surefire-reports/*.xml' // Publica el reporte de pruebas
+                }
+                failure {
+                    echo "Some tests failed. Check the report for details."
                 }
             }
         }
