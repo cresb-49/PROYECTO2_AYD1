@@ -293,7 +293,6 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             horarios.add(new HorarioEmpleado(miercoles, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
             horarios.add(new HorarioEmpleado(jueves, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
             horarios.add(new HorarioEmpleado(viernes, null, LocalTime.of(8, 0), LocalTime.of(18, 0)));
-            horarios.add(new HorarioEmpleado(sabado, null, LocalTime.of(8, 0), LocalTime.of(13, 0)));
             try {
                 this.usuarioService.crearAdministrador(admin);
                 this.usuarioService.crearAdministrador(admin2);
@@ -345,13 +344,11 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             Cancha cancha5 = new Cancha(300.0, "Cancha de futbol 11 con cesped artificial");
             //Horario generico para las canchas
             ArrayList<HorarioCancha> horariosEmpleados = new ArrayList<>();
-            horariosEmpleados.add(new HorarioCancha(null, lunes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horariosEmpleados.add(new HorarioCancha(null, martes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horariosEmpleados.add(new HorarioCancha(null, miercoles, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horariosEmpleados.add(new HorarioCancha(null, jueves, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horariosEmpleados.add(new HorarioCancha(null, viernes, LocalTime.of(8, 0), LocalTime.of(23, 0)));
-            horariosEmpleados.add(new HorarioCancha(null, sabado, LocalTime.of(8, 0), LocalTime.of(17, 0)));
-            horariosEmpleados.add(new HorarioCancha(null, domingo, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, lunes, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, martes, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, miercoles, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, jueves, LocalTime.of(8, 0), LocalTime.of(18, 0)));
+            horariosEmpleados.add(new HorarioCancha(null, viernes, LocalTime.of(8, 0), LocalTime.of(18, 0)));
             //Se crean las canchas
             try {
                 //Verificamos si ya existen 5 canchas
