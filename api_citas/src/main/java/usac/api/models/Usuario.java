@@ -99,6 +99,10 @@ public class Usuario extends Auditor {
         this.password = password;
     }
 
+    public Usuario(Long id) {
+        super(id);
+    }
+
     public Usuario() {
     }
 

@@ -24,6 +24,9 @@ public class ReporteDisponibilidadDTO {
         this.fecha2 = fecha2;
     }
 
+    public ReporteDisponibilidadDTO() {
+    }
+
     public List<DisponiblilidadRecursoDTO> getDisponibilidadEmpleados() {
         return disponibilidadEmpleados;
     }

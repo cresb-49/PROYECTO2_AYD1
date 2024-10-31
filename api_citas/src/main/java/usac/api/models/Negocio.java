@@ -61,6 +61,10 @@ public class Negocio extends Auditor {
     public Negocio() {
     }
 
+    public Negocio(Double porcentajeAnticipo) {
+        this.porcentajeAnticipo = porcentajeAnticipo;
+    }
+
     public Negocio(String logo, String nombre, boolean asignacionManual, String direccion,
             Double porcentajeAnticipo) {
         this.logo = logo;

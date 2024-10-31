@@ -23,24 +23,24 @@ import org.hibernate.annotations.Where;
  */
 @Entity
 @Table(name = "horario_cancha", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "dia", "cancha" })
+    @UniqueConstraint(columnNames = {"dia", "cancha"})
 })
 @SQLDelete(sql = "UPDATE horario_cancha SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "desactivated_at IS NULL")
 public class HorarioCancha extends Auditor {
-    
+
     @ManyToOne
-    @JoinColumn(name = "cancha",nullable = false)
+    @JoinColumn(name = "cancha", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Schema(hidden = true)
     private Cancha cancha;
-    
+
     @ManyToOne
     @JoinColumn(name = "dia", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Dia dia;
-    
+
     @NotNull(message = "La hora de apertura no puede ser nula")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm") // Formato para hora
     private LocalTime apertura;
@@ -50,6 +50,11 @@ public class HorarioCancha extends Auditor {
     private LocalTime cierre;
 
     public HorarioCancha() {
+    }
+
+    public HorarioCancha(LocalTime apertura, LocalTime cierre) {
+        this.apertura = apertura;
+        this.cierre = cierre;
     }
 
     public HorarioCancha(Cancha cancha, Dia dia, LocalTime apertura, LocalTime cierre) {
