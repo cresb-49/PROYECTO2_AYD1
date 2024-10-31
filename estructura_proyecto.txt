@@ -1,0 +1,481 @@
+.
+├── api_citas
+│   ├── jrxml
+│   │   ├── ConstanciaReserva.jrxml
+│   │   ├── Factura.jrxml
+│   │   ├── ReporteClientes.jrxml
+│   │   ├── ReporteServicios.jrxml
+│   │   └── ReporteVentasPY2.jrxml
+│   ├── nbactions.xml
+│   ├── pom.xml
+│   └── src
+│       ├── main
+│       │   ├── java
+│       │   │   └── usac
+│       │   │       └── api
+│       │   │           ├── ApIecommerceApplication.java
+│       │   │           ├── config
+│       │   │           │   ├── AppProperties.java
+│       │   │           │   ├── CorsConfig.java
+│       │   │           │   ├── PathsSecurityConfig.java
+│       │   │           │   ├── SeedersConfig.java
+│       │   │           │   └── SwaggerConfig.java
+│       │   │           ├── controllers
+│       │   │           │   ├── CanchaController.java
+│       │   │           │   ├── DiaController.java
+│       │   │           │   ├── EmpleadoController.java
+│       │   │           │   ├── FacturaController.java
+│       │   │           │   ├── HelloController.java
+│       │   │           │   ├── NegocioController.java
+│       │   │           │   ├── PermisoController.java
+│       │   │           │   ├── ReportesController.java
+│       │   │           │   ├── ReservaController.java
+│       │   │           │   ├── RolController.java
+│       │   │           │   ├── ServicioController.java
+│       │   │           │   └── UsuarioController.java
+│       │   │           ├── enums
+│       │   │           │   ├── FileHttpMetaData.java
+│       │   │           │   └── PermisoEnum.java
+│       │   │           ├── filters
+│       │   │           │   └── JwtRequestFilter.java
+│       │   │           ├── models
+│       │   │           │   ├── Auditor.java
+│       │   │           │   ├── Cancha.java
+│       │   │           │   ├── Cita.java
+│       │   │           │   ├── Dia.java
+│       │   │           │   ├── dto
+│       │   │           │   │   ├── ArchivoDTO.java
+│       │   │           │   │   ├── CreateClienteTokenDTO.java
+│       │   │           │   │   ├── LoginDTO.java
+│       │   │           │   │   ├── NegocioPublicDTO.java
+│       │   │           │   │   ├── NegocioUpdateDTO.java
+│       │   │           │   │   ├── reportes
+│       │   │           │   │   │   ├── ClienteFrecuenteDto.java
+│       │   │           │   │   │   ├── ReporteClientesFrecuentesDto.java
+│       │   │           │   │   │   ├── ReporteServiciosDTO.java
+│       │   │           │   │   │   ├── ReporteVentasDTO.java
+│       │   │           │   │   │   └── ServicioMasDemandadoDto.java
+│       │   │           │   │   └── ReservaDTO.java
+│       │   │           │   ├── Empleado.java
+│       │   │           │   ├── Factura.java
+│       │   │           │   ├── HorarioCancha.java
+│       │   │           │   ├── HorarioEmpleado.java
+│       │   │           │   ├── HorarioNegocio.java
+│       │   │           │   ├── Negocio.java
+│       │   │           │   ├── Permiso.java
+│       │   │           │   ├── request
+│       │   │           │   │   ├── CanchaRequest.java
+│       │   │           │   │   ├── CreacionClienteRequest.java
+│       │   │           │   │   ├── CreateTokenAuthRequest.java
+│       │   │           │   │   ├── GetReservacionesRequest.java
+│       │   │           │   │   ├── NuevoEmpleadoRequest.java
+│       │   │           │   │   ├── PasswordChangeRequest.java
+│       │   │           │   │   ├── ReporteExportRequest.java
+│       │   │           │   │   ├── ReporteRequest.java
+│       │   │           │   │   ├── ReservacionCanchaRequest.java
+│       │   │           │   │   ├── ReservacionRequest.java
+│       │   │           │   │   ├── ReservacionServicioRequest.java
+│       │   │           │   │   ├── RolCreateRequest.java
+│       │   │           │   │   ├── RolPermisoUpdateRequest.java
+│       │   │           │   │   ├── UpdateEmpleadoRequest.java
+│       │   │           │   │   ├── UserChangePasswordRequest.java
+│       │   │           │   │   └── UsuarioRolAsignacionRequest.java
+│       │   │           │   ├── ReservaCancha.java
+│       │   │           │   ├── Reserva.java
+│       │   │           │   ├── ReservaServicio.java
+│       │   │           │   ├── Rol.java
+│       │   │           │   ├── RolPermiso.java
+│       │   │           │   ├── RolUsuario.java
+│       │   │           │   ├── Servicio.java
+│       │   │           │   ├── TokenAuth.java
+│       │   │           │   └── Usuario.java
+│       │   │           ├── reportes
+│       │   │           │   ├── ComprobanteReservaReporte.java
+│       │   │           │   ├── imprimibles
+│       │   │           │   │   ├── ComprobanteReservaImprimible.java
+│       │   │           │   │   ├── ConstructorReporteImprimible.java
+│       │   │           │   │   ├── FacturaImprimible.java
+│       │   │           │   │   ├── ReporteClientesImprimible.java
+│       │   │           │   │   ├── ReporteServiciosImprimible.java
+│       │   │           │   │   └── ReporteVentasImprimible.java
+│       │   │           │   ├── ReporteCientesFrecuentes.java
+│       │   │           │   ├── Reporte.java
+│       │   │           │   ├── ReporteServiciosMasSolicitados.java
+│       │   │           │   └── ReporteVentas.java
+│       │   │           ├── repositories
+│       │   │           │   ├── CanchaRepository.java
+│       │   │           │   ├── DiaRepository.java
+│       │   │           │   ├── EmpleadoRepository.java
+│       │   │           │   ├── FacturaRepository.java
+│       │   │           │   ├── HorarioCanchaRepository.java
+│       │   │           │   ├── HorarioEmpleadoRepository.java
+│       │   │           │   ├── HorarioNegocioRepository.java
+│       │   │           │   ├── NegocioRepository.java
+│       │   │           │   ├── PermisoRepository.java
+│       │   │           │   ├── ReservaCanchaRepository.java
+│       │   │           │   ├── ReservaRepository.java
+│       │   │           │   ├── ReservaServicioRepository.java
+│       │   │           │   ├── RolRepository.java
+│       │   │           │   ├── ServicioRepository.java
+│       │   │           │   ├── TokenAuthRepository.java
+│       │   │           │   └── UsuarioRepository.java
+│       │   │           ├── services
+│       │   │           │   ├── authentification
+│       │   │           │   │   ├── AuthenticationService.java
+│       │   │           │   │   └── JwtGeneratorService.java
+│       │   │           │   ├── B64Service.java
+│       │   │           │   ├── CanchaService.java
+│       │   │           │   ├── DiaService.java
+│       │   │           │   ├── EmpleadoService.java
+│       │   │           │   ├── FacturaService.java
+│       │   │           │   ├── HorarioCanchaService.java
+│       │   │           │   ├── HorarioNegocioService.java
+│       │   │           │   ├── MailService.java
+│       │   │           │   ├── NegocioService.java
+│       │   │           │   ├── permisos
+│       │   │           │   │   └── ValidadorPermiso.java
+│       │   │           │   ├── PermisoService.java
+│       │   │           │   ├── ReporteService.java
+│       │   │           │   ├── ReservaService.java
+│       │   │           │   ├── RolService.java
+│       │   │           │   ├── Service.java
+│       │   │           │   ├── ServicioService.java
+│       │   │           │   ├── TokenAuthService.java
+│       │   │           │   └── UsuarioService.java
+│       │   │           ├── ServletInitializer.java
+│       │   │           └── tools
+│       │   │               ├── Encriptador.java
+│       │   │               ├── ManejadorTiempo.java
+│       │   │               └── transformers
+│       │   │                   ├── ApiBaseTransformer.java
+│       │   │                   └── PaginateApiBaseTransformer.java
+│       │   └── resources
+│       │       ├── application.properties
+│       │       ├── images
+│       │       │   ├── imagen_ejemplo.jpg
+│       │       │   └── logo.svg
+│       │       ├── imprimibles
+│       │       │   ├── ConstanciaReserva.jasper
+│       │       │   ├── Factura.jasper
+│       │       │   ├── ReporteClientes.jasper
+│       │       │   ├── ReporteServicios.jasper
+│       │       │   ├── ReporteVentas.jasper
+│       │       │   └── ReporteVentasPY2.jasper
+│       │       └── templates
+│       │           ├── CorreoDeRecuperacion.html
+│       │           └── CorreoTokenAuth.html
+│       └── test
+│           └── java
+│               └── usac
+│                   └── api
+│                       ├── config
+│                       │   ├── AppPropertiesTest.java
+│                       │   ├── CorsConfigTest.java
+│                       │   └── PathsSecurityConfigTest.java
+│                       ├── filters
+│                       │   └── JwtRequestFilterTest.java
+│                       ├── models
+│                       │   ├── AuditorTest.java
+│                       │   ├── dto
+│                       │   │   ├── LoginDTOTest.java
+│                       │   │   ├── NegocioPublicDTOTest.java
+│                       │   │   └── NegocioUpdateDTOTest.java
+│                       │   ├── PermisoTest.java
+│                       │   ├── request
+│                       │   │   ├── NuevoEmpleadoRequestTest.java
+│                       │   │   ├── PasswordChangeRequestTest.java
+│                       │   │   ├── RolPermisoRequestTest.java
+│                       │   │   └── UserChangePasswordRequestTest.java
+│                       │   ├── RolPermisoTest.java
+│                       │   ├── RolTest.java
+│                       │   └── UsuarioTest.java
+│                       ├── services
+│                       │   ├── authentification
+│                       │   │   ├── AuthenticationServiceTest.java
+│                       │   │   └── JwtGeneratorServiceTest.java
+│                       │   ├── MailServiceTest.java
+│                       │   ├── NegocioServiceTest.java
+│                       │   ├── permisos
+│                       │   │   └── ValidadorPermisosTest.java
+│                       │   ├── PermisosServiceTest.java
+│                       │   ├── RolServiceTest.java
+│                       │   ├── ServiceTest.java
+│                       │   └── UsuarioServiceTest.java
+│                       ├── tools
+│                       │   ├── EncriptadorTest.java
+│                       │   └── ManejadorTiempoTest.java
+│                       └── transformers
+│                           ├── ApiBaseTransformerTest.java
+│                           └── PaginateApiBaseTransformerTest.java
+├── app_citas
+│   ├── angular.json
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   │   ├── excel-ico.svg
+│   │   ├── favicon.ico
+│   │   ├── image-ico.svg
+│   │   ├── no-image-found.png
+│   │   ├── pdf-ico.svg
+│   │   ├── soccer-court.svg
+│   │   ├── soccer_field.jpg
+│   │   └── word-ico.svg
+│   ├── README.md
+│   ├── src
+│   │   ├── app
+│   │   │   ├── app.component.css
+│   │   │   ├── app.component.html
+│   │   │   ├── app.component.ts
+│   │   │   ├── app.config.ts
+│   │   │   ├── app.routes.ts
+│   │   │   ├── components
+│   │   │   │   ├── calendar-components
+│   │   │   │   │   ├── calendar
+│   │   │   │   │   │   ├── calendar.component.css
+│   │   │   │   │   │   ├── calendar.component.html
+│   │   │   │   │   │   └── calendar.component.ts
+│   │   │   │   │   ├── event-calendar
+│   │   │   │   │   │   ├── event-calendar.component.css
+│   │   │   │   │   │   ├── event-calendar.component.html
+│   │   │   │   │   │   └── event-calendar.component.ts
+│   │   │   │   │   └── month-day-calendar
+│   │   │   │   │       ├── month-day-calendar.component.css
+│   │   │   │   │       ├── month-day-calendar.component.html
+│   │   │   │   │       └── month-day-calendar.component.ts
+│   │   │   │   ├── card-actions
+│   │   │   │   │   ├── card-actions.component.css
+│   │   │   │   │   ├── card-actions.component.html
+│   │   │   │   │   └── card-actions.component.ts
+│   │   │   │   ├── card-button
+│   │   │   │   │   ├── card-button.component.css
+│   │   │   │   │   ├── card-button.component.html
+│   │   │   │   │   └── card-button.component.ts
+│   │   │   │   ├── card-service
+│   │   │   │   │   ├── card-service.component.css
+│   │   │   │   │   ├── card-service.component.html
+│   │   │   │   │   └── card-service.component.ts
+│   │   │   │   ├── create-user
+│   │   │   │   │   ├── create-user.component.css
+│   │   │   │   │   ├── create-user.component.html
+│   │   │   │   │   └── create-user.component.ts
+│   │   │   │   ├── cu-admin
+│   │   │   │   │   ├── cu-admin.component.css
+│   │   │   │   │   ├── cu-admin.component.html
+│   │   │   │   │   └── cu-admin.component.ts
+│   │   │   │   ├── cu-cliente
+│   │   │   │   │   ├── cu-cliente.component.css
+│   │   │   │   │   ├── cu-cliente.component.html
+│   │   │   │   │   └── cu-cliente.component.ts
+│   │   │   │   ├── cu-rol
+│   │   │   │   │   ├── cu-rol.component.css
+│   │   │   │   │   ├── cu-rol.component.html
+│   │   │   │   │   └── cu-rol.component.ts
+│   │   │   │   ├── cu-servicio
+│   │   │   │   │   ├── cu-servicio.component.css
+│   │   │   │   │   ├── cu-servicio.component.html
+│   │   │   │   │   └── cu-servicio.component.ts
+│   │   │   │   ├── download-report
+│   │   │   │   │   ├── download-report.component.css
+│   │   │   │   │   ├── download-report.component.html
+│   │   │   │   │   └── download-report.component.ts
+│   │   │   │   ├── forgot-password
+│   │   │   │   │   ├── forgot-password.component.css
+│   │   │   │   │   ├── forgot-password.component.html
+│   │   │   │   │   └── forgot-password.component.ts
+│   │   │   │   ├── home
+│   │   │   │   │   ├── home.component.css
+│   │   │   │   │   ├── home.component.html
+│   │   │   │   │   └── home.component.ts
+│   │   │   │   ├── login
+│   │   │   │   │   ├── login.component.css
+│   │   │   │   │   ├── login.component.html
+│   │   │   │   │   └── login.component.ts
+│   │   │   │   ├── navbar
+│   │   │   │   │   ├── navbar.component.css
+│   │   │   │   │   ├── navbar.component.html
+│   │   │   │   │   └── navbar.component.ts
+│   │   │   │   ├── pop-up-modal
+│   │   │   │   │   ├── pop-up-modal.component.css
+│   │   │   │   │   ├── pop-up-modal.component.html
+│   │   │   │   │   └── pop-up-modal.component.ts
+│   │   │   │   ├── schedule-conf
+│   │   │   │   │   ├── schedule-conf.component.css
+│   │   │   │   │   ├── schedule-conf.component.html
+│   │   │   │   │   └── schedule-conf.component.ts
+│   │   │   │   ├── set-new-password
+│   │   │   │   │   ├── set-new-password.component.css
+│   │   │   │   │   ├── set-new-password.component.html
+│   │   │   │   │   └── set-new-password.component.ts
+│   │   │   │   ├── signup
+│   │   │   │   │   ├── signup.component.css
+│   │   │   │   │   ├── signup.component.html
+│   │   │   │   │   └── signup.component.ts
+│   │   │   │   └── table
+│   │   │   │       ├── table.component.css
+│   │   │   │       ├── table.component.html
+│   │   │   │       └── table.component.ts
+│   │   │   ├── layout
+│   │   │   │   ├── clean-layout
+│   │   │   │   │   ├── clean-layout.component.css
+│   │   │   │   │   ├── clean-layout.component.html
+│   │   │   │   │   └── clean-layout.component.ts
+│   │   │   │   └── default-layout
+│   │   │   │       ├── default-layout.component.css
+│   │   │   │       ├── default-layout.component.html
+│   │   │   │       └── default-layout.component.ts
+│   │   │   ├── services
+│   │   │   │   ├── auth
+│   │   │   │   │   ├── auth.service.ts
+│   │   │   │   │   └── types.ts
+│   │   │   │   ├── cancha
+│   │   │   │   │   └── cancha.service.ts
+│   │   │   │   ├── dia
+│   │   │   │   │   └── dia.service.ts
+│   │   │   │   ├── horario
+│   │   │   │   │   └── horario.service.ts
+│   │   │   │   ├── http
+│   │   │   │   │   └── http.service.ts
+│   │   │   │   ├── negocio
+│   │   │   │   │   └── negocio.service.ts
+│   │   │   │   ├── reporte
+│   │   │   │   │   └── reporte.service.ts
+│   │   │   │   ├── reserva
+│   │   │   │   │   └── reserva.service.ts
+│   │   │   │   ├── rol
+│   │   │   │   │   └── rol.service.ts
+│   │   │   │   ├── servicio
+│   │   │   │   │   └── servicio.service.ts
+│   │   │   │   ├── theme
+│   │   │   │   │   └── theme.service.ts
+│   │   │   │   └── user
+│   │   │   │       └── user.service.ts
+│   │   │   └── views
+│   │   │       ├── admin-dashboard
+│   │   │       │   ├── admin-dashboard.component.css
+│   │   │       │   ├── admin-dashboard.component.html
+│   │   │       │   └── admin-dashboard.component.ts
+│   │   │       ├── agendar-cita
+│   │   │       │   ├── agendar-cita.component.css
+│   │   │       │   ├── agendar-cita.component.html
+│   │   │       │   └── agendar-cita.component.ts
+│   │   │       ├── crear-admin
+│   │   │       │   ├── crear-admin.component.css
+│   │   │       │   ├── crear-admin.component.html
+│   │   │       │   └── crear-admin.component.ts
+│   │   │       ├── crear-cliente
+│   │   │       │   ├── crear-cliente.component.css
+│   │   │       │   ├── crear-cliente.component.html
+│   │   │       │   └── crear-cliente.component.ts
+│   │   │       ├── crear-empleado
+│   │   │       │   ├── crear-empleado.component.css
+│   │   │       │   ├── crear-empleado.component.html
+│   │   │       │   └── crear-empleado.component.ts
+│   │   │       ├── crear-negocio
+│   │   │       │   ├── crear-negocio.component.css
+│   │   │       │   ├── crear-negocio.component.html
+│   │   │       │   └── crear-negocio.component.ts
+│   │   │       ├── crear-rol
+│   │   │       │   ├── crear-rol.component.css
+│   │   │       │   ├── crear-rol.component.html
+│   │   │       │   └── crear-rol.component.ts
+│   │   │       ├── crear-servicio
+│   │   │       │   ├── crear-servicio.component.css
+│   │   │       │   ├── crear-servicio.component.html
+│   │   │       │   └── crear-servicio.component.ts
+│   │   │       ├── create-court
+│   │   │       │   ├── create-court.component.css
+│   │   │       │   ├── create-court.component.html
+│   │   │       │   └── create-court.component.ts
+│   │   │       ├── edit-admin
+│   │   │       │   ├── edit-admin.component.css
+│   │   │       │   ├── edit-admin.component.html
+│   │   │       │   └── edit-admin.component.ts
+│   │   │       ├── editar-rol
+│   │   │       │   ├── editar-rol.component.css
+│   │   │       │   ├── editar-rol.component.html
+│   │   │       │   └── editar-rol.component.ts
+│   │   │       ├── editar-servicio
+│   │   │       │   ├── editar-servicio.component.css
+│   │   │       │   ├── editar-servicio.component.html
+│   │   │       │   └── editar-servicio.component.ts
+│   │   │       ├── edit-cliente
+│   │   │       │   ├── edit-cliente.component.css
+│   │   │       │   ├── edit-cliente.component.html
+│   │   │       │   └── edit-cliente.component.ts
+│   │   │       ├── edit-court
+│   │   │       │   ├── edit-court.component.css
+│   │   │       │   ├── edit-court.component.html
+│   │   │       │   └── edit-court.component.ts
+│   │   │       ├── edit-employee
+│   │   │       │   ├── edit-employee.component.css
+│   │   │       │   ├── edit-employee.component.html
+│   │   │       │   └── edit-employee.component.ts
+│   │   │       ├── graficos
+│   │   │       │   ├── graficos.component.css
+│   │   │       │   ├── graficos.component.html
+│   │   │       │   └── graficos.component.ts
+│   │   │       ├── my-calendar
+│   │   │       │   ├── my-calendar.component.css
+│   │   │       │   ├── my-calendar.component.html
+│   │   │       │   └── my-calendar.component.ts
+│   │   │       ├── my-information
+│   │   │       │   ├── my-information.component.css
+│   │   │       │   ├── my-information.component.html
+│   │   │       │   └── my-information.component.ts
+│   │   │       ├── procesar-cita
+│   │   │       │   ├── procesar-cita.component.css
+│   │   │       │   ├── procesar-cita.component.html
+│   │   │       │   └── procesar-cita.component.ts
+│   │   │       ├── recovery-password
+│   │   │       │   ├── recovery-password.component.css
+│   │   │       │   ├── recovery-password.component.html
+│   │   │       │   └── recovery-password.component.ts
+│   │   │       ├── reportes
+│   │   │       │   ├── reportes.component.css
+│   │   │       │   ├── reportes.component.html
+│   │   │       │   └── reportes.component.ts
+│   │   │       ├── reservar-cancha
+│   │   │       │   ├── reservar-cancha.component.css
+│   │   │       │   ├── reservar-cancha.component.html
+│   │   │       │   └── reservar-cancha.component.ts
+│   │   │       ├── see-admins
+│   │   │       │   ├── see-admins.component.css
+│   │   │       │   ├── see-admins.component.html
+│   │   │       │   └── see-admins.component.ts
+│   │   │       ├── see-courts
+│   │   │       │   ├── see-courts.component.css
+│   │   │       │   ├── see-courts.component.html
+│   │   │       │   └── see-courts.component.ts
+│   │   │       ├── see-employees
+│   │   │       │   ├── see-employees.component.css
+│   │   │       │   ├── see-employees.component.html
+│   │   │       │   └── see-employees.component.ts
+│   │   │       ├── see-roles
+│   │   │       │   ├── see-roles.component.css
+│   │   │       │   ├── see-roles.component.html
+│   │   │       │   └── see-roles.component.ts
+│   │   │       ├── see-servicios
+│   │   │       │   ├── see-servicios.component.css
+│   │   │       │   ├── see-servicios.component.html
+│   │   │       │   └── see-servicios.component.ts
+│   │   │       └── see-users
+│   │   │           ├── see-users.component.css
+│   │   │           ├── see-users.component.html
+│   │   │           └── see-users.component.ts
+│   │   ├── environments
+│   │   │   ├── environment.development.ts
+│   │   │   ├── environment.example.ts
+│   │   │   └── environment.ts
+│   │   ├── index.html
+│   │   ├── main.ts
+│   │   └── styles.css
+│   ├── tailwind.config.js
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   └── tsconfig.spec.json
+├── estructura_proyecto.txt
+├── Jenkinsfile
+├── JenkinsFileUnix
+└── README.md
+
+115 directories, 364 files

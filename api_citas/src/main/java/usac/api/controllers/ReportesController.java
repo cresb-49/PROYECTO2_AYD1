@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import usac.api.models.dto.ArchivoDTO;
+import usac.api.models.dto.reportes.DisponiblilidadRecursoDTO;
 import usac.api.models.dto.reportes.ReporteClientesFrecuentesDto;
+import usac.api.models.dto.reportes.ReporteDisponibilidadDTO;
 import usac.api.models.dto.reportes.ReporteServiciosDTO;
 import usac.api.models.dto.reportes.ReporteVentasDTO;
 import usac.api.models.request.ReporteExportRequest;
@@ -172,6 +175,13 @@ public class ReportesController {
         }
     }
 
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Reporte generado correctamente",
+                content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ReporteServiciosDTO.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content(mediaType = "application/json"))
+    })
     @PostMapping("/private/restricted/serviciosMasSolicitados")
     public ResponseEntity<?> serviciosMasSolicitados(
             @RequestBody ReporteRequest request
@@ -179,6 +189,27 @@ public class ReportesController {
         try {
             validadorPermiso.verificarPermiso();
             ReporteServiciosDTO data = reporteService.getReporteServicios(request);
+            return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ApiBaseTransformer(HttpStatus.BAD_REQUEST, "Error", null, null, ex.getMessage()).sendResponse();
+        }
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Reporte generado correctamente",
+                content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ReporteDisponibilidadDTO.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/private/restricted/disponiblilidadRecursos")
+    public ResponseEntity<?> disponiblilidadRecursos(
+            @RequestBody ReporteRequest request
+    ) {
+        try {
+            validadorPermiso.verificarPermiso();
+            ReporteDisponibilidadDTO data = reporteService.getReporteDisponibilidad(request);
             return new ApiBaseTransformer(HttpStatus.OK, "OK", data, null, null).sendResponse();
         } catch (Exception ex) {
             ex.printStackTrace();

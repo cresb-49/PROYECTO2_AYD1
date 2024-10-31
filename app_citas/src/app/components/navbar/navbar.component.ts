@@ -27,14 +27,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     logo: ''
   }
 
+  isLoggedIn = false;
+
   navOptions = [
-    { name: 'Inicio', path: '/' },
-    { name: 'Canchas', path: '/canchas' },
-    { name: 'Calendario', path: '/calendar' },
+    { name: 'Inicio', path: '/'},
+    { name: 'Canchas', path: '/canchas',},
+    { name: 'Calendario', path: '/calendar'},
   ];
 
   themeIcon = 'wb_sunny';
-  isLoggedIn = false;
   private authSubscription: Subscription = new Subscription();
 
   constructor(
