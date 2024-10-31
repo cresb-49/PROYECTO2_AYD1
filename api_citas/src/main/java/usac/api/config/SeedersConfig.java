@@ -183,7 +183,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
             // Seeder de usuarios del sistema
             Usuario admin = new Usuario("456123789", "3322114455669",
                     "89456123",
-                    "elrincondelgamer77@gmail.com",
+                    "admin@admin.com",
                     "admin", "admin",
                     "12345");
 
@@ -191,7 +191,7 @@ public class SeedersConfig implements ApplicationListener<ContextRefreshedEvent>
                     "777666555",
                     "1234567891233",
                     "12345678",
-                    "carlosbpac@gmail.com",
+                    "admin2@admin.com",
                     "Carlos",
                     "Pac",
                     "12345");
