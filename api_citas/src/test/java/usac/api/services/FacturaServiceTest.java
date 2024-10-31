@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpHeaders;
-import usac.api.enums.FileHttpMetaData;
 import usac.api.models.Factura;
 import usac.api.models.Reserva;
 import usac.api.models.Usuario;
@@ -130,6 +128,30 @@ class FacturaServiceTest {
         } catch (Exception ex) {
             Logger.getLogger(FacturaServiceTest.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Test
+    void testCrearFacturaReservaYaFacturada() {
+        try {
+            reserva.setFactura(factura);
+            when(reservaService.obtenerReservaPorId(anyLong())).thenReturn(reserva);
+
+            Exception exception = assertThrows(Exception.class, () -> facturaService.crearFactura(factura, reserva.getId()));
+            assertEquals("La reserva ya tiene una factura asociada.", exception.getMessage());
+        } catch (Exception ex) {
+            Logger.getLogger(FacturaServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test
+    void testObtenerFacturaPorIdCliente_FacturaNoEncontrada() {
+        // Configuración del mock para simular que no se encuentra la factura
+        when(facturaRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // Ejecutar y verificar que se lance una excepción con el mensaje esperado
+        Exception exception = assertThrows(Exception.class, () -> facturaService.obtenerFacturaPorIdCliente(1L));
+        assertEquals("Factura no econtrada.", exception.getMessage());
+        verify(facturaRepository, times(1)).findById(1L);
     }
 
 }

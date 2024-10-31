@@ -130,4 +130,18 @@ class EmpleadoServiceTest {
         assertFalse(empleados.isEmpty());
         assertEquals(1, empleados.size());
     }
+
+    @Test
+    void testGetEmpleados_TodosEliminados() {
+
+        when(empleadoRepository.findAll()).thenReturn(
+                List.of(new Empleado()));
+
+        List<Empleado> empleados = empleadoService.getEmpleados();
+
+        // Verificar que la lista de empleados está vacía
+        assertNotNull(empleados);
+        assertFalse(empleados.isEmpty());
+        verify(empleadoRepository, times(1)).findAll();
+    }
 }
