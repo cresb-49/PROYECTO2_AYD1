@@ -11,6 +11,22 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/cresb-49/PROYECTO2_AYD1.git'
             }
         }
+        stage('Run Unit Tests') {
+            steps {
+                dir('api_citas') {
+                    echo 'Running unit tests...'
+                    sh 'mvn test -Dmaven.test.failure.ignore=true'
+                }
+            }
+            post {
+                always {
+                    junit 'api_citas/target/surefire-reports/*.xml' // Publica el reporte de pruebas
+                }
+                failure {
+                    echo "Some tests failed. Check the report for details."
+                }
+            }
+        }
         stage('Build Backend') {
             steps {
                 echo 'Simulating Spring Boot Application build...'
