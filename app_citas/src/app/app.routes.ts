@@ -33,6 +33,7 @@ import { CrearRolComponent } from './views/crear-rol/crear-rol.component';
 import { EditarRolComponent } from './views/editar-rol/editar-rol.component';
 import { ProcesarCitaComponent } from './views/procesar-cita/procesar-cita.component';
 import { ReportesComponent } from './views/reportes/reportes.component';
+import { GraficosComponent } from './views/graficos/graficos.component';
 
 export const routes: Routes = [
   // Rutas que usan el DefaultLayoutComponent
@@ -129,6 +130,9 @@ export const routes: Routes = [
       },
       {
         path: 'reportes', component: ReportesComponent
+      },
+      {
+        path: 'graficos', component: GraficosComponent
       }
     ]
   },
