@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import usac.api.models.Reserva;
+import usac.api.models.dto.reportes.DisponiblilidadRecursoDTO;
 import usac.api.models.dto.reportes.ServicioMasDemandadoDto;
 
 /**
@@ -65,5 +66,80 @@ public interface ReservaRepository extends CrudRepository<Reserva, Long> {
     public List<ServicioMasDemandadoDto> findServiciosMasDemandados(
             @Param("fechaInicio") java.sql.Date fechaInicio,
             @Param("fechaFin") java.sql.Date fechaFin);
+
+    /* @Query("SELECT new usac.api.models.dto.reportes.DisponiblilidadRecursoDTO("
+            + "r.reservador.nombres, r.horaInicio, r.horaFin, r.fechaReservacion, "
+            + "CASE WHEN rc.cancha IS NOT NULL THEN rc.cancha.descripcion "
+            + "WHEN rs.servicio IS NOT NULL THEN rs.empleado.usuario.nombres "
+            + "END) "
+            + "FROM Reserva r "
+            + "LEFT JOIN r.reservaCancha rc "
+            + "LEFT JOIN r.reservaServicio rs "
+            + "WHERE (:fechaInicio IS NULL OR r.fechaReservacion >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR r.fechaReservacion <= :fechaFin) "
+            + "ORDER BY CASE WHEN rc.cancha IS NOT NULL THEN rc.cancha.id "
+            + "WHEN rs.empleado IS NOT NULL THEN rs.empleado.id "
+            + "END ASC")*/
+    @Query("SELECT new usac.api.models.dto.reportes.DisponiblilidadRecursoDTO("
+            + "u.nombres, "
+            + "r.horaInicio, "
+            + "r.horaFin, "
+            + "r.fechaReservacion, "
+            + "CASE "
+            + "WHEN rc.cancha IS NOT NULL THEN c.descripcion "
+            + "WHEN rs.servicio IS NOT NULL THEN s.nombre "
+            + "ELSE 'No asignado' "
+            + "END) "
+            + "FROM Reserva r "
+            + "LEFT JOIN r.reservaCancha rc "
+            + "LEFT JOIN rc.cancha c "
+            + "LEFT JOIN r.reservaServicio rs "
+            + "LEFT JOIN rs.servicio s "
+            + "LEFT JOIN r.reservador u "
+            + "WHERE (rc.cancha IS NOT NULL OR rs.servicio IS NOT NULL) "
+            + "AND (:fechaInicio IS NULL OR r.fechaReservacion >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR r.fechaReservacion <= :fechaFin) "
+            + "ORDER BY "
+            + "CASE "
+            + "WHEN rc.cancha IS NOT NULL THEN c.id "
+            + "WHEN rs.servicio IS NOT NULL THEN s.id "
+            + "END ASC")
+    public List<DisponiblilidadRecursoDTO> findReporteDisponibilidad(
+            @Param("fechaInicio") LocalDate fechaInicio,
+            @Param("fechaFin") LocalDate fechaFin);
+
+    @Query("SELECT new usac.api.models.dto.reportes.DisponiblilidadRecursoDTO("
+            + "u.nombres, "
+            + "r.horaInicio, "
+            + "r.horaFin, "
+            + "r.fechaReservacion, "
+            + "CASE WHEN rs.empleado IS NOT NULL THEN e.usuario.nombres ELSE 'No asignado' END) "
+            + "FROM Reserva r "
+            + "JOIN r.reservaServicio rs "
+            + "JOIN rs.empleado e "
+            + "JOIN r.reservador u "
+            + "WHERE (:fechaInicio IS NULL OR r.fechaReservacion >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR r.fechaReservacion <= :fechaFin) "
+            + "ORDER BY e.id ASC")
+    public List<DisponiblilidadRecursoDTO> findReporteDisponibilidadReservasServicio(
+            @Param("fechaInicio") LocalDate fechaInicio,
+            @Param("fechaFin") LocalDate fechaFin);
+
+    @Query("SELECT new usac.api.models.dto.reportes.DisponiblilidadRecursoDTO("
+            + "u.nombres, "
+            + "r.horaInicio, "
+            + "r.horaFin, "
+            + "r.fechaReservacion, "
+            + "CASE WHEN rc.cancha IS NOT NULL THEN c.descripcion ELSE 'No asignado' END) "
+            + "FROM Reserva r "
+            + "JOIN r.reservaCancha rc "
+            + "JOIN rc.cancha c "
+            + "JOIN r.reservador u "
+            + "WHERE (:fechaInicio IS NULL OR r.fechaReservacion >= :fechaInicio) "
+            + "AND (:fechaFin IS NULL OR r.fechaReservacion <= :fechaFin) "
+            + "ORDER BY c.id ASC")
+    public List<DisponiblilidadRecursoDTO> findReporteDisponibilidadReservasCancha(
+            @Param("fechaInicio") LocalDate fechaInicio,
+            @Param("fechaFin") LocalDate fechaFin);
 
 }

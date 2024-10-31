@@ -33,6 +33,8 @@ public enum PermisoEnum {
             "/api/reporte/private/restricted/exportarReporte"),
     REPORTE_VENTAS("Generar reportes de ventas",
             "/api/reporte/private/restricted/reporteVentas"),
+    REPORTE_DiSPONIBILIDAD_RECURSOS("Generar reportes de la disponibilidad de los recursos",
+            "/api/reporte/private/restricted/disponiblilidadRecursos"),
     REPORTE_CLIENTES("Generar reportes de clientes frecuentes",
             "/api/reporte/private/restricted/reporteClientes"
     );

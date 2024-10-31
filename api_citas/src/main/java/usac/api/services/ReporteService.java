@@ -4,18 +4,22 @@
  */
 package usac.api.services;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import usac.api.enums.FileHttpMetaData;
 import usac.api.models.dto.ArchivoDTO;
+import usac.api.models.dto.reportes.DisponiblilidadRecursoDTO;
 import usac.api.models.dto.reportes.ReporteClientesFrecuentesDto;
+import usac.api.models.dto.reportes.ReporteDisponibilidadDTO;
 import usac.api.models.dto.reportes.ReporteServiciosDTO;
 import usac.api.models.dto.reportes.ReporteVentasDTO;
 import usac.api.models.request.ReporteExportRequest;
 import usac.api.models.request.ReporteRequest;
 import usac.api.reportes.ReporteCientesFrecuentes;
+import usac.api.reportes.ReporteDisponibilidad;
 import usac.api.reportes.ReporteServiciosMasSolicitados;
 import usac.api.reportes.ReporteVentas;
 
@@ -47,6 +51,8 @@ public class ReporteService extends Service {
     private ReporteCientesFrecuentes reporteCientesFrecuentes;
     @Autowired
     private ReporteServiciosMasSolicitados reporteServiciosMasSolicitados;
+    @Autowired
+    private ReporteDisponibilidad reporteDisponibilidad;
 
     /**
      * Exporta un reporte basado en los parámetros recibidos en el request.
@@ -77,6 +83,10 @@ public class ReporteService extends Service {
             }
             case "reporteServicios" -> {
                 reporteBytes = reporteServiciosMasSolicitados.exportarServiciosFrecuentes(req);
+            }
+
+            case "reporteDisponibilidad" -> {
+                reporteBytes = reporteDisponibilidad.exportarReporteDisponiblilidad(req);
             }
             default -> {
                 throw new Exception("Tipo de reporte no válido.");
@@ -124,6 +134,11 @@ public class ReporteService extends Service {
     public ReporteServiciosDTO getReporteServicios(ReporteRequest request) throws Exception {
         validarModelo(request);
         return reporteServiciosMasSolicitados.generarServiciosFrecuentes(request);
+    }
+
+    public ReporteDisponibilidadDTO getReporteDisponibilidad(ReporteRequest request) throws Exception {
+        validarModelo(request);
+        return reporteDisponibilidad.generarReporteDisponiblilidad(request);
     }
 
     /**
