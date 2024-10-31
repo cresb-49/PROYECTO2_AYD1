@@ -32,6 +32,10 @@ export class ReportesComponent implements OnInit {
       titulo: 'Reporte Servicios',
       descripcion: 'Seleccione el rango de fechas para descargar el reporte',
       tipo: 'reporteServicios'
+    },{
+      titulo: 'Reporte Disponibilidad',
+      descripcion: 'Seleccione el rango de fechas para descargar el reporte',
+      tipo: 'reporteDisponibilidad'
     }
   ];
 
