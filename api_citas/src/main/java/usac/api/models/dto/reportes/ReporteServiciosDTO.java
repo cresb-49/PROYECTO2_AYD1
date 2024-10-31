@@ -26,6 +26,9 @@ public class ReporteServiciosDTO {
         this.numeroReservaciones = numeroReservaciones;
     }
 
+    public ReporteServiciosDTO() {
+    }
+
     public List<ServicioMasDemandadoDto> getServicios() {
         return servicios;
     }

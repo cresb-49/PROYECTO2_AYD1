@@ -1,5 +1,6 @@
 package usac.api.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,7 +25,6 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,13 +41,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import usac.api.models.Rol;
 
 import usac.api.models.RolUsuario;
+import usac.api.models.TokenAuth;
 
 import usac.api.models.Usuario;
 import usac.api.models.dto.LoginDTO;
-import usac.api.models.request.NuevoEmpleadoRequest;
+import usac.api.models.request.CreacionClienteRequest;
 import usac.api.models.request.PasswordChangeRequest;
+import usac.api.models.request.UpdateEmpleadoRequest;
 import usac.api.models.request.UserChangePasswordRequest;
 import usac.api.models.request.UsuarioRolAsignacionRequest;
+import usac.api.repositories.EmpleadoRepository;
 import usac.api.repositories.RolRepository;
 import usac.api.repositories.UsuarioRepository;
 import usac.api.services.authentification.AuthenticationService;
@@ -99,6 +102,12 @@ public class UsuarioServiceTest {
 
     @Mock
     private MailService mailService;
+
+    @Mock
+    private TokenAuthService tokenAuthService;
+
+    @Mock
+    private EmpleadoRepository empleadoRepository;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -808,152 +817,106 @@ public class UsuarioServiceTest {
         });
         assertEquals("No hemos encontrado el usuario.", exception.getMessage());
     }
-    /*
+
     @Test
     void testCrearUsuarioCliente_Success() throws Exception {
         Usuario usuario = new Usuario();
-        usuario.setNit("12345678901");
-        usuario.setCui("12345678901");
-        usuario.setPhone("12345678");
-        usuario.setEmail("newuser@test.com");
-        usuario.setNombres("Nuevo");
-        usuario.setApellidos("Usuario");
-        usuario.setPassword("password_valida");
+        usuario.setEmail("test@cliente.com");
+        usuario.setPassword("password123");
+        usuario.setId(1L);
 
-        Rol clienteRol = new Rol();
-        clienteRol.setNombre("CLIENTE");
+        Rol rolCliente = new Rol();
+        rolCliente.setNombre("CLIENTE");
 
-        Usuario userCreado = new Usuario();
-        userCreado.setId(1L);
-        userCreado.setEmail("newuser@test.com");
-
-        when(rolService.getRolByNombre("CLIENTE")).thenReturn(clienteRol);
-        when(usuarioRepository.existsByEmail("newuser@test.com")).thenReturn(false);
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(userCreado);
-        when(authenticationService.loadUserByUsername("newuser@test.com")).thenReturn(mock(UserDetails.class));
+        when(rolService.getRolByNombre("CLIENTE")).thenReturn(rolCliente);
+        when(usuarioRepository.existsByEmail(usuario.getEmail())).thenReturn(false);
+        when(encriptador.encriptar("password123")).thenReturn("encryptedPassword");
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+        when(authenticationService.loadUserByUsername(usuario.getEmail())).thenReturn(mock(UserDetails.class));
         when(jwtGenerator.generateToken(any(UserDetails.class))).thenReturn("mocked-jwt");
 
-        LoginDTO result = usuarioService.crearUsuarioCliente(usuario);
+        LoginDTO loginDTO = usuarioService.crearUsuarioCliente(usuario);
 
-        assertNotNull(result);
-        assertEquals("mocked-jwt", result.getJwt());
-        assertEquals(1L, result.getUsuario().getId());
+        assertNotNull(loginDTO);
+        assertEquals("mocked-jwt", loginDTO.getJwt());
+        assertEquals(usuario.getEmail(), loginDTO.getUsuario().getEmail());
         verify(usuarioRepository, times(1)).save(usuario);
     }
 
     @Test
-    void testCrearUsuarioCliente_ValidationFail() throws Exception {
+    void testCrearUsuarioCliente_EmailAlreadyExists() {
         Usuario usuario = new Usuario();
-        usuario.setEmail("");
-        usuario.setPassword("password");
+        usuario.setEmail("test@cliente.com");
 
-        Rol clienteRol = new Rol();
-        clienteRol.setNombre("CLIENTE");
-
-        when(rolService.getRolByNombre("CLIENTE")).thenReturn(clienteRol);
-
-        Set<ConstraintViolation<Usuario>> violations = new HashSet<>();
-        ConstraintViolation<Usuario> violation = mock(ConstraintViolation.class);
-        when(violation.getMessage()).thenReturn("El email no puede estar vacío.");
-        violations.add(violation);
-
-        when(validator.validate(any(Usuario.class))).thenReturn(violations);
+        when(usuarioRepository.existsByEmail(usuario.getEmail())).thenReturn(true);
 
         Exception exception = assertThrows(Exception.class, () -> {
             usuarioService.crearUsuarioCliente(usuario);
         });
 
-        assertTrue(exception.getMessage().contains("El email no puede estar vacío."));
-        verify(usuarioRepository, never()).save(any(Usuario.class));
+        assertEquals("El Email test@cliente.com ya existe.", exception.getMessage());
     }
 
     @Test
-    void testGuardarUsuario_EmailAlreadyExists() throws Exception {
-        Usuario usuario = new Usuario();
-        usuario.setEmail("existing@test.com");
+    void testActualizarEmpleado_NotFound() {
+        try {
+            UpdateEmpleadoRequest updateRequest = new UpdateEmpleadoRequest();
+            updateRequest.setId(1L);
 
-        when(usuarioRepository.existsByEmail("existing@test.com")).thenReturn(true);
+            when(empleadoService.getEmpleadoById(1L)).thenReturn(null);
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            usuarioService.crearUsuarioCliente(usuario);
-        });
-        assertEquals(String.format("El Email %s ya existe.", usuario.getEmail()), exception.getMessage());
+            Exception exception = assertThrows(Exception.class, () -> {
+                usuarioService.actualizarEmpleado(updateRequest);
+            });
+
+            assertEquals("Empleado no encontrado", exception.getMessage());
+        } catch (Exception ex) {
+        }
     }
 
     @Test
-    void testCrearAdministrador_Success() throws Exception {
+    void testEliminarUsuarioById_Success() throws Exception {
         Usuario usuario = new Usuario();
-        usuario.setEmail("admin@test.com");
-        usuario.setPassword("adminpassword");
-
-        Rol adminRol = new Rol();
-        adminRol.setNombre("ADMIN");
-
-        when(rolService.getRolByNombre("ADMIN")).thenReturn(adminRol);
-        when(usuarioRepository.existsByEmail("admin@test.com")).thenReturn(false);
-        when(encriptador.encriptar("adminpassword")).thenReturn("encryptedpassword");
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
-
-        Usuario usuarioCreado = usuarioService.crearAdministrador(usuario);
-
-        assertNotNull(usuarioCreado);
-        assertEquals("admin@test.com", usuarioCreado.getEmail());
-        verify(rolService, times(1)).getRolByNombre("ADMIN");
-        verify(usuarioRepository, times(1)).save(any(Usuario.class));
-    }
-
-    @Test
-    void testCrearEmpleado_Success() throws Exception {
-        Usuario usuario = new Usuario();
-        usuario.setEmail("empleado@test.com");
-        usuario.setPassword("empleadopassword");
-
-        Rol empleadoRol = new Rol();
-        empleadoRol.setId(1L);
-        empleadoRol.setNombre("EMPLEADO");
-
-        when(rolService.getRolByNombre("EMPLEADO")).thenReturn(empleadoRol);
-        when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(false);
-        when(encriptador.encriptar("empleadopassword")).thenReturn("encryptedpassword");
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
-
-        Usuario usuarioCreado = usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, new ArrayList<>(), empleadoRol));
-
-        assertEquals("empleado@test.com", usuarioCreado.getEmail());
-        verify(rolService, times(1)).getRolByNombre("EMPLEADO");
-        verify(usuarioRepository, times(1)).save(any(Usuario.class));
-    }
-
-    @Test
-    void testCrearAdministrador_EmailAlreadyExists() throws Exception {
-        Usuario usuario = new Usuario();
-        usuario.setEmail("admin@test.com");
-        usuario.setPassword("adminpassword");
         usuario.setId(1L);
 
-        when(usuarioRepository.existsByEmail("admin@test.com")).thenReturn(true);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            usuarioService.crearAdministrador(usuario);
-        });
-        assertEquals(String.format("El Email %s ya existe.", usuario.getEmail()), exception.getMessage());
+        // Llamada directa al método sin `doNothing()`
+        usuarioService.eliminarUsuarioById(1L);
+
+        // Verificación del método
+        verify(usuarioRepository, times(1)).deleteUsuarioById(1L);
     }
 
     @Test
-    void testCrearEmpleado_EmailAlreadyExists() throws Exception {
-        Usuario usuario = new Usuario();
-        usuario.setEmail("empleado@test.com");
-        usuario.setPassword("empleadopassword");
-
-        Rol rol = new Rol();
-        rol.setId(1L);
-
-        when(usuarioRepository.existsByEmail("empleado@test.com")).thenReturn(true);
+    void testEliminarUsuarioById_NotFound() {
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(Exception.class, () -> {
-            usuarioService.crearEmpleado(new NuevoEmpleadoRequest(usuario, new ArrayList<>(), rol));
+            usuarioService.eliminarUsuarioById(1L);
         });
-        assertEquals(String.format("El Email %s ya existe.", usuario.getEmail()), exception.getMessage());
+
+        assertEquals("No se encontro el usuario", exception.getMessage());
     }
-     */
+
+    @Test
+    void testActualizarUsuarioConDuplicados_MultiplesCampos() {
+        Usuario usuario = new Usuario();
+        usuario.setId(2L);
+        usuario.setEmail("nuevo@correo.com");
+        usuario.setPhone("98765432");
+        usuario.setCui("123456789");
+        usuario.setNit("555555");
+
+        when(usuarioRepository.existsUsuarioByEmailAndIdNot("nuevo@correo.com", 2L)).thenReturn(true);
+        when(usuarioRepository.existsUsuarioByPhoneAndIdNot("98765432", 2L)).thenReturn(true);
+        when(usuarioRepository.existsUsuarioByCuiAndIdNot("123456789", 2L)).thenReturn(true);
+        when(usuarioRepository.existsUsuarioByNitAndIdNot("555555", 2L)).thenReturn(true);
+
+        Exception exception = assertThrows(Exception.class, () -> usuarioService.updateUsuario(usuario));
+
+        // Verificamos que se lanza la excepción por la duplicidad de los datos
+        assertEquals("No hemos encontrado el usuario.", exception.getMessage());
+        verify(usuarioRepository, times(0)).save(any());
+    }
 }

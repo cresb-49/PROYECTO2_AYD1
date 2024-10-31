@@ -62,6 +62,9 @@ public class CreacionClienteRequest {
         this.password = password;
     }
 
+    public CreacionClienteRequest() {
+    }
+
     public String getTokenAuth() {
         return tokenAuth;
     }
