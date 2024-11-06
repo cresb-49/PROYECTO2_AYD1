@@ -31,7 +31,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   navOptions = [
     { name: 'Inicio', path: '/'},
-    { name: 'Canchas', path: '/canchas',},
+    // { name: 'Canchas', path: '/canchas',},
     { name: 'Calendario', path: '/calendar'},
   ];
 
